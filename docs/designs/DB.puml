@@ -57,6 +57,9 @@ entity "relation_topic_course" as rtc {
   * topic_id : uuid <<FK>>
   * course_id : uuid <<FK>>
   * seq_no : int
+  ..
+  <<unique>> (course_id, topic_id)
+  <<unique>> (course_id, seq_no)
 }
 
 entity "relation_res_topics" as rrt {
@@ -66,6 +69,8 @@ entity "relation_res_topics" as rrt {
   * topic_id : uuid <<FK>>
   desc : str | None
   timestamp : datetime | None
+  ..
+  <<unique>> (res_id, topic_id)
 }
 
 entity "prerequisites" as prereq {
@@ -74,6 +79,9 @@ entity "prerequisites" as prereq {
   * course_id : uuid <<FK>>
   * prerequisite_id : uuid <<FK>>
   * timestamp : datetime
+  ..
+  <<unique>> (course_id, prerequisite_id)
+  <<check>> course_id <> prerequisite_id
 }
 
 entity "topic_relations" as trel {
@@ -82,6 +90,9 @@ entity "topic_relations" as trel {
   * topic_id : uuid <<FK>>
   * req_topic_id : uuid <<FK>>
   * timestamp : datetime
+  ..
+  <<unique>> (topic_id, req_topic_id)
+  <<check>> topic_id <> req_topic_id
 }
 
 entity "progress" as progress {
