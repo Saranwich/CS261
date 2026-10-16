@@ -1,0 +1,114 @@
+vars: {
+  d2-config: {
+    layout-engine: elk
+  }
+}
+
+CourseView: {
+  shape: class
+  label: "<<view>>\nCourseView"
+  - courseList
+}
+
+CourseViewController: {
+  shape: class
+  label: "<<viewController>>\nCourseViewController"
+  + selectCourse(): void
+  + onBtnPressed(): void
+}
+
+CourseController: {
+  shape: class
+  label: "<<controller>>\nCourseController"
+  +getCourses(): CourseResponseDTO
+}
+
+UserDTO: {
+  shape: class
+  label: "<<model>>\nUserDTO"
+  + studentId
+}
+
+CourseRequestDTO: {
+  shape: class
+  label: "<<model>>\nCourseRequestDTO"
+  + user
+  + courseCode
+}
+
+CourseResponseDTO: {
+  shape: class
+  label: "<<model>>\nCourseResponseDTO"
+  + courses
+}
+
+CourseItem: {
+  shape: class
+  label: "<<model>>\nCourseItem"
+  + courseCode
+  + name
+}
+
+CourseService: {
+  shape: class
+  label: "<<service>>\nCourseService"
+  + getCourses(): List<Course>
+}
+
+Cache: {
+  shape: class
+  label: "<<interface>>\nCache"
+  + get(): Object
+  + set(): void
+}
+
+RedisCache: {
+  shape: class
+  label: "<<cache>>\nRedisCache"
+  + get(): Object
+  + set(): void
+}
+
+CourseRepository: {
+  shape: class
+  label: "<<interface>>\nCourseRepository"
+  + findCourses(): List<Course>
+}
+
+SqlCourseRepository: {
+  shape: class
+  label: "<<repository>>\nSqlCourseRepository"
+  + findCourses(): List<Course>
+}
+
+Course: {
+  shape: class
+  label: "<<entity>>\nCourse"
+  + courseCode
+  + name
+}
+
+
+CourseViewController -> CourseView: "1 .. 1\ncontrols"
+CourseViewController -> CourseController: "* .. 1\nrequests courses from"
+CourseController -> CourseRequestDTO: "1 .. 1\ncreates"
+CourseController -> CourseResponseDTO: "1 .. 1\nreturns"
+CourseController -> CourseService: "1 .. 1\nuses"
+CourseController -> Course: "1 .. *\nconverts to CourseItem"
+CourseRequestDTO -> UserDTO: "1 .. 1\nbelongs to"
+CourseResponseDTO -> CourseItem: "1 .. *\ncontains"
+CourseService -> Cache: "1 .. 1\nchecks first"
+CourseService -> CourseRepository: "1 .. 1\nqueries on cache miss"
+CourseRepository -> Course: "1 .. *\nfinds"
+
+
+RedisCache -> Cache: implements {
+  style.stroke-dash: 3
+  target-arrowhead.shape: triangle
+  target-arrowhead.style.filled: false
+}
+SqlCourseRepository -> CourseRepository: implements {
+  style.stroke-dash: 3
+  target-arrowhead.shape: triangle
+  target-arrowhead.style.filled: false
+}

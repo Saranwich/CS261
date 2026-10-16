@@ -1,5 +1,5 @@
 @startuml DB
-' ER diagram — transcribed from the paper cards
+' ER diagram — transcribed from the paper card
 hide circle
 skinparam linetype ortho
 skinparam roundcorner 6
