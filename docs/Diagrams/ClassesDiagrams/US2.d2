@@ -8,9 +8,8 @@ title: |md
   # UserStory 2 : เข้าสู่ระบบด้วยบัญชี TU
 | {near: top-center}
 
-Views: Views {
-    LoginView: @components/views/loginView.loginView
-}
+ViewContainer: @components/views/viewContainer.viewContainer
+ViewControllerContainer: @components/views/viewControllerContainer.viewControllerContainer
 
 Controllers: Controllers {
     AuthController: @components/controllers/authController.authController
@@ -52,10 +51,13 @@ Services.UserService -> Repositories.UserRepository: "1 .. 1\nuses"
 Services.UserService -> Mappers.UserMapper: "1 .. 1\nuses"
 Repositories.UserRepository -> Entities.User: "1 .. *\nmanages"
 
-Views.LoginView -> Controllers.AuthController: "* .. 1\nsends" {
+ViewContainer -> ViewControllerContainer: uses {
     style.stroke-dash: 3
 }
-Views.LoginView -> DTOs.LoginRequestDTO: creates {
+ViewControllerContainer -> Controllers.AuthController: "* .. 1\nsends" {
+    style.stroke-dash: 3
+}
+ViewControllerContainer -> DTOs.LoginRequestDTO: creates {
     style.stroke-dash: 3
 }
 Controllers.AuthController -> DTOs.LoginRequestDTO: receives {

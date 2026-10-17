@@ -8,9 +8,8 @@ title: |md
   # UserStory 3 : เลือกรายวิชา
 | {near: top-center}
 
-Views: Views {
-    CourseDetailView: @components/views/courseDetailView.courseDetailView
-}
+ViewContainer: @components/views/viewContainer.viewContainer
+ViewControllerContainer: @components/views/viewControllerContainer.viewControllerContainer
 
 Controllers: Controllers {
     CourseController: @components/controllers/courseController.courseController
@@ -61,10 +60,13 @@ Entities.CourseTopic -> Entities.Topic: "* .. 1\nrefers to"
 Entities.Progress -> Entities.ProgressId: "1 .. 1\nhas"
 DTOs.CourseDetailDTO -> DTOs.TopicItemDTO: "1 .. *\ncontains"
 
-Views.CourseDetailView -> Controllers.CourseController: "* .. 1\nsends" {
+ViewContainer -> ViewControllerContainer: uses {
     style.stroke-dash: 3
 }
-Views.CourseDetailView -> Controllers.ProgressController: "* .. 1\nsends" {
+ViewControllerContainer -> Controllers.CourseController: "* .. 1\nsends" {
+    style.stroke-dash: 3
+}
+ViewControllerContainer -> Controllers.ProgressController: "* .. 1\nsends" {
     style.stroke-dash: 3
 }
 Controllers.CourseController -> DTOs.CourseDetailDTO: returns {

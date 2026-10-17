@@ -8,9 +8,8 @@ title: |md
   # UserStory 1 : ดูภาพรวมเพื่อหารายวิชา (skill tree)
 | {near: top-center}
 
-Views: Views {
-    SkillTreeView: @components/views/skillTreeView.skillTreeView
-}
+ViewContainer: @components/views/viewContainer.viewContainer
+ViewControllerContainer: @components/views/viewControllerContainer.viewControllerContainer
 
 Controllers: Controllers {
     CourseController: @components/controllers/courseController.courseController
@@ -51,7 +50,10 @@ Entities.Prerequisite -> Entities.Course: "* .. 1\nprerequisiteId"
 DTOs.SkillTreeDTO -> DTOs.CourseItemDTO: "1 .. *\ncontains"
 DTOs.SkillTreeDTO -> DTOs.PrerequisiteDTO: "1 .. *\ncontains"
 
-Views.SkillTreeView -> Controllers.CourseController: "* .. 1\nsends" {
+ViewContainer -> ViewControllerContainer: uses {
+    style.stroke-dash: 3
+}
+ViewControllerContainer -> Controllers.CourseController: "* .. 1\nsends" {
     style.stroke-dash: 3
 }
 Controllers.CourseController -> DTOs.SkillTreeDTO: returns {

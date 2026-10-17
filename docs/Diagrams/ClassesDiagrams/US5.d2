@@ -8,9 +8,8 @@ title: |md
   # UserStory 5 : ดูภาพรวม progress ทั้งหมด
 | {near: top-center}
 
-Views: Views {
-    ProgressOverviewView: @components/views/progressOverviewView.progressOverviewView
-}
+ViewContainer: @components/views/viewContainer.viewContainer
+ViewControllerContainer: @components/views/viewControllerContainer.viewControllerContainer
 
 Controllers: Controllers {
     ProgressController: @components/controllers/progressController.progressController
@@ -46,7 +45,10 @@ Services.ProgressService -> Mappers.ProgressMapper: "1 .. 1\nuses"
 Repositories.ProgressRepository -> Entities.Progress: "1 .. *\nmanages"
 Entities.Progress -> Entities.ProgressId: "1 .. 1\nhas"
 
-Views.ProgressOverviewView -> Controllers.ProgressController: "* .. 1\nsends" {
+ViewContainer -> ViewControllerContainer: uses {
+    style.stroke-dash: 3
+}
+ViewControllerContainer -> Controllers.ProgressController: "* .. 1\nsends" {
     style.stroke-dash: 3
 }
 Controllers.ProgressController -> DTOs.CourseProgressDTO: returns {

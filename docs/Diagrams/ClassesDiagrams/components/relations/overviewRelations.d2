@@ -1,3 +1,6 @@
+ViewContainer -> ViewControllerContainer: uses {
+    style.stroke-dash: 3
+}
 Controllers.CourseController -> Services.CourseService: "1 .. 1\nuses"
 Services.CourseService -> Repositories.CourseRepository: "1 .. 1\nuses"
 Services.CourseService -> Repositories.PrerequisiteRepository: "1 .. 1\nuses"
@@ -26,13 +29,13 @@ Entities.Progress -> Entities.ProgressId: "1 .. 1\nhas"
 DTOs.CourseDetailDTO -> DTOs.TopicItemDTO: "1 .. *\ncontains"
 Services.ProgressService -> Repositories.TopicRepository: "1 .. 1\nuses"
 Repositories.TopicRepository -> Entities.Topic: "1 .. *\nmanages"
-Views.SkillTreeView -> Controllers.CourseController: "* .. 1\nsends" {
+ViewControllerContainer -> Controllers.CourseController: "* .. 1\nsends" {
     style.stroke-dash: 3
 }
 Controllers.CourseController -> DTOs.SkillTreeDTO: returns {
     style.stroke-dash: 3
 }
-Views.LoginView -> Controllers.AuthController: "* .. 1\nsends" {
+ViewControllerContainer -> Controllers.AuthController: "* .. 1\nsends" {
     style.stroke-dash: 3
 }
 Controllers.AuthController -> DTOs.LoginRequestDTO: receives {
@@ -41,19 +44,13 @@ Controllers.AuthController -> DTOs.LoginRequestDTO: receives {
 Controllers.AuthController -> DTOs.UserDTO: returns {
     style.stroke-dash: 3
 }
-Views.CourseDetailView -> Controllers.CourseController: "* .. 1\nsends" {
-    style.stroke-dash: 3
-}
-Views.CourseDetailView -> Controllers.ProgressController: "* .. 1\nsends" {
+ViewControllerContainer -> Controllers.ProgressController: "* .. 1\nsends" {
     style.stroke-dash: 3
 }
 Controllers.CourseController -> DTOs.CourseDetailDTO: returns {
     style.stroke-dash: 3
 }
 Controllers.ProgressController -> DTOs.ProgressDTO: returns {
-    style.stroke-dash: 3
-}
-Views.ProgressOverviewView -> Controllers.ProgressController: "* .. 1\nsends" {
     style.stroke-dash: 3
 }
 Controllers.ProgressController -> DTOs.CourseProgressDTO: returns {

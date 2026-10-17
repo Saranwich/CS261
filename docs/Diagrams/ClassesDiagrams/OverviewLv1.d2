@@ -8,7 +8,12 @@ title: |md
   # Overview Lv1 : layer ของระบบ (US1–US5)
 | {near: top-center}
 
-Views: "<<view>>\nViews\n(4 classes)"
+ViewContainer: "ViewContainer" {
+    style.stroke-dash: 3
+}
+ViewControllerContainer: "ViewControllerContainer" {
+    style.stroke-dash: 3
+}
 Controllers: "<<@RestController>>\nControllers\n(3 classes)"
 Services: "<<@Service>>\nServices\n(4 classes)"
 Clients: "<<@Component>>\nClients\n(1 class)"
@@ -17,7 +22,10 @@ Repositories: "<<JpaRepository>>\nRepositories\n(6 classes)"
 Entities: "<<@Entity>>\nEntities\n(8 classes)"
 DTOs: "<<record>>\nDTOs\n(12 classes)"
 
-Views -> Controllers: "HTTP / JSON (DTO)" {
+ViewContainer -> ViewControllerContainer: uses {
+    style.stroke-dash: 3
+}
+ViewControllerContainer -> Controllers: "HTTP / JSON (DTO)" {
     style.stroke-dash: 3
 }
 Controllers -> Services: calls

@@ -8,9 +8,8 @@ title: |md
   # UserStory 4 : Checkbox บันทึกว่าเรียน topic แล้ว
 | {near: top-center}
 
-Views: Views {
-    CourseDetailView: @components/views/courseDetailView.courseDetailView
-}
+ViewContainer: @components/views/viewContainer.viewContainer
+ViewControllerContainer: @components/views/viewControllerContainer.viewControllerContainer
 
 Controllers: Controllers {
     ProgressController: @components/controllers/progressController.progressController
@@ -47,7 +46,10 @@ Repositories.ProgressRepository -> Entities.Progress: "1 .. *\nmanages"
 Repositories.TopicRepository -> Entities.Topic: "1 .. *\nmanages"
 Entities.Progress -> Entities.ProgressId: "1 .. 1\nhas"
 
-Views.CourseDetailView -> Controllers.ProgressController: "* .. 1\nsends" {
+ViewContainer -> ViewControllerContainer: uses {
+    style.stroke-dash: 3
+}
+ViewControllerContainer -> Controllers.ProgressController: "* .. 1\nsends" {
     style.stroke-dash: 3
 }
 Controllers.ProgressController -> DTOs.ProgressDTO: returns {
