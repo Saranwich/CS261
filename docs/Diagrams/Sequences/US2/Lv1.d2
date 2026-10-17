@@ -22,7 +22,7 @@ Redis: Redis Container {
     Frontend -> Backend: "POST /auth/login"
     Backend -> TUAPI: ยืนยันตัวตน (HTTPS)
 
-    success: "[ยืนยันผ่าน]" {
+    success: "[ยืนยันผ่าน และเป็นนักศึกษา]" {
         TUAPI -> Backend: ผ่าน + ข้อมูลนักศึกษา (std_id)
         Backend -> Redis: หาข้อมูลผู้ใช้ใน cache ด้วย std_id
 
@@ -46,5 +46,11 @@ Redis: Redis Container {
         TUAPI -> Backend: ไม่ผ่าน
         Backend -> Frontend: "401 Unauthorized"
         Frontend -> CstuStudent: username หรือ password ไม่ถูกต้อง
+    }
+
+    not_student: "[ไม่ใช่นักศึกษา]" {
+        TUAPI -> Backend: ผ่าน แต่ type ไม่ใช่ student
+        Backend -> Frontend: "403 Forbidden"
+        Frontend -> CstuStudent: ระบบนี้สำหรับนักศึกษาเท่านั้น
     }
 }

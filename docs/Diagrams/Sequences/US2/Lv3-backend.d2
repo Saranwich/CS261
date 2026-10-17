@@ -44,7 +44,7 @@ Redis: Redis Container {
         }
 
         cache_miss: "[cache miss]" {
-            UserSvc -> Repository: "findByStdId(response.username())"
+            UserSvc -> Repository: "findByStudentId(response.username())"
             Repository -> UserSvc: Optional<User>
 
             new_user: "[Optional ว่าง]" {
