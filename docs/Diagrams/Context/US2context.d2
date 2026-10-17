@@ -7,13 +7,13 @@ vars: {
 direction: right
 
 cstu_student: CSTU Students
-cstu_student.shape: rectangle
+cstu_student.shape: person
 
 system: 2. ระบบเข้าสู่ระบบ
-system.shape: rectangle
+system.shape: circle
 
 tu_api: TU API
-tu_api.shape: rectangle
+tu_api.shape: person
 
 cstu_student -> system: username + password (บัญชี TU)
 system -> cstu_student: ผลการเข้าสู่ระบบ + session

@@ -10,7 +10,9 @@ Controller: "<<@RestController>>\nAuthController"
 Service: "<<@Service>>\nAuthService"
 UserSvc: "<<@Service>>\nUserService"
 Client: "<<@Component>>\nTuApiClient"
-TUAPI: "<<external>>\nTU API"
+TUAPI: "<<external>>\nTU API" {
+    shape: person
+}
 Mapper: "<<@Component>>\nUserMapper"
 Repository: "<<JpaRepository>>\nUserRepository"
 MySQL: MySQL Container {

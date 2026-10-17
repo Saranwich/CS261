@@ -9,7 +9,9 @@ Controller: ":AuthController"
 Service: ":AuthService"
 UserSvc: ":UserService"
 Client: ":TuApiClient"
-TUAPI: "<<external>>\nTU API"
+TUAPI: "<<external>>\nTU API" {
+    shape: person
+}
 Mapper: ":UserMapper"
 Repository: ":UserRepository"
 Session: ":HttpSession"

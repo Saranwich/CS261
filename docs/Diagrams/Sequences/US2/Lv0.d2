@@ -8,7 +8,9 @@ CstuStudent: CSTU Student {
     shape: person
 }
 System: CSTU Compass
-TUAPI: "<<external>>\nTU API"
+TUAPI: "<<external>>\nTU API" {
+    shape: person
+}
 
 เข้าสู่ระบบ: {
     CstuStudent -> System: กรอก username + password (บัญชี TU)
