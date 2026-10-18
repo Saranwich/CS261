@@ -2,7 +2,7 @@ import './Upperbar.css';
 import { useState, useEffect } from 'react';
 function Upperbar() {
 
-  const [activeTab, setActiveTab] = useState('topic');
+  const [activeTab, setActiveTab] = useState('course');
   const [searchText, setSearchText] = useState('');
   const [student, setStudent] = useState('');
   const studentName = student?.name?.trim() || "";
@@ -25,10 +25,10 @@ function Upperbar() {
       <span className="brand">CSTUCOM</span>
 
       <div className="tabs" role="tablist">
-        <button  className={`tab ${activeTab === 'topic' ? 'active' : ''}`} 
-          onClick={() => setActiveTab('topic')}>รายหัวข้อ</button>
         <button className={`tab ${activeTab === 'course' ? 'active' : ''}`} 
         onClick={() => setActiveTab('course')}>รายวิชา</button>
+        <button  className={`tab ${activeTab === 'topic' ? 'active' : ''}`} 
+          onClick={() => setActiveTab('topic')}>รายหัวข้อ</button>
       </div>
 
      
