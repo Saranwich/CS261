@@ -2,7 +2,7 @@ import './Upperbar.css';
 import { useState, useEffect } from 'react';
 function Upperbar() {
 
-  const [activeTab, setActiveTab] = useState('course');
+  const [activeTab, setActiveTab] = useState('topic');
   const [searchText, setSearchText] = useState('');
   const [student, setStudent] = useState('');
   const studentName = student?.name?.trim() || "";
