@@ -1,11 +1,20 @@
 import React from 'react';
-
+import Rightpage from './Rightpage';
+import Upperbar from '../components/Upperbar';
+import "./Homepage.css";
 function Home() {
   return (
-    <div className="home-container">
-      <h1>ยินดีต้อนรับสู่ หน้าหลัก (Home Page)</h1>
-      <p>นี่คือเนื้อหาเริ่มต้นของเว็บไซต์</p>
-    </div>
+    <>
+      <Upperbar />
+      <div className="homepage">
+        <div className="left-page">
+          <h1>652</h1>
+        </div>
+        <div className="right-page">
+          <Rightpage />
+        </div>
+      </div>
+    </>
   );
 }
 
