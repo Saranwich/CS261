@@ -1,10 +1,11 @@
 import './App.css'
+import Upperbar from './components/Upperbar'
 
 function App() {
 
   return (
     <>
-    <h1>Hello</h1>
+    <Upperbar />
     </>
   )
 }
