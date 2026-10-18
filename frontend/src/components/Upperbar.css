@@ -1,5 +1,5 @@
 
-.nav-container {
+.bar-container {
   display: flex;
   align-items: center;
   justify-content: flex-start;
@@ -138,4 +138,38 @@
 .who small {
   color: #A3A6BC;
   font-size: 11px;
+}
+
+@media (max-width: 820px) {
+  .search-wrap {
+    max-width: 300px;
+  }
+  .who {
+    display: none; 
+  }
+}
+
+
+@media (max-width: 480px) {
+  .bar-container {
+    gap: 6px;
+    padding: 8px 10px;
+  }
+  
+  .tabs {
+    display: none; 
+  }
+  
+  .search-wrap {
+    max-width: 100%; 
+  }
+  
+  .search-btn kbd {
+    display: none; 
+  }
+  
+  .brand {
+    font-size: 12px;
+    padding: 0 4px; 
+  }
 }
