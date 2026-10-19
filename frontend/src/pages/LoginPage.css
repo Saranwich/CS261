@@ -126,6 +126,20 @@
 .cl-input::placeholder { color: var(--muted); opacity: 0.85; }
 .cl-input:focus { box-shadow: 0 0 0 4px rgba(47, 99, 57, 0.18); }
 
+/* error state ของช่อง Student ID */
+.cl-input--error {
+  border-color: #b3261e;
+}
+.cl-input--error:focus {
+  box-shadow: 0 0 0 4px rgba(179, 38, 30, 0.18);
+}
+
+.cl-field-error {
+  margin: 0.4rem 0 0;
+  font-size: 0.75rem;
+  color: #b3261e;
+}
+
 .cl-error {
   margin: 1rem 0 0;
   font-size: 0.75rem;
