@@ -30,7 +30,18 @@ function Rightpage({ selectedCourse, courses = [] }) {
           <span className="detail-dot"></span>
           {selectedCourse.name}
         </h1>
+        {/* ==================================
+    ส่วน: คำอธิบายรายวิชา
+================================== */}
+        <div className="course-description">
+          <div className="description-title">
+            คำอธิบายรายวิชา
+          </div>
 
+          <div className="description-text">
+            {selectedCourse.description}
+          </div>
+        </div>
         <div className="detail-info">
           ใช้ความรู้จาก <strong>{prereqList.length} วิชา</strong> • ต่อยอดไป{" "}
           <strong>{nextList.length} วิชา</strong> • มี{" "}
@@ -41,11 +52,10 @@ function Rightpage({ selectedCourse, courses = [] }) {
           <div
             className="detail-progress-fill"
             style={{
-              width: `${
-                selectedCourse.topics === 0
-                  ? 0
-                  : (selectedCourse.learned / selectedCourse.topics) * 100
-              }%`,
+              width: `${selectedCourse.topics === 0
+                ? 0
+                : (selectedCourse.learned / selectedCourse.topics) * 100
+                }%`,
             }}
           />
         </div>

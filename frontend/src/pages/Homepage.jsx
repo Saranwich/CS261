@@ -12,6 +12,7 @@ const courses = [
     learned: 0,
     prerequisites: [],
     nextCourses: [2, 3],   // ← เพิ่ม
+    description: "รายวิชาแนะนำพื้นฐานด้านวิทยาการคอมพิวเตอร์และแนวคิดสำคัญสำหรับผู้เริ่มต้น",
   },
   {
     id: 2,
@@ -20,6 +21,7 @@ const courses = [
     learned: 0,
     prerequisites: [1],
     nextCourses: [],
+    description: "รายวิชาแนะนำพื้นฐานด้านวิทยาการคอมพิวเตอร์และแนวคิดสำคัญสำหรับผู้เริ่มต้น",
   },
   {
     id: 3,
@@ -28,14 +30,16 @@ const courses = [
     learned: 0,
     prerequisites: [1],    // ← เพิ่ม
     nextCourses: [],
+    description: "รายวิชาแนะนำพื้นฐานด้านวิทยาการคอมพิวเตอร์และแนวคิดสำคัญสำหรับผู้เริ่มต้น",
   },
   {
     id: 4,
     name: "CS100",
     topics: 1,
     learned: 0,
-    prerequisites: [],   
-    nextCourses: [],      
+    prerequisites: [],
+    nextCourses: [],
+    description: "รายวิชาแนะนำพื้นฐานด้านวิทยาการคอมพิวเตอร์และแนวคิดสำคัญสำหรับผู้เริ่มต้น",
   },
 ];
 

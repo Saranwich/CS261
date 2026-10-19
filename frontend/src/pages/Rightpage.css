@@ -309,3 +309,19 @@
   color: #556070;
   font-size: 12px;
 }
+.course-description {
+  margin-top: 16px;
+  margin-bottom: 20px;
+}
+
+.description-title {
+  margin-bottom: 6px;
+  color: #8e96a8;
+  font-size: 12px;
+}
+
+.description-text {
+  color: #d7dbe5;
+  font-size: 14px;
+  line-height: 1.6;
+}
