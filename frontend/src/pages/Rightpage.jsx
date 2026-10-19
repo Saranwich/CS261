@@ -1,222 +1,115 @@
-import { useState } from "react";
 import "./Rightpage.css";
 
-function Rightpage() {
+function Rightpage({ selectedCourse, courses = [] }) {
+  if (selectedCourse === null) {
+    return (
+      <div className="right-page">
+        <div className="empty-course">
+          <h2>โปรดเลือกรายวิชา</h2>
+        </div>
+      </div>
+    );
+  }
 
-  const courses = [
-    {
-      id: 1,
-      name: "Programming Fundamentals",
-      usedFrom: 1,
-      nextCourses: 2,
-      topics: 4,
-    },
-    {
-      id: 2,
-      name: "CS102",
-      usedFrom: 1,
-      nextCourses: 2,
-      topics: 4,
-    },
-  ];
+  // ฟังก์ชันดึงข้อมูลวิชาจาก array ตาม id
+  const getCourseById = (id) => courses.find((c) => c.id === id);
 
+  const prereqList = (selectedCourse.prerequisites || [])
+    .map(getCourseById)
+    .filter(Boolean);
 
-
-
-  const [selectedCourse, setSelectedCourse] = useState(courses[0]);
-
-
-
-  const [isExpanded, setIsExpanded] = useState(true);
-
-
-
-  const prerequisiteCourses = [
-    {
-      id: 1,
-      name: "Discrete Mathematics",
-      progress: "เริ่มแล้ว 0/4 หัวข้อ",
-    },
-  ];
-
-  const nextCourses = [
-    {
-      id: 1,
-      name: "Data Structures",
-      progress: "รู้แล้ว 0/4 หัวข้อ",
-    },
-    {
-      id: 2,
-      name: "Algorithms",
-      progress: "รู้แล้ว 0/4 หัวข้อ",
-    },
-  ];
-
+  const nextList = (selectedCourse.nextCourses || [])
+    .map(getCourseById)
+    .filter(Boolean);
 
   return (
-    <div className="page">
+    <div className="right-page">
+      <div className="course-detail">
+        <div className="detail-label">วิชาที่เลือก</div>
+        <h1 className="detail-title">
+          <span className="detail-dot"></span>
+          {selectedCourse.name}
+        </h1>
 
-      <div className="course-panel">
-
-
-        <div className="course-header">
-
-          <div className="small-title">
-            วิชาที่เลือก
-          </div>
-
-          <h1 className="main-title">
-
-            <span className="status-dot"></span>
-
-            {selectedCourse.name}
-
-          </h1>
-
-          <div className="course-description">
-
-            ใช้ความรู้จาก{" "}
-            <strong>
-              {selectedCourse.usedFrom}
-            </strong>{" "}
-            วิชา · ต่ออยู่ใน{" "}
-            <strong>
-              {selectedCourse.nextCourses}
-            </strong>{" "}
-            วิชา · มี{" "}
-            <strong>
-              {selectedCourse.topics}
-            </strong>{" "}
-            หัวข้อ
-
-          </div>
-
+        <div className="detail-info">
+          ใช้ความรู้จาก <strong>{prereqList.length} วิชา</strong> • ต่อยอดไป{" "}
+          <strong>{nextList.length} วิชา</strong> • มี{" "}
+          <strong>{selectedCourse.topics} หัวข้อ</strong>
         </div>
 
-
-
-        <div className="actions">
-
-          <button className="primary-button">
-            ดูหัวข้อในวิชานี้
-          </button>
-
-          <button
-            className="secondary-button"
-            onClick={() => setSelectedCourse(courses[0])}
-          >
-            ล้าง
-          </button>
-
-          <button
-            className="collapse-button"
-            onClick={() => setIsExpanded(!isExpanded)}
-          >
-            {isExpanded ? "↑" : "↓"}
-          </button>
-
+        <div className="detail-progress">
+          <div
+            className="detail-progress-fill"
+            style={{
+              width: `${
+                selectedCourse.topics === 0
+                  ? 0
+                  : (selectedCourse.learned / selectedCourse.topics) * 100
+              }%`,
+            }}
+          />
         </div>
 
+        <div className="detail-buttons">
+          <button className="primary-button">ดูหัวข้อในวิชานี้</button>
+          <button className="secondary-button">ล้าง</button>
+        </div>
 
-
-        {isExpanded && (
-          <>
-
-            <section className="course-section">
-
-              <div className="section-label">
-                ผ่านตามลำดับ
-              </div>
-
-              <div className="course-list">
-
-                {prerequisiteCourses.map((course) => (
-
-                  <div
-                    className="course-node prerequisite-node"
-                    key={course.id}
-                  >
-
-                    <div className="course-number prerequisite-number">
-                      {course.id}
-                    </div>
-
-                    <div className="course-info">
-
-                      <div className="course-name">
-                        {course.name}
+        {/* ==================================
+            ส่วน: ผ่านตามลำดับ (Prerequisites)
+        ================================== */}
+        <div className="section-block">
+          <div className="section-title">ผ่านตามลำดับ</div>
+          <div className="relation-list">
+            {prereqList.length > 0 ? (
+              prereqList.map((course, index) => (
+                <div key={course.id} className="relation-item-wrapper">
+                  <div className="relation-card prereq-card">
+                    <div className="badge prereq-badge">{index + 1}</div>
+                    <div className="relation-text">
+                      <div className="relation-name">{course.name}</div>
+                      <div className="relation-sub">
+                        รู้แล้ว {course.learned}/{course.topics} หัวข้อ
                       </div>
-
-                      <div className="course-progress">
-                        {course.progress}
-                      </div>
-
                     </div>
-
                   </div>
+                  {index < prereqList.length - 1 && (
+                    <span className="arrow">→</span>
+                  )}
+                </div>
+              ))
+            ) : (
+              <div className="empty-text">- ไม่มีวิชาก่อนหน้า -</div>
+            )}
+          </div>
+        </div>
 
-                ))}
-
-              </div>
-
-            </section>
-
-
-
-            <section className="course-section">
-
-              <div className="section-label">
-                ต่อถัดไป
-              </div>
-
-              <div className="next-course-list">
-
-                {nextCourses.map((course, index) => (
-
-                  <div
-                    className="course-with-arrow"
-                    key={course.id}
-                  >
-
-                    {index > 0 && (
-                      <div className="course-arrow">
-                        →
+        {/* ==================================
+            ส่วน: ต่อยอดไป (Next Courses)
+        ================================== */}
+        <div className="section-block">
+          <div className="section-title">ต่อยอดไป</div>
+          <div className="relation-list">
+            {nextList.length > 0 ? (
+              nextList.map((course, index) => (
+                <div key={course.id} className="relation-item-wrapper">
+                  <div className="relation-card next-card">
+                    <div className="badge next-badge">{index + 1}</div>
+                    <div className="relation-text">
+                      <div className="relation-name">{course.name}</div>
+                      <div className="relation-sub">
+                        รู้แล้ว {course.learned}/{course.topics} หัวข้อ
                       </div>
-                    )}
-
-                    <div className="course-node next-node">
-
-                      <div className="course-number next-number">
-                        {course.id}
-                      </div>
-
-                      <div className="course-info">
-
-                        <div className="course-name">
-                          {course.name}
-                        </div>
-
-                        <div className="course-progress">
-                          {course.progress}
-                        </div>
-
-                      </div>
-
                     </div>
-
                   </div>
-
-                ))}
-
-              </div>
-
-            </section>
-
-          </>
-        )}
-
+                </div>
+              ))
+            ) : (
+              <div className="empty-text">- ไม่มีวิชาต่อยอด -</div>
+            )}
+          </div>
+        </div>
       </div>
-
     </div>
   );
 }
