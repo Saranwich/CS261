@@ -278,3 +278,30 @@
   }
 
 }
+
+/*formattopicbox*/
+/*.course-Id*/
+
+/* CS102 */
+.course-1 {
+  left: 15%;
+  top: 25%;
+}
+
+/* CS111 */
+.course-2 {
+  left: 15%;
+  top: 50%;
+}
+
+/* CS101 */
+.course-3 {
+  left: 40%;
+  top: 25%;
+}
+
+/* CS100 */
+.course-4 {
+  left: 65%;
+  top: 25%;
+}
