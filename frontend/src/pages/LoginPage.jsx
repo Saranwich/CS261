@@ -19,17 +19,8 @@ function CompassIcon({ size = 56 }) {
         stroke="#ffffff"
         strokeLinejoin="round"
       />
-      <path
-        d="M37 18 L31 30 L28 27 Z"
-        fill="#b8d8bd"
-      />
-      <circle
-        cx="28"
-        cy="28"
-        r="1.8"
-        fill="#ffffff"
-      />
-
+      <path d="M37 18 L31 30 L28 27 Z" fill="#b8d8bd" />
+      <circle cx="28" cy="28" r="1.8" fill="#ffffff" />
     </svg>
   );
 }
@@ -41,9 +32,15 @@ export default function LoginPage({ onSubmit }) {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
+  // Student ID ต้องเป็นตัวเลขเท่านั้น (ช่องว่างไม่ถือว่า error จนกว่าจะกด submit)
+  // คำนวณจากค่าที่พิมพ์ จึงหายเองทันทีเมื่อแก้เป็นตัวเลขล้วน
+  const isStudentIdInvalid = studentId !== "" && !/^\d+$/.test(studentId);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+
+    if (isStudentIdInvalid) return; // บล็อกการ submit ถ้ามีตัวอักษรปนอยู่
 
     if (!studentId.trim() || !password) {
       setError("Please enter your Student ID and password.");
@@ -85,14 +82,21 @@ export default function LoginPage({ onSubmit }) {
           </label>
           <input
             id="studentId"
-            className="cl-input"
+            className={`cl-input${isStudentIdInvalid ? " cl-input--error" : ""}`}
             type="text"
             inputMode="numeric"
             autoComplete="username"
             placeholder="Enter Student ID"
             value={studentId}
             onChange={(e) => setStudentId(e.target.value)}
+            aria-invalid={isStudentIdInvalid}
+            aria-describedby={isStudentIdInvalid ? "studentId-error" : undefined}
           />
+          {isStudentIdInvalid && (
+            <p id="studentId-error" className="cl-field-error" role="alert">
+              Student ID must contain numbers only.
+            </p>
+          )}
 
           <div className="cl-label-row">
             <label className="cl-label" htmlFor="password">
@@ -118,7 +122,11 @@ export default function LoginPage({ onSubmit }) {
             </p>
           )}
 
-          <button className="cl-button" type="submit" disabled={loading}>
+          <button
+            className="cl-button"
+            type="submit"
+            disabled={loading || isStudentIdInvalid}
+          >
             {loading ? "Logging in…" : "Log In"}
           </button>
         </form>
