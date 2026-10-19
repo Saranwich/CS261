@@ -10,15 +10,15 @@ const courses = [
     name: "CS102",
     topics: 1,
     learned: 0,
-    prerequisites: [], 
-    nextCourses: [],
+    prerequisites: [],
+    nextCourses: [2, 3],   // ← เพิ่ม
   },
   {
     id: 2,
     name: "CS111",
     topics: 2,
     learned: 0,
-    prerequisites: [1], 
+    prerequisites: [1],
     nextCourses: [],
   },
   {
@@ -26,8 +26,8 @@ const courses = [
     name: "CS101",
     topics: 1,
     learned: 0,
-    prerequisites: [], 
-    nextCourses: [],      
+    prerequisites: [1],    // ← เพิ่ม
+    nextCourses: [],
   },
   {
     id: 4,
