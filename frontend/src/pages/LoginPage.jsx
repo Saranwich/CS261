@@ -10,13 +10,26 @@ function CompassIcon({ size = 56 }) {
       viewBox="0 0 56 56"
       aria-hidden="true"
       className="cl-compass"
+      xmlns="http://www.w3.org/2000/svg"
     >
-      <circle cx="28" cy="28" r="28" fill="currentColor" />
-      {/* needle */}
-      <g transform="rotate(45 28 28)">
-        <rect x="23" y="21" width="10" height="14" rx="2.5" fill="#fff" />
-        <circle cx="28" cy="28" r="2.6" fill="currentColor" />
-      </g>
+      <circle cx="28" cy="28" r="26" fill="currentColor" />
+      <path
+        d="M37 18 L31 30 L19 38 L25 26 Z"
+        fill="#ffffff"
+        stroke="#ffffff"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M37 18 L31 30 L28 27 Z"
+        fill="#b8d8bd"
+      />
+      <circle
+        cx="28"
+        cy="28"
+        r="1.8"
+        fill="#ffffff"
+      />
+
     </svg>
   );
 }
