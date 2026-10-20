@@ -1,7 +1,9 @@
 package com.cs261g7cstu.backend.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public record TuVerifyRequestDTO(
-        String userName,
-        String passWord
+        @JsonProperty("UserName") String userName,
+        @JsonProperty("PassWord") String passWord
 ) {
 }
