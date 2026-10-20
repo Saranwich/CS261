@@ -57,6 +57,7 @@ services:
       REDIS_HOST: redis
       MYSQL_DATABASE: ${MYSQL_DATABASE}
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      TU_API_KEY: ${TU_API_KEY}
     volumes:
       - ./backend/src:/app/src
     depends_on:
@@ -77,6 +78,7 @@ services:
       REDIS_HOST: redis
       MYSQL_DATABASE: ${MYSQL_DATABASE}
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      TU_API_KEY: ${TU_API_KEY}
     depends_on:
       - mysql
       - redis
