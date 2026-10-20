@@ -26,6 +26,19 @@ To get the latest changes from the `dev` branch:
 git switch dev
 git pull origin dev
 ```
+## Profiles
+
+| Profile | Runs |
+|---|---|
+| `dev` | frontend (Vite) + backend (Spring Boot) + MySQL + Redis |
+| `fe-dev` | frontend (Vite) only |
+| `be-dev` | backend (Spring Boot) + MySQL + Redis |
+| `prod` | frontend (Apache) + backend (Tomcat) + MySQL + Redis |
+| `fe-prod` | frontend (Apache) only |
+| `be-prod` | backend (Tomcat) + MySQL + Redis |
+
+Profiles that include the backend need a `.env` file in the project root (see `.env.example`).
+Do not run a `dev` and a `prod` profile at the same time: both use ports `8080`, `3306` and `6379`.
 
 ## 3. Run Frontend in Development Mode
 
@@ -57,7 +70,9 @@ docker compose --profile prod up --build
 
 Open the frontend in your browser:
 
-http://localhost:8080
+http://localhost
+
+Apache forwards `/api` to the backend, so the backend is also reachable at http://localhost/api.
 
 ### Stop Production Mode
 
@@ -123,7 +138,7 @@ Start Docker Desktop and wait until the Docker engine is ready.
 
 ### Port is already in use
 
-Another application may already be using port `5173` or `8080`. Stop the conflicting application before starting the frontend again.
+Another application may already be using port `5173`, `80` or `8080`. Stop the conflicting application before starting the frontend again.
 
 ### Changes do not appear in Development Mode
 
