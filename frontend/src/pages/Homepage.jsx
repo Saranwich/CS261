@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import Rightpage from "./Rightpage";
-import Leftpage from "./leftpage";
+import Rightpage from "../components/Rightpage";
+import Leftpage from "../components/leftpage";
 import Upperbar from "../components/Upperbar";
 import "./Homepage.css";
 // ข้อมูลรายวิชาทั้งหมด
