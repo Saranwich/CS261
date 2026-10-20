@@ -139,3 +139,22 @@
   color: #A3A6BC;
   font-size: 11px;
 }
+
+.logout-btn {
+  height: 32px;
+  padding: 0 12px;
+  border: 1px solid #323548;
+  border-radius: 8px;
+  background-color: #14151B;
+  color: #A3A6BC;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.logout-btn:hover {
+  border-color: #b3261e;
+  color: #ff6b63;
+  background-color: rgba(179, 38, 30, 0.1);
+}

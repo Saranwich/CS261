@@ -1,6 +1,6 @@
 import './Upperbar.css';
 import { useState, useEffect } from 'react';
-function Upperbar() {
+function Upperbar({ onLogout }) {
 
   const [activeTab, setActiveTab] = useState('course');
   const [searchText, setSearchText] = useState('');
@@ -46,6 +46,14 @@ function Upperbar() {
           <small>วิทยาการคอมพิวเตอร์</small>
         </span>
       </div>
+
+      <div className="user" title="ข้อมูลนักศึกษา">
+        ...
+      </div>
+
+      <button className="logout-btn" onClick={onLogout}>
+        ออกจากระบบ
+      </button>
     </nav>
   );
 }
