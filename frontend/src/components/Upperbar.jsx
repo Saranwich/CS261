@@ -1,3 +1,4 @@
+import './Upperbar.css';
 import { useState } from 'react';
 function Upperbar({ onLogout }) {
 
@@ -6,18 +7,6 @@ function Upperbar({ onLogout }) {
   // ข้อมูลนักศึกษาได้มาตอน login (App เก็บไว้ใน localStorage)
   const student = JSON.parse(localStorage.getItem("user") || "null");
   const studentName = student?.displayNameTh?.trim() || "";
-  useEffect(() => {
-  fetch("รอUrl")
-    .then((response) => response.json())
-    .then((data) => {
-      setStudent(data);
-    })
-    .catch((error) => {
-      console.error("เกิดข้อผิดพลาด ไม่สามารถดึงชื่อได้", error);
-    });
-}, []);
-  
-
   
 
   return (
