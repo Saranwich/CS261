@@ -21,6 +21,8 @@ services:
       context: .
       dockerfile: Dockerfile.frontend
       target: production
+    environment:
+      API_PROXY_TARGET: http://backend-prod:8080
     ports:
       - "80:80"
     profiles:
