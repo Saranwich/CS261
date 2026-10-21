@@ -1,11 +1,11 @@
-import './Upperbar.css';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 function Upperbar({ onLogout }) {
 
   const [activeTab, setActiveTab] = useState('course');
   const [searchText, setSearchText] = useState('');
-  const [student, setStudent] = useState('');
-  const studentName = student?.name?.trim() || "";
+  // ข้อมูลนักศึกษาได้มาตอน login (App เก็บไว้ใน localStorage)
+  const student = JSON.parse(localStorage.getItem("user") || "null");
+  const studentName = student?.displayNameTh?.trim() || "";
   useEffect(() => {
   fetch("รอUrl")
     .then((response) => response.json())

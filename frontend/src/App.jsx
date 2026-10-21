@@ -10,15 +10,18 @@ function App() {
   );
 
   const handleLogin = async ({ studentId, password }) => {
-    // TODO: ต่อ API จริงตรงนี้ ถ้า login ไม่ผ่านให้ throw error
-    // เช่น
-    // const res = await fetch("URL_ของคุณ", {
-    //   method: "POST",
-    //   headers: { "Content-Type": "application/json" },
-    //   body: JSON.stringify({ studentId, password }),
-    // });
-    // if (!res.ok) throw new Error("รหัสนักศึกษาหรือรหัสผ่านไม่ถูกต้อง");
+    const res = await fetch("/api/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username: studentId, password }),
+    });
+    // LoginPage เอา error.message ไปแสดงใต้ฟอร์ม
+    if (res.status === 401) throw new Error("Invalid Student ID or password.");
+    if (res.status === 403) throw new Error("Only students can log in.");
+    if (!res.ok) throw new Error("Login failed. Please try again later.");
 
+    // เก็บข้อมูลนักศึกษาไว้ให้ Upperbar ใช้ (session จริงอยู่ใน cookie ที่ browser ถือเอง)
+    localStorage.setItem("user", JSON.stringify(await res.json()));
     localStorage.setItem("isLoggedIn", "true");
     setIsLoggedIn(true);
   };
@@ -26,6 +29,7 @@ function App() {
   // ปุ่ม Logout
   const handleLogout = () => {
     localStorage.removeItem("isLoggedIn");
+    localStorage.removeItem("user");
     setIsLoggedIn(false);
   };
 
