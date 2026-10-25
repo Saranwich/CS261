@@ -1,6 +1,7 @@
 import "./Rightpage.css";
 
-function Rightpage({ selectedCourse, courses = [] }) {
+
+function Rightpage({selectedCourse,courses = [],courseTopics = [],setSelectedCourse,onShowTopics,onSelectTopic,}) {
   if (selectedCourse === null) {
     return (
       <div className="right-page">
@@ -61,10 +62,10 @@ function Rightpage({ selectedCourse, courses = [] }) {
         </div>
 
         <div className="detail-buttons">
-          <button className="primary-button">ดูหัวข้อในวิชานี้</button>
-          <button className="secondary-button">ล้าง</button>
+          <button className="primary-button" onClick={onShowTopics}>ดูหัวข้อในวิชานี้</button>
+          <button className="secondary-button" onClick={() => setSelectedCourse(null)}>ล้าง</button>
         </div>
-
+        
         {/* ==================================
             ส่วน: ผ่านตามลำดับ (Prerequisites)
         ================================== */}
@@ -74,7 +75,7 @@ function Rightpage({ selectedCourse, courses = [] }) {
             {prereqList.length > 0 ? (
               prereqList.map((course, index) => (
                 <div key={course.id} className="relation-item-wrapper">
-                  <div className="relation-card prereq-card">
+                  <div className="relation-card prereq-card" onClick={() => setSelectedCourse(course)}style={{ cursor: "pointer" }}>
                     <div className="badge prereq-badge">{index + 1}</div>
                     <div className="relation-text">
                       <div className="relation-name">{course.name}</div>
@@ -103,7 +104,7 @@ function Rightpage({ selectedCourse, courses = [] }) {
             {nextList.length > 0 ? (
               nextList.map((course, index) => (
                 <div key={course.id} className="relation-item-wrapper">
-                  <div className="relation-card next-card">
+                  <div className="relation-card next-card" onClick={() => setSelectedCourse(course)}style={{ cursor: "pointer" }}>
                     <div className="badge next-badge">{index + 1}</div>
                     <div className="relation-text">
                       <div className="relation-name">{course.name}</div>
