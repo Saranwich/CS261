@@ -120,6 +120,26 @@ function Rightpage({selectedCourse,courses = [],courseTopics = [],setSelectedCou
             )}
           </div>
         </div>
+
+        {/* ==================================
+        ส่วน: หัวข้อในวิชานี้
+        ================================== */}
+        <div className="section-block">
+          <div className="section-title">หัวข้อในวิชานี้</div>
+          <div className="path-list">{courseTopics.length > 0 ? (courseTopics.map((topic) => (
+            <div key={topic.id} className="path-item"onClick={() => onSelectTopic(topic)}style={{ cursor: "pointer" }}>{topic.name}</div>))) : (
+            <div className="empty-text">- ไม่มีหัวข้อ -</div>)}
+          </div>
+        </div>
+
+
+        {/* ==================================
+        ส่วน: แหล่งเรียนวิชานี้
+        ================================== */}
+        <div className="section-block">
+          <div className="section-title">แหล่งเรียนวิชานี้</div>
+          <ResourceList resources={COURSE_RESOURCES[selectedCourse.code] || []} />
+          </div>
       </div>
     </div>
   );
