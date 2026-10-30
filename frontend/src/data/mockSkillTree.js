@@ -167,7 +167,12 @@ export const mockSkillTree = {
     prerequisites: [],
     nextCourses: [],
   })),
-  prerequisites: [],
+  prerequisites: [
+    {
+      courseId: 4,       
+      prerequisiteId: 3 
+    }
+  ],
 };
 
 // หัวข้อที่จำลองว่าเรียนเสร็จแล้ว

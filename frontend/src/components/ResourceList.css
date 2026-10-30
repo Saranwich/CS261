@@ -1,0 +1,115 @@
+
+.resource-list {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  width: 100%;
+  margin-top: 12px;
+}
+
+.resource-list--empty {
+  padding: 14px;
+  border: 1px dashed rgba(151, 164, 191, 0.2);
+  border-radius: 10px;
+  color: #8995ac;
+  font-size: 11px;
+}
+
+.resource-list--empty p {
+  margin: 0;
+}
+
+.resource-card {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid rgba(151, 164, 191, 0.15);
+  border-radius: 11px;
+  color: #edf1fa;
+  background: rgba(25, 31, 46, 0.8);
+  text-decoration: none;
+  transition:
+    border-color 180ms ease,
+    background 180ms ease,
+    transform 180ms ease;
+}
+
+.resource-card:hover {
+  border-color: rgba(139, 154, 255, 0.48);
+  background: rgba(139, 154, 255, 0.07);
+  transform: translateY(-1px);
+}
+
+.resource-card:focus-visible {
+  outline: 2px solid #9ba8ff;
+  outline-offset: 2px;
+}
+
+.resource-card__icon {
+  display: grid;
+  place-items: center;
+  flex: 0 0 35px;
+  width: 35px;
+  height: 35px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.resource-card__icon--video {
+  color: #ff9d9d;
+  background: rgba(255, 100, 100, 0.1);
+}
+
+.resource-card__icon--article {
+  color: #aab5ff;
+  background: rgba(139, 154, 255, 0.1);
+}
+
+.resource-card__icon--document {
+  color: #69dfbd;
+  background: rgba(69, 214, 174, 0.1);
+}
+
+.resource-card__content {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+
+.resource-card__title {
+  color: #e4e9f6;
+  font-size: 11px;
+  font-weight: 650;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.resource-card__description {
+  color: #8995ac;
+  font-size: 10px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.resource-card__label {
+  color: #9ba8ff;
+  font-size: 9px;
+  font-weight: 650;
+}
+
+.resource-card__arrow {
+  flex-shrink: 0;
+  color: #7f8ba3;
+  font-size: 14px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .resource-card {
+    transition: none;
+  }
+}

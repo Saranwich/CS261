@@ -6,6 +6,8 @@ import Topicpage from "../components/Topicpage";
 import TopicDetail from "../components/TopicDetail";
 import { toLookup, toTopicCards } from "../utils/topics";
 import "./Homepage.css";
+import {mockSkillTree,mockCourseDetails,mockDoneTopicIds,} from "../data/mockSkillTree";
+import { USE_MOCK_DATA } from "../config/mockConfig";
 
 // ========================================
 // แปลงข้อมูลจาก backend ให้เป็นรูปแบบที่ Leftpage / Rightpage ใช้อยู่แล้ว
@@ -93,6 +95,15 @@ function Home({ onLogout }) {
   useEffect(() => {
     async function loadAll() {
       try {
+
+        if (USE_MOCK_DATA) {
+          setTree(mockSkillTree);
+          setCourseDetails(mockCourseDetails);
+          setDoneTopicIds(mockDoneTopicIds);
+          setLoadError(null);
+          return;
+        }
+
         // 1) หัวข้อที่เรารู้แล้ว (ต้อง login — browser แนบ cookie ให้เอง)
         const progressResponse = await fetch("/api/progress");
 

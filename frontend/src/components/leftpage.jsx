@@ -2,6 +2,15 @@ import { useRef, useState, useLayoutEffect } from "react";
 import "./leftpage.css";
 
 function Leftpage({ courses, selectedCourse, setSelectedCourse }) {
+  console.log(
+    "Course prerequisites:",
+    courses.map((course) => ({
+      code: course.code,
+      id: course.id,
+      prerequisites: course.prerequisites
+    }))
+  );
+
   const mapRef = useRef(null);
   const cardRefs = useRef({});
   const [lines, setLines] = useState([]);
