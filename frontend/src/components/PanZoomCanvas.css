@@ -1,0 +1,22 @@
+/* กำหนดพื้นที่แสดงผืนผ้าใบ และซ่อนส่วนที่เลื่อนออกนอกกรอบ */
+.pan-zoom-viewport {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  touch-action: none;
+}
+
+/* จัดวางเนื้อหาให้เลื่อนและซูมได้ โดยเริ่มลากจากจุดมุมซ้ายบน */
+.pan-zoom-content {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: top left;
+  cursor: grab;
+}
+
+/* เปลี่ยนตัวชี้เมาส์ขณะกำลังลากผืนผ้าใบ */
+.pan-zoom-viewport.dragging .pan-zoom-content {
+  cursor: grabbing;
+}

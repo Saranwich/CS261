@@ -234,10 +234,18 @@
   padding-bottom: 8px;
 }
 
+/* ทำให้รายการวิชาก่อนหน้าและวิชาต่อยอดคลิกเลือกได้ โดยไม่แสดงกรอบปุ่ม */
 .relation-item-wrapper {
   display: flex;
   align-items: center;
   gap: 10px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
 }
 
 .arrow {
@@ -324,4 +332,52 @@
   color: #d7dbe5;
   font-size: 14px;
   line-height: 1.6;
+}
+
+.topic-resources {
+  margin-top: 20px;
+}
+
+/* จัดรายการแหล่งเรียนเป็นแถวและขึ้นบรรทัดใหม่เมื่อพื้นที่ไม่พอ */
+.topic-resource-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+/* แสดงแต่ละแหล่งเรียนเป็นลิงก์การ์ด พร้อมเอฟเฟกต์เมื่อชี้หรือโฟกัส */
+.topic-resource-link {
+  display: flex;
+  flex: 1 1 190px;
+  flex-direction: column;
+  gap: 5px;
+  padding: 12px 14px;
+  border: 1px solid #363d4c;
+  border-radius: 9px;
+  background: #10141d;
+  color: #ffffff;
+  text-decoration: none;
+  transition: border-color 0.2s, background-color 0.2s;
+}
+
+.topic-resource-link:hover {
+  border-color: #55d7bd;
+  background: #222631;
+}
+
+.topic-resource-link:focus-visible {
+  outline: 2px solid #55d7bd;
+  outline-offset: 2px;
+}
+
+.topic-resource-title {
+  color: #55d7bd;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* แยกคำอธิบายแหล่งเรียนออกจากชื่อด้วยสีและขนาดตัวอักษร */
+.topic-resource-description {
+  color: #8b93a3;
+  font-size: 12px;
 }

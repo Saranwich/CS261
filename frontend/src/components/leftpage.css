@@ -8,8 +8,6 @@
 ======================================== */
 
 .course-map {
-  position: relative;
-
   width: 100%;
   height: 100%;
 
@@ -178,44 +176,10 @@
 
 
 /* ========================================
-   ตำแหน่งวิชา
-======================================== */
-/*formattopicbox*/
-/*.course-Id*/
-.course-1 {
-  left: 15%;
-  top: 25%;
-}
-
-/* CS111 */
-.course-2 {
-  left: 15%;
-  top: 50%;
-}
-
-/* CS101 */
-.course-3 {
-  left: 40%;
-  top: 25%;
-}
-
-/* CS100 */
-.course-4 {
-  left: 65%;
-  top: 25%;
-}
-
-
-/* ========================================
    Responsive
 ======================================== */
 
 @media (max-width: 1100px) {
-
-  .course-card {
-    width: 210px;
-  }
-
   .course-name {
     font-size: 12px;
   }
@@ -224,11 +188,6 @@
 
 
 @media (max-width: 850px) {
-
-  .course-card {
-    width: 180px;
-  }
-
   .course-name {
     font-size: 11px;
   }
@@ -243,6 +202,7 @@
    เส้นเชื่อมรายวิชา
 ======================================== */
 
+/* วางเส้นไว้ใต้การ์ด และไม่ให้เส้นขวางการคลิกเลือกวิชา */
 .course-lines {
   position: absolute;
   inset: 0;
@@ -252,13 +212,22 @@
   z-index: 1;            /* อยู่ใต้การ์ด (z-index: 2) */
 }
 
+/* เส้นปกติใช้ความหนาน้อย เพื่อให้เห็นลำดับวิชาโดยไม่แย่งความสนใจ */
 .course-line {
   fill: none;
   stroke: #435066;
-  stroke-width: 2;
-  transition: stroke 0.15s ease;
+  stroke-width: 1.5;
+  transition: stroke 0.15s ease, stroke-width 0.15s ease;
 }
 
+/* เน้นเส้นที่เชื่อมกับวิชาที่เลือก */
 .course-line.active {
-  stroke: #e5a92e;       /* ไฮไลต์เส้นของวิชาที่เลือก */
+  stroke: #e5a92e;
+  stroke-width: 3;
+}
+
+/* ขณะชี้การ์ด ให้เส้นที่เกี่ยวข้องเด่นกว่าเส้นสถานะอื่น */
+.course-line.hovered {
+  stroke: #55d7bd;
+  stroke-width: 4.5;
 }
