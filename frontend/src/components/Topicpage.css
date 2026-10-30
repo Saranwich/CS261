@@ -1,0 +1,465 @@
+
+.topic-page {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  color: #edf1fa;
+  background: #0d1018;
+  font-family: Inter, "Noto Sans Thai", sans-serif;
+}
+
+/* ==============================
+   Header
+================================ */
+
+.topic-page__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 22px 26px 18px;
+  border-bottom: 1px solid rgba(151, 164, 191, 0.12);
+  background: rgba(16, 20, 31, 0.96);
+  flex-shrink: 0;
+}
+
+.topic-page__eyebrow {
+  margin: 0 0 6px;
+  color: #8b9aff;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 2px;
+}
+
+.topic-page__title {
+  margin: 0;
+  color: #f4f6ff;
+  font-size: 23px;
+  font-weight: 750;
+  letter-spacing: -0.6px;
+}
+
+.topic-page__subtitle {
+  margin: 7px 0 0;
+  color: #8e99af;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.topic-page__legend {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.topic-page__legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: #a8b1c5;
+  font-size: 10px;
+  white-space: nowrap;
+}
+
+.topic-page__legend-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.topic-page__legend-dot--done {
+  background: #45d6ae;
+  box-shadow: 0 0 8px rgba(69, 214, 174, 0.35);
+}
+
+.topic-page__legend-dot--selected {
+  background: #8b9aff;
+  box-shadow: 0 0 8px rgba(139, 154, 255, 0.45);
+}
+
+.topic-page__legend-line {
+  display: inline-block;
+  width: 19px;
+  height: 2px;
+  border-radius: 2px;
+  background: #596780;
+}
+
+/* ==============================
+   Canvas
+================================ */
+
+.topic-page__canvas {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.topic-page__panzoom {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+}
+
+/* พื้นที่ที่ใช้จัดวาง Skill Tree */
+.topic-tree {
+  position: relative;
+  isolation: isolate;
+  min-width: 100%;
+  min-height: 100%;
+}
+
+/* ==============================
+   Course groups
+================================ */
+
+.topic-course {
+  position: absolute;
+  z-index: 0;
+  box-sizing: border-box;
+  border: 1px solid rgba(124, 143, 184, 0.2);
+  border-radius: 17px;
+  background: rgba(24, 30, 45, 0.42);
+  pointer-events: none;
+  transition:
+    border-color 180ms ease,
+    background 180ms ease;
+}
+
+.topic-course--selected {
+  border-color: rgba(139, 154, 255, 0.48);
+  background: rgba(76, 91, 151, 0.09);
+}
+
+.topic-course__heading {
+  position: absolute;
+  top: -1px;
+  left: 14px;
+  right: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 35px;
+  padding: 0 4px;
+  border-bottom: 1px solid rgba(124, 143, 184, 0.15);
+}
+
+.topic-course__code {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 7px;
+  border: 1px solid rgba(139, 154, 255, 0.22);
+  border-radius: 6px;
+  color: #aab5ff;
+  background: rgba(104, 119, 215, 0.1);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+}
+
+.topic-course__name {
+  overflow: hidden;
+  color: #aeb9d1;
+  font-size: 11px;
+  font-weight: 650;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ==============================
+   Prerequisite edges
+================================ */
+
+.topic-tree__edges {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  overflow: visible;
+  color: #52617e;
+  pointer-events: none;
+}
+
+.topic-edge {
+  fill: none;
+  stroke: #4b5872;
+  stroke-width: 1.7;
+  stroke-opacity: 0.62;
+  transition:
+    stroke 180ms ease,
+    stroke-opacity 180ms ease,
+    stroke-width 180ms ease;
+}
+
+.topic-edge--active {
+  color: #8b9aff;
+  stroke: #8b9aff;
+  stroke-width: 2.5;
+  stroke-opacity: 1;
+  filter: drop-shadow(0 0 4px rgba(139, 154, 255, 0.22));
+}
+
+/* ==============================
+   Topic nodes
+================================ */
+
+.topic-node {
+  position: absolute;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  box-sizing: border-box;
+  padding: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(126, 143, 179, 0.24);
+  border-radius: 12px;
+  color: #e4e9f6;
+  background: linear-gradient(
+    135deg,
+    rgba(32, 40, 58, 0.98),
+    rgba(23, 29, 44, 0.98)
+  );
+  text-align: left;
+  cursor: pointer;
+  box-shadow: 0 5px 14px rgba(0, 0, 0, 0.13);
+  transition:
+    opacity 180ms ease,
+    border-color 180ms ease,
+    background 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms ease;
+}
+
+.topic-node:hover {
+  z-index: 4;
+  border-color: rgba(139, 154, 255, 0.68);
+  background: linear-gradient(
+    135deg,
+    rgba(43, 53, 79, 0.99),
+    rgba(30, 38, 59, 0.99)
+  );
+  box-shadow: 0 7px 22px rgba(0, 0, 0, 0.22);
+  transform: translateY(-2px);
+}
+
+.topic-node:focus-visible {
+  z-index: 5;
+  outline: 2px solid #a5b0ff;
+  outline-offset: 3px;
+}
+
+.topic-node--done {
+  border-color: rgba(69, 214, 174, 0.34);
+}
+
+.topic-node--done .topic-node__status {
+  color: #45d6ae;
+  background: rgba(69, 214, 174, 0.12);
+}
+
+.topic-node--selected {
+  z-index: 5;
+  border-color: #9ba8ff;
+  background: linear-gradient(
+    135deg,
+    rgba(65, 76, 132, 0.98),
+    rgba(38, 46, 79, 0.98)
+  );
+  box-shadow:
+    0 0 0 1px rgba(139, 154, 255, 0.15),
+    0 0 24px rgba(104, 119, 215, 0.17);
+}
+
+.topic-node--selected .topic-node__status {
+  color: #c1c9ff;
+  background: rgba(139, 154, 255, 0.18);
+}
+
+.topic-node--in-path:not(.topic-node--selected) {
+  border-color: rgba(139, 154, 255, 0.55);
+  background: linear-gradient(
+    135deg,
+    rgba(39, 47, 73, 0.98),
+    rgba(27, 34, 52, 0.98)
+  );
+}
+
+.topic-node--in-path:not(.topic-node--selected) .topic-node__status {
+  color: #aab5ff;
+  background: rgba(139, 154, 255, 0.1);
+}
+
+.topic-node--dimmed {
+  opacity: 0.27;
+}
+
+.topic-node--dimmed:hover {
+  opacity: 0.85;
+}
+
+.topic-node--course-match:not(.topic-node--in-path) {
+  border-color: rgba(126, 143, 179, 0.4);
+}
+
+/* สถานะทางซ้ายของการ์ด */
+.topic-node__status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 27px;
+  width: 27px;
+  height: 27px;
+  border-radius: 8px;
+  color: #8e9bb7;
+  background: rgba(142, 155, 184, 0.09);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+/* ชื่อและข้อมูลหัวข้อ */
+.topic-node__content {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.topic-node__name {
+  display: -webkit-box;
+  overflow: hidden;
+  color: #edf1fa;
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
+
+.topic-node__meta {
+  overflow: hidden;
+  color: #8d9ab6;
+  font-size: 9px;
+  line-height: 1.3;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.topic-node__selected-label {
+  position: absolute;
+  top: 5px;
+  right: 7px;
+  color: #c4cbff;
+  font-size: 7px;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+}
+
+/* ==============================
+   Empty state
+================================ */
+
+.topic-page__empty {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 30px;
+  text-align: center;
+}
+
+.topic-page__empty-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 58px;
+  height: 58px;
+  margin-bottom: 18px;
+  border: 1px solid rgba(139, 154, 255, 0.25);
+  border-radius: 18px;
+  color: #9ba8ff;
+  background: rgba(139, 154, 255, 0.08);
+  font-size: 30px;
+}
+
+.topic-page__empty h3 {
+  margin: 0;
+  color: #e9edf8;
+  font-size: 16px;
+}
+
+.topic-page__empty p {
+  max-width: 340px;
+  margin: 10px 0 0;
+  color: #8995ac;
+  font-size: 12px;
+  line-height: 1.8;
+}
+
+/* ==============================
+   Footer
+================================ */
+
+.topic-page__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  min-height: 39px;
+  box-sizing: border-box;
+  padding: 9px 20px;
+  border-top: 1px solid rgba(151, 164, 191, 0.12);
+  color: #8995ac;
+  background: #10141f;
+  font-size: 10px;
+  flex-shrink: 0;
+}
+
+/* ==============================
+   Responsive
+================================ */
+
+@media (max-width: 900px) {
+  .topic-page__header {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 18px;
+  }
+
+  .topic-page__legend {
+    gap: 12px;
+  }
+
+  .topic-page__title {
+    font-size: 20px;
+  }
+
+  .topic-page__footer {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .topic-node,
+  .topic-edge,
+  .topic-course {
+    transition: none;
+  }
+}

@@ -1,0 +1,1 @@
+import { USE_MOCK_DATA } from "../config/mockConfig";
