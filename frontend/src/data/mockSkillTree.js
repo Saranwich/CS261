@@ -1,4 +1,4 @@
-import TOPIC_PREREQUISITES from "./topicPrerequisites";
+﻿import TOPIC_PREREQUISITES from "./topicPrerequisites";
 
 export const fallbackSkillTree = {
   courses: [
@@ -28,6 +28,10 @@ export const fallbackSkillTree = {
     },
   ],
   prerequisites: [
+    {
+      courseId: "c0000000-0000-0000-0000-000000000101",
+      prerequisiteId: "c0000000-0000-0000-0000-000000000100",
+    },
     {
       courseId: "c0000000-0000-0000-0000-000000000102",
       prerequisiteId: "c0000000-0000-0000-0000-000000000101",

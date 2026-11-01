@@ -23,11 +23,11 @@ import TOPIC_PREREQUISITES from "../data/topicPrerequisites";
 //   }
 // ========================================
 
-export function toTopicCards(courseDetails, doneTopicIds) {
+export function toTopicCards(courseDetails = [], doneTopicIds = []) {
   // 1) สร้างหัวข้อทุกตัว (ยังไม่มีเส้นเชื่อม)
   const topics = [];
-  courseDetails.forEach((course) => {
-    course.topics.forEach((topic) => {
+  (courseDetails || []).forEach((course) => {
+    (course.topics || []).forEach((topic) => {
       topics.push({
         id: topic.id,
         name: topic.name,
@@ -51,78 +51,71 @@ export function toTopicCards(courseDetails, doneTopicIds) {
   });
 
   // 3) ใส่เส้นเชื่อมตาม data/topicPrerequisites.js
-  Object.entries(TOPIC_PREREQUISITES).forEach(([courseCode, topicList]) => {
-    Object.entries(topicList).forEach(([topicName, needList]) => {
-      const topic = topicByFullName[`${courseCode}: ${topicName}`];
-      if (!topic) {
-        console.warn(`topicPrerequisites.js: ไม่เจอหัวข้อ "${courseCode}: ${topicName}"`);
-        return;
-      }
+  if (TOPIC_PREREQUISITES) {
+    Object.entries(TOPIC_PREREQUISITES).forEach(([courseCode, topicList]) => {
+      Object.entries(topicList).forEach(([topicName, needList]) => {
+        const topic = topicByFullName[`${courseCode}: ${topicName}`];
+        if (!topic) return;
 
-      needList.forEach((need) => {
-        // ไม่มีรหัสวิชานำหน้า = หัวข้อในวิชาเดียวกัน
-        const fullName = /^CS\d+: /.test(need) ? need : `${courseCode}: ${need}`;
-        const needTopic = topicByFullName[fullName];
-        if (!needTopic) {
-          console.warn(`topicPrerequisites.js: ไม่เจอหัวข้อ "${fullName}" (ที่ ${courseCode}: ${topicName} ต้องรู้ก่อน)`);
-          return;
-        }
+        needList.forEach((need) => {
+          const fullName = /^CS\d+: /.test(need) ? need : `${courseCode}: ${need}`;
+          const needTopic = topicByFullName[fullName];
+          if (!needTopic) return;
 
-        topic.prerequisites.push(needTopic.id);
-        needTopic.nextTopics.push(topic.id);
+          topic.prerequisites.push(needTopic.id);
+          needTopic.nextTopics.push(topic.id);
+        });
       });
     });
-  });
+  }
 
   // 4) หา depth = ต้องผ่านหัวข้อก่อนหน้ายาวที่สุดกี่ขั้น
   const topicById = toLookup(topics);
   const finished = {};
 
   function depthOf(topic) {
-    if (finished[topic.id]) return topic.depth;
-    finished[topic.id] = true; // ตั้งไว้ก่อน กันวนไม่รู้จบ ถ้าข้อมูลบังเอิญชี้กันเป็นวง
+    if (!topic || !topic.id) return 0;
+    if (finished[topic.id]) return topic.depth || 0;
+    finished[topic.id] = true;
 
-    topic.prerequisites.forEach((preId) => {
-      topic.depth = Math.max(topic.depth, depthOf(topicById[preId]) + 1);
+    (topic.prerequisites || []).forEach((preId) => {
+      const parent = topicById[preId];
+      if (parent) {
+        topic.depth = Math.max(topic.depth || 0, depthOf(parent) + 1);
+      }
     });
-    return topic.depth;
+    return topic.depth || 0;
   }
 
   topics.forEach(depthOf);
   return topics;
 }
 
-
 // { [id]: item } เอาไว้หาของจาก id ได้เร็ว ๆ
-export function toLookup(items) {
+export function toLookup(items = []) {
   const lookup = {};
-  items.forEach((item) => {
-    lookup[item.id] = item;
+  (items || []).forEach((item) => {
+    if (item && item.id != null) {
+      lookup[item.id] = item;
+    }
   });
   return lookup;
 }
 
-
 // ========================================
 // หาหัวข้อทั้งหมดที่ต้องรู้ก่อน (ย้อนไปให้สุดทุกชั้น)
-//
-//   startIds = id หัวข้อที่อยากเรียน (ใส่ได้หลายตัว เช่น ทุกหัวข้อในวิชาเดียว)
-//
-// ตัวอย่าง  Loops → Arrays → Arrays & Dynamic Arrays
-//   findAllPrerequisites(["Arrays & Dynamic Arrays"]) ได้ [Loops, Arrays, ...]
-//
-// ผลลัพธ์ = หัวข้อเรียงจาก "พื้นฐานสุด" ไป "ใกล้หัวข้อที่อยากเรียน"
-//           (ไม่รวมหัวข้อใน startIds เอง)
 // ========================================
 
-export function findAllPrerequisites(startIds, topicById) {
+export function findAllPrerequisites(startIds = [], topicById = {}) {
   const foundIds = [];
   const toVisit = [...startIds];
 
   while (toVisit.length > 0) {
-    const topic = topicById[toVisit.pop()];
+    const curId = toVisit.pop();
+    const topic = topicById[curId];
+    if (!topic) continue;
 
-    topic.prerequisites.forEach((preId) => {
+    (topic.prerequisites || []).forEach((preId) => {
       if (!foundIds.includes(preId)) {
         foundIds.push(preId);
         toVisit.push(preId);
@@ -133,10 +126,11 @@ export function findAllPrerequisites(startIds, topicById) {
   return foundIds
     .filter((id) => !startIds.includes(id))
     .map((id) => topicById[id])
+    .filter(Boolean)
     .sort(
       (a, b) =>
-        a.depth - b.depth ||
-        a.courseCode.localeCompare(b.courseCode) ||
-        a.seqNo - b.seqNo
+        (a.depth || 0) - (b.depth || 0) ||
+        (a.courseCode || "").localeCompare(b.courseCode || "") ||
+        (a.seqNo || 0) - (b.seqNo || 0)
     );
 }

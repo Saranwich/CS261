@@ -1,17 +1,16 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import "./PanZoomCanvas.css";
 
 // ผืนผ้าใบที่รองรับการลากเพื่อเลื่อน และใช้ล้อเมาส์เพื่อซูมเข้า-ออก
-function PanZoomCanvas({ children, width, height }) {
+function PanZoomCanvas({ children, width, height, initialScale = 1, initialX = 0, initialY = 0 }) {
   const viewportRef = useRef(null);
-  // เก็บจุดเริ่มลากไว้โดยไม่ต้องทำให้ React วาดหน้าจอใหม่ทุกครั้งที่เลื่อน
   const dragRef = useRef(null);
-  const [view, setView] = useState({ x: 0, y: 0, scale: 1 });
+  const [view, setView] = useState({ x: initialX, y: initialY, scale: initialScale });
   const [isDragging, setIsDragging] = useState(false);
 
   function handlePointerDown(event) {
     // ไม่เริ่มลากเมื่อคลิกปุ่มการ์ด เพื่อให้ปุ่มยังคลิกเลือกได้ตามปกติ
-    if (event.button !== 0 || event.target.closest("button")) return;
+    if (event.button !== 0 || event.target.closest("button") || event.target.closest("select")) return;
     dragRef.current = {
       pointerId: event.pointerId,
       startX: event.clientX,
@@ -26,7 +25,6 @@ function PanZoomCanvas({ children, width, height }) {
   function handlePointerMove(event) {
     const drag = dragRef.current;
     if (!drag || drag.pointerId !== event.pointerId) return;
-    // เลื่อนตำแหน่งผืนผ้าใบตามระยะที่ลากจากจุดเริ่มต้น
     setView((current) => ({
       ...current,
       x: drag.x + event.clientX - drag.startX,
@@ -49,11 +47,10 @@ function PanZoomCanvas({ children, width, height }) {
     const pointerX = event.clientX - bounds.left;
     const pointerY = event.clientY - bounds.top;
 
-    // จำกัดระดับซูม และคงตำแหน่งใต้เคอร์เซอร์ให้เป็นจุดอ้างอิงขณะซูม
     setView((current) => {
       const scale = Math.min(
         2.5,
-        Math.max(0.5, current.scale * (event.deltaY < 0 ? 1.1 : 0.9))
+        Math.max(0.4, current.scale * (event.deltaY < 0 ? 1.1 : 0.9))
       );
       const ratio = scale / current.scale;
       return {
@@ -77,8 +74,8 @@ function PanZoomCanvas({ children, width, height }) {
       <div
         className="pan-zoom-content"
         style={{
-          width: `${width}px`,
-          height: `${height}px`,
+          width: width ? `${width}px` : "100%",
+          height: height ? `${height}px` : "100%",
           transform: `translate(${view.x}px, ${view.y}px) scale(${view.scale})`,
         }}
       >

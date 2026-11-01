@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+﻿import { useMemo, useState } from "react";
 import PanZoomCanvas from "./PanZoomCanvas";
 import "./leftpage.css";
 
@@ -43,15 +43,30 @@ function Leftpage({ courses = [], selectedCourse, setSelectedCourse }) {
         columns.get(depth).push(course);
       });
 
+      // วางตำแหน่งทุกวิชาก่อน (ยกเว้น CS111)
       const positionsById = new Map();
       columns.forEach((column, depth) => {
-        column.forEach((course, row) => {
+        let row = 0;
+        column.forEach((course) => {
+          if (course.code === "CS111") return;
           positionsById.set(course.id, {
             x: PADDING_X + depth * (CARD_WIDTH + COLUMN_GAP),
             y: PADDING_Y + row * (CARD_HEIGHT + ROW_GAP),
           });
+          row++;
         });
       });
+
+      // วาง CS111 ใต้ CS102
+      const cs102 = courses.find((c) => c.code === "CS102");
+      const cs111 = courses.find((c) => c.code === "CS111");
+      if (cs102 && cs111 && positionsById.has(cs102.id)) {
+        const cs102pos = positionsById.get(cs102.id);
+        positionsById.set(cs111.id, {
+          x: cs102pos.x,
+          y: cs102pos.y + CARD_HEIGHT + ROW_GAP,
+        });
+      }
 
       const positionedCourses = courses.map((course) => ({
         ...course,
@@ -91,14 +106,20 @@ function Leftpage({ courses = [], selectedCourse, setSelectedCourse }) {
           const to = positionsById.get(course.id);
           if (!from || !to) return [];
 
+          // ซ่อนเส้นเชื่อม CS100 -> CS101
+          const cs100id = courses.find((c) => c.code === "CS100")?.id;
+          const cs101id = courses.find((c) => c.code === "CS101")?.id;
+          if (prerequisiteId === cs100id && course.id === cs101id) return [];
+
           return [
             {
               key: `${prerequisiteId}-${course.id}`,
               from: prerequisiteId,
               to: course.id,
-              x1: from.x + CARD_WIDTH,
-              y1: from.y + CARD_HEIGHT / 2,
-              x2: to.x,
+              isVertical: prerequisiteId === courses.find((c) => c.code === "CS102")?.id && course.id === courses.find((c) => c.code === "CS111")?.id,
+              x1: (prerequisiteId === courses.find((c) => c.code === "CS102")?.id && course.id === courses.find((c) => c.code === "CS111")?.id) ? from.x + CARD_WIDTH / 2 : from.x + CARD_WIDTH,
+              y1: (prerequisiteId === courses.find((c) => c.code === "CS102")?.id && course.id === courses.find((c) => c.code === "CS111")?.id) ? from.y + CARD_HEIGHT : from.y + CARD_HEIGHT / 2,
+              x2: (prerequisiteId === courses.find((c) => c.code === "CS102")?.id && course.id === courses.find((c) => c.code === "CS111")?.id) ? to.x + CARD_WIDTH / 2 : to.x,
               y2: to.y + CARD_HEIGHT / 2,
             },
           ];
@@ -128,7 +149,7 @@ function Leftpage({ courses = [], selectedCourse, setSelectedCourse }) {
             return (
               <path
                 key={line.key}
-                d={`M ${line.x1} ${line.y1} C ${midX} ${line.y1}, ${midX} ${line.y2}, ${line.x2} ${line.y2}`}
+                d={`M ${line.x1} ${line.y1} ${line.isVertical ? 'L' : ('C ' + midX + ' ' + line.y1 + ', ' + midX + ' ' + line.y2 + ',')} ${line.x2} ${line.y2}`}
                 className={`course-line ${active ? "active" : ""} ${
                   hovered ? "hovered" : ""
                 }`}

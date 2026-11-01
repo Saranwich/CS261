@@ -5,16 +5,12 @@ import Upperbar from "../components/Upperbar";
 import Topicpage from "../components/Topicpage";
 import TopicDetail from "../components/TopicDetail";
 import { toLookup, toTopicCards } from "../utils/topics";
-// [จุดที่แก้] นำเข้าข้อมูลจำลอง fallback ในกรณีที่ยังไม่ได้เปิด Backend หรือเซิร์ฟเวอร์ออฟไลน์
+// นำเข้าข้อมูลจำลอง fallback ในกรณีที่ยังไม่ได้เปิด Backend หรือไม่มีข้อมูล
 import { fallbackSkillTree, fallbackCourseDetails } from "../data/mockSkillTree";
 import "./Homepage.css";
 
 // ========================================
 // แปลงข้อมูลจาก backend ให้เป็นรูปแบบที่ Leftpage / Rightpage ใช้อยู่แล้ว
-//
-//   tree   = ผลของ GET /api/skill-tree
-//            { courses: [...], prerequisites: [{ courseId, prerequisiteId }] }
-//   topics = หัวข้อทุกตัว (จาก toTopicCards ใน utils/topics.js) เอามานับว่ามีกี่หัวข้อ รู้แล้วกี่หัวข้อ
 // ========================================
 
 function toCourseCards(tree, topics = []) {
@@ -22,7 +18,7 @@ function toCourseCards(tree, topics = []) {
 
   return tree.courses.map((course) => {
     // หัวข้อของวิชานี้
-    const courseTopics = topics.filter((topic) => topic.courseId === course.id);
+    const courseTopics = (topics || []).filter((topic) => topic.courseId === course.id);
 
     // วิชาที่ต้องผ่านก่อนวิชานี้
     const prerequisites = (tree.prerequisites || [])
@@ -48,15 +44,9 @@ function toCourseCards(tree, topics = []) {
 }
 
 function Home({ onLogout }) {
-  // ========================================
-  // [จุดที่แก้] State ข้อมูลจาก backend
-  // - tree: แผนผังวิชา + เส้น prerequisite
-  // - courseDetails: รายละเอียด + หัวข้อย่อยของทุกวิชา
-  // - doneTopicIds: id ของหัวข้อที่เรียนรู้แล้ว (อ่านจาก localStorage ก่อนเพื่อให้คงสถานะไว้ได้)
-  // ========================================
-
-  const [tree, setTree] = useState(null);
-  const [courseDetails, setCourseDetails] = useState([]);
+  // เริ่มต้นด้วย fallbackSkillTree ทันที เพื่อป้องกันหน้าจอว่างเปล่า
+  const [tree, setTree] = useState(fallbackSkillTree);
+  const [courseDetails, setCourseDetails] = useState(fallbackCourseDetails);
   const [doneTopicIds, setDoneTopicIds] = useState(() => {
     try {
       const saved = localStorage.getItem("learnedTopicIds");
@@ -76,7 +66,7 @@ function Home({ onLogout }) {
   const [activeTab, setActiveTab] = useState("course");
 
   // ========================================
-  // [จุดที่แก้] โหลดข้อมูลจาก Backend API ตอนเปิดหน้าเว็บ
+  // โหลดข้อมูลจาก Backend API ตอนเปิดหน้าเว็บ
   // ========================================
 
   useEffect(() => {
@@ -92,7 +82,7 @@ function Home({ onLogout }) {
             progressList = await progressResponse.json();
           }
         } catch (err) {
-          console.warn("ไม่สามารถดึง progress จาก backend ได้ (ใช้ข้อมูล local แทน):", err);
+          console.warn("ไม่สามารถดึง progress จาก backend ได้:", err);
         }
 
         // 2) แผนผังวิชาจาก GET /api/skill-tree
@@ -103,6 +93,15 @@ function Home({ onLogout }) {
         }
 
         const treeData = await treeResponse.json();
+
+        if (!treeData.courses || treeData.courses.length === 0) {
+          // ถ้า backend ส่งวิชาว่าง ให้ใช้ fallback
+          if (isMounted) {
+            setTree(fallbackSkillTree);
+            setCourseDetails(fallbackCourseDetails);
+          }
+          return;
+        }
 
         // 3) ดึงรายละเอียดและหัวข้อของทุกวิชาจาก GET /api/courses/{id} พร้อมกัน
         const details = await Promise.all(
@@ -123,8 +122,7 @@ function Home({ onLogout }) {
           }
         }
       } catch (error) {
-        // [จุดที่แก้] ถ้าติดต่อ backend ไม่ได้ ให้ใช้ fallback data แทนเพื่อไม่ให้หน้าจอพัง
-        console.warn("โหลดข้อมูลจาก backend ไม่สำเร็จ ใช้ข้อมูลจำลอง (fallback data) ชั่วคราว:", error);
+        console.warn("โหลดข้อมูลจาก backend ไม่สำเร็จ ใช้ข้อมูลจำลอง (fallback data):", error);
         if (isMounted) {
           setTree(fallbackSkillTree);
           setCourseDetails(fallbackCourseDetails);
@@ -140,7 +138,7 @@ function Home({ onLogout }) {
     };
   }, []);
 
-  // [จุดที่แก้] ซิงค์หัวข้อที่รู้แล้วลง localStorage
+  // ซิงค์หัวข้อที่รู้แล้วลง localStorage
   useEffect(() => {
     try {
       localStorage.setItem("learnedTopicIds", JSON.stringify(doneTopicIds));
@@ -169,22 +167,17 @@ function Home({ onLogout }) {
     setActiveTab("topic");
   }
 
-  // ========================================
-  // [จุดที่แก้] บันทึกความก้าวหน้า "รู้แล้ว" / "ยังไม่รู้"
-  // PUT /api/progress/topics/{topicId} หรือ DELETE
-  // ========================================
-
+  // บันทึกความก้าวหน้า "รู้แล้ว" / "ยังไม่รู้"
   async function toggleTopicDone(topicId) {
     const isDone = doneTopicIds.includes(topicId);
 
-    // อัปเดตที่หน้าบ้านทันทีเพื่อให้ UI ตอบสนองแบบ Optimistic UI
+    // Optimistic update
     if (isDone) {
       setDoneTopicIds((prev) => prev.filter((id) => id !== topicId));
     } else {
       setDoneTopicIds((prev) => [...prev, topicId]);
     }
 
-    // ส่งคำขอไปยัง Backend
     try {
       const response = await fetch(`/api/progress/topics/${topicId}`, {
         method: isDone ? "DELETE" : "PUT",
@@ -195,7 +188,7 @@ function Home({ onLogout }) {
         return;
       }
     } catch (err) {
-      console.warn("ไม่สามารถ sync progress ไปยัง backend ได้ (บันทึกไว้ใน browser):", err);
+      console.warn("ไม่สามารถ sync progress ไปยัง backend:", err);
     }
   }
 
@@ -232,7 +225,6 @@ function Home({ onLogout }) {
 
   return (
     <>
-      {/* [จุดที่แก้] ส่ง activeTab, setActiveTab และข้อมูล courses, topics ให้ Upperbar */}
       <Upperbar
         onLogout={onLogout}
         activeTab={activeTab}
