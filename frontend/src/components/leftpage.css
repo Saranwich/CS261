@@ -2,152 +2,120 @@
   box-sizing: border-box;
 }
 
-
 /* ========================================
-   พื้นที่แผนผัง
+   พื้นที่แผนผังรายวิชา (สไตล์เดียวกับ Topicpage)
 ======================================== */
 
 .course-map {
+  position: relative;
   width: 100%;
   height: 100%;
-
   overflow: hidden;
-
+  color: #edf1fa;
   background: #0d1018;
-
-  background-image:
-    radial-gradient(
-      #252b38 1px,
-      transparent 1px
-    );
-
+  background-image: radial-gradient(
+    rgba(139, 154, 255, 0.12) 1px,
+    transparent 1px
+  );
   background-size: 18px 18px;
+  font-family: Inter, "Noto Sans Thai", sans-serif;
 }
 
-
 /* ========================================
-   กล่องรายวิชา
+   กล่องรายวิชา (Node Card)
 ======================================== */
 
 .course-card {
   position: absolute;
-
   width: 240px;
   height: 84px;
-
-  padding: 14px;
-
-  border: 1px solid #293344;
-
-  border-radius: 13px;
-
-  background: #141925;
-
-  color: white;
-
+  padding: 13px 15px;
+  border: 1px solid rgba(126, 143, 179, 0.24);
+  border-radius: 14px;
+  background: linear-gradient(
+    135deg,
+    rgba(32, 40, 58, 0.98),
+    rgba(23, 29, 44, 0.98)
+  );
+  color: #e4e9f6;
   text-align: left;
-
   cursor: pointer;
-
   z-index: 2;
-
+  box-shadow: 0 5px 14px rgba(0, 0, 0, 0.22);
   transition:
-    transform 0.15s ease,
-    border-color 0.15s ease,
-    box-shadow 0.15s ease;
+    transform 0.18s ease,
+    border-color 0.18s ease,
+    background 0.18s ease,
+    box-shadow 0.18s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
-
-/* ========================================
-   Hover
-======================================== */
-
+/* Hover */
 .course-card:hover {
   transform: translateY(-2px);
-
-  border-color: #435066;
-
-  box-shadow:
-    0 8px 20px
-    rgba(0, 0, 0, 0.3);
+  border-color: rgba(139, 154, 255, 0.68);
+  background: linear-gradient(
+    135deg,
+    rgba(38, 48, 70, 0.98),
+    rgba(27, 34, 52, 0.98)
+  );
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
+  z-index: 4;
 }
 
-
-/* ========================================
-   วิชาที่เลือก
-======================================== */
-
+/* วิชาที่เลือก */
 .course-card.selected {
-  border: 2px solid #e5a92e;
-
+  border-color: #8b9aff;
   box-shadow:
-    0 0 0 3px
-    rgba(229, 169, 46, 0.15);
+    0 0 0 1px #8b9aff,
+    0 10px 24px rgba(45, 59, 133, 0.45);
+  z-index: 5;
 }
 
-
 /* ========================================
-   ส่วนหัว
+   ส่วนหัวของการ์ด
 ======================================== */
 
 .course-card-header {
   display: flex;
-
   align-items: center;
-
   gap: 8px;
-
-  margin-bottom: 9px;
 }
 
-
-/* ========================================
-   จุดหน้าชื่อวิชา
-======================================== */
-
+/* จุดสถานะ */
 .course-dot {
-  width: 9px;
-  height: 9px;
-
+  width: 8px;
+  height: 8px;
   flex-shrink: 0;
-
-  border-radius: 2px;
-
-  background: #55d7bd;
+  border-radius: 50%;
+  background: #45d6ae;
+  box-shadow: 0 0 8px rgba(69, 214, 174, 0.35);
+  transition: background 0.18s ease, box-shadow 0.18s ease;
 }
 
+.course-card.selected .course-dot {
+  background: #8b9aff;
+  box-shadow: 0 0 8px rgba(139, 154, 255, 0.45);
+}
 
-/* ========================================
-   ชื่อวิชา
-======================================== */
-
+/* ชื่อวิชา */
 .course-name {
-  color: #22C55E;
-
-  font-size: 14px;
-
+  color: #f0f3fc;
+  font-size: 13px;
   font-weight: 700;
-
   white-space: nowrap;
-
   overflow: hidden;
-
   text-overflow: ellipsis;
+  letter-spacing: -0.2px;
 }
 
-
-/* ========================================
-   ข้อมูล
-======================================== */
-
+/* ข้อมูลย่อย */
 .course-info {
-  margin-bottom: 9px;
-
-  color: #7f8999;
-
+  color: #8e9bb4;
   font-size: 11px;
 }
-
 
 /* ========================================
    Progress Bar
@@ -155,25 +123,55 @@
 
 .progress-bar {
   width: 100%;
-
   height: 5px;
-
   border-radius: 10px;
-
-  background: #282f3e;
-
+  background: rgba(151, 164, 191, 0.16);
   overflow: hidden;
 }
 
-
 .progress {
   height: 100%;
-
   border-radius: 10px;
-
-  background: #55d7bd;
+  background: linear-gradient(90deg, #45d6ae, #8b9aff);
+  transition: width 0.3s ease;
 }
 
+/* ========================================
+   เส้นเชื่อมรายวิชา (SVG Edges)
+======================================== */
+
+.course-lines {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.course-line {
+  fill: none;
+  stroke: #4b5872;
+  stroke-width: 1.7;
+  stroke-opacity: 0.62;
+  transition:
+    stroke 180ms ease,
+    stroke-opacity 180ms ease,
+    stroke-width 180ms ease;
+}
+
+.course-line.hovered {
+  stroke: #8b9aff;
+  stroke-opacity: 0.85;
+  stroke-width: 2.2;
+}
+
+.course-line.active {
+  stroke: #8b9aff;
+  stroke-width: 2.8;
+  stroke-opacity: 1;
+  filter: drop-shadow(0 0 6px rgba(139, 154, 255, 0.45));
+}
 
 /* ========================================
    Responsive
@@ -183,9 +181,7 @@
   .course-name {
     font-size: 12px;
   }
-
 }
-
 
 @media (max-width: 850px) {
   .course-name {
@@ -195,39 +191,4 @@
   .course-info {
     font-size: 10px;
   }
-
-}
-
-/* ========================================
-   เส้นเชื่อมรายวิชา
-======================================== */
-
-/* วางเส้นไว้ใต้การ์ด และไม่ให้เส้นขวางการคลิกเลือกวิชา */
-.course-lines {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;  /* ไม่บังการคลิกการ์ด */
-  z-index: 1;            /* อยู่ใต้การ์ด (z-index: 2) */
-}
-
-/* เส้นปกติใช้ความหนาน้อย เพื่อให้เห็นลำดับวิชาโดยไม่แย่งความสนใจ */
-.course-line {
-  fill: none;
-  stroke: #435066;
-  stroke-width: 1.5;
-  transition: stroke 0.15s ease, stroke-width 0.15s ease;
-}
-
-/* เน้นเส้นที่เชื่อมกับวิชาที่เลือก */
-.course-line.active {
-  stroke: #e5a92e;
-  stroke-width: 3;
-}
-
-/* ขณะชี้การ์ด ให้เส้นที่เกี่ยวข้องเด่นกว่าเส้นสถานะอื่น */
-.course-line.hovered {
-  stroke: #55d7bd;
-  stroke-width: 4.5;
 }
