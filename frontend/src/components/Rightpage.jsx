@@ -9,6 +9,7 @@ function Rightpage({
   setSelectedCourse,
   onShowTopics,
   onSelectTopic,
+  onToggleDone,
 }) {
   if (selectedCourse === null) {
     return (
@@ -237,32 +238,56 @@ function Rightpage({
           ) : (
             <ul className="right-page__list">
               {courseTopics.map((topic) => (
-                <li key={topic.id}>
+                <li key={topic.id} className="right-page__topic-item">
+                  {/* ปุ่มซ้าย: คลิกทำเครื่องหมายว่าเรียนแล้ว/ยังไม่เรียนได้ทันที */}
                   <button
                     type="button"
-                    className="right-page__list-button"
-                    onClick={() => onSelectTopic?.(topic)}
+                    className={`right-page__list-status right-page__list-status--clickable ${
+                      topic.done ? "is-done" : ""
+                    }`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onToggleDone?.(topic.id);
+                    }}
+                    title={
+                      topic.done
+                        ? "คลิกเพื่อยกเลิกสถานะเรียนแล้ว"
+                        : "คลิกเพื่อทำเครื่องหมายว่าเรียนแล้ว"
+                    }
+                    aria-label={topic.done ? "เรียนแล้ว" : "ยังไม่เรียน"}
                   >
-                    <span
-                      className={`right-page__list-status ${
-                        topic.done ? "is-done" : ""
-                      }`}
-                    >
-                      {topic.done ? "✓" : "◇"}
-                    </span>
-                    <span className="right-page__list-text">
-                      <strong>{topic.name}</strong>
-                      <small>
-                        {topic.desc || "คลิกเพื่อดูรายละเอียดหัวข้อ"}
-                      </small>
-                    </span>
-                    <span
-                      className={`right-page__badge ${
-                        topic.done ? "is-done" : ""
-                      }`}
-                    >
-                      {topic.done ? "เรียนแล้ว" : "ยังไม่เรียน"}
-                    </span>
+                    {topic.done ? "✓" : "◇"}
+                  </button>
+
+                  {/* ตรงกลาง: คลิกเพื่อเข้าไปดูรายละเอียดหัวข้อ */}
+                  <div
+                    className="right-page__list-text right-page__list-text--clickable"
+                    onClick={() => onSelectTopic?.(topic)}
+                    title="คลิกเพื่อดูรายละเอียดหัวข้อนี้"
+                  >
+                    <strong>{topic.name}</strong>
+                    <small>
+                      {topic.desc || "คลิกเพื่อดูรายละเอียดหัวข้อ"}
+                    </small>
+                  </div>
+
+                  {/* ปุ่ม Badge ขวา: คลิกเปลี่ยนสถานะได้ทันทีโดยไม่ต้องเปิดหน้ารายละเอียด */}
+                  <button
+                    type="button"
+                    className={`right-page__badge-btn ${
+                      topic.done ? "is-done" : ""
+                    }`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onToggleDone?.(topic.id);
+                    }}
+                    title={
+                      topic.done
+                        ? "คลิกเพื่อยกเลิกสถานะเรียนแล้ว"
+                        : "คลิกเพื่อทำเครื่องหมายว่าเรียนแล้ว"
+                    }
+                  >
+                    {topic.done ? "✓ เรียนแล้ว" : "+ ยังไม่เรียน"}
                   </button>
                 </li>
               ))}

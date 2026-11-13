@@ -365,6 +365,89 @@
   background: rgba(69, 214, 174, 0.1);
 }
 
+/* ========================================
+   Interactive Topic Row Items
+======================================== */
+
+.right-page__topic-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-width: 0;
+  padding: 10px 12px;
+  border: 1px solid rgba(151, 164, 191, 0.13);
+  border-radius: 10px;
+  background: rgba(25, 31, 46, 0.8);
+  transition: all 180ms ease;
+}
+
+.right-page__topic-item:hover {
+  border-color: rgba(139, 154, 255, 0.35);
+  background: rgba(30, 38, 56, 0.85);
+}
+
+/* ปุ่มไอคอนซ้าย คลิกสลับสถานะได้ทันที */
+.right-page__list-status--clickable {
+  border: none;
+  cursor: pointer;
+  transition: all 180ms ease;
+}
+
+.right-page__list-status--clickable:hover {
+  transform: scale(1.12);
+  filter: brightness(1.25);
+  box-shadow: 0 0 8px rgba(139, 154, 255, 0.35);
+}
+
+.right-page__list-status--clickable.is-done:hover {
+  box-shadow: 0 0 8px rgba(69, 214, 174, 0.4);
+}
+
+/* ข้อความตรงกลาง คลิกเพื่อดูรายละเอียด */
+.right-page__list-text--clickable {
+  cursor: pointer;
+}
+
+.right-page__list-text--clickable:hover strong {
+  color: #8b9aff;
+}
+
+/* ปุ่ม Badge ด้านขวา สำหรับกดเรียนรู้แล้วทันที */
+.right-page__badge-btn {
+  flex-shrink: 0;
+  padding: 5px 10px;
+  border-radius: 7px;
+  font-size: 10px;
+  font-weight: 650;
+  white-space: nowrap;
+  border: 1px solid rgba(151, 164, 191, 0.18);
+  color: #9ba6bd;
+  background: rgba(151, 164, 191, 0.08);
+  cursor: pointer;
+  transition: all 180ms ease;
+}
+
+.right-page__badge-btn:hover {
+  border-color: rgba(69, 214, 174, 0.45);
+  color: #60dfb8;
+  background: rgba(69, 214, 174, 0.14);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+
+.right-page__badge-btn.is-done {
+  border-color: rgba(69, 214, 174, 0.35);
+  color: #60dfb8;
+  background: rgba(69, 214, 174, 0.12);
+}
+
+.right-page__badge-btn.is-done:hover {
+  border-color: rgba(248, 113, 113, 0.45);
+  color: #fca5a5;
+  background: rgba(239, 68, 68, 0.14);
+}
+
 .right-page__list-text {
   display: flex;
   flex: 1;

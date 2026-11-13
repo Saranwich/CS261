@@ -259,6 +259,7 @@ function Home({ onLogout }) {
               courseTopics={topics.filter((topic) => topic.courseId === selectedCourseId)}
               onShowTopics={() => setActiveTab("topic")}
               onSelectTopic={selectTopic}
+              onToggleDone={toggleTopicDone}
             />
           )}
         </div>
