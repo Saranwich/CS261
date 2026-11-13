@@ -6,10 +6,10 @@ import "./Topicpage.css";
 
 const NODE_WIDTH = 220;
 const NODE_HEIGHT = 76;
-const COURSE_WIDTH = 290;
-const COURSE_GAP = 44;
-const LEVEL_GAP = 145;
-const SIBLING_GAP = 96;
+const COURSE_WIDTH = 340;
+const COURSE_GAP = 50;
+const LEVEL_GAP = 48;
+const SIBLING_GAP = 30;
 const TREE_PADDING = 40;
 
 function Topicpage({
@@ -88,32 +88,40 @@ function Topicpage({
       // เรียงหัวข้อในแต่ละระดับให้ตำแหน่งคงที่
       const sortedTopics = [...course.topics].sort(
         (a, b) =>
-          (Number(a.depth) || 0) - (Number(b.depth) || 0) ||
           (Number(a.seqNo) || 0) - (Number(b.seqNo) || 0)
       );
 
-      const rankByDepth = new Map();
+    // แบ่งหัวข้อตามระดับ depth
+const topicsByDepth = new Map();
 
-      sortedTopics.forEach((topic) => {
-        const depth = Number(topic.depth) || 0;
-        const rank = rankByDepth.get(depth) || 0;
+sortedTopics.forEach((topic) => {
+  const depth = Number(topic.depth) || 0;
 
-        rankByDepth.set(depth, rank + 1);
+  if (!topicsByDepth.has(depth)) {
+    topicsByDepth.set(depth, []);
+  }
 
-        // depth มากจะอยู่สูงกว่า เพื่อให้หัวข้อพื้นฐานอยู่ด้านล่าง
-        const y =
-          TREE_PADDING +
-          (maxDepth - depth) * LEVEL_GAP +
-          rank * SIBLING_GAP;
+  topicsByDepth.get(depth).push(topic);
+});
 
-        positions[topic.id] = {
-          x: x + (COURSE_WIDTH - NODE_WIDTH) / 2,
-          y,
-          width: NODE_WIDTH,
-          height: NODE_HEIGHT,
-          centerX: x + COURSE_WIDTH / 2,
-        };
-      });
+// เรียงระดับจาก depth มากไปน้อย
+const depthLevels = [...topicsByDepth.keys()].sort(
+  (a, b) => b - a
+);
+
+sortedTopics.forEach((topic, index) => {
+  const y =
+    TREE_PADDING +
+    index * (NODE_HEIGHT + SIBLING_GAP);
+
+  positions[topic.id] = {
+    x: x + (COURSE_WIDTH - NODE_WIDTH) / 2,
+    y,
+    width: NODE_WIDTH,
+    height: NODE_HEIGHT,
+    centerX: x + COURSE_WIDTH / 2,
+  };
+});
 
       const courseTopics = sortedTopics
         .map((topic) => positions[topic.id])
@@ -166,13 +174,26 @@ function Topicpage({
         if (!source) return;
 
         const startX = source.x + source.width / 2;
-        const startY = source.y;
         const endX = target.x + target.width / 2;
-        const endY = target.y + target.height;
+
+        const sourceCenterY = source.y + source.height / 2;
+        const targetCenterY = target.y + target.height / 2;
+
+        const sourceIsAbove = sourceCenterY < targetCenterY;
+
+        const startY = sourceIsAbove
+          ? source.y + source.height
+          : source.y;
+
+        const endY = sourceIsAbove
+          ? target.y
+          : target.y + target.height;
+
+        const direction = sourceIsAbove ? 1 : -1;
 
         const curveOffset = Math.max(
-          35,
-          Math.abs(startY - endY) * 0.35
+          25,
+          Math.abs(endY - startY) * 0.35
         );
 
         result.push({
@@ -181,8 +202,8 @@ function Topicpage({
           topicId: topic.id,
           path: [
             `M ${startX} ${startY}`,
-            `C ${startX} ${startY - curveOffset},`,
-            `${endX} ${endY + curveOffset},`,
+            `C ${startX} ${startY + direction * curveOffset},`,
+            `${endX} ${endY - direction * curveOffset},`,
             `${endX} ${endY}`,
           ].join(" "),
         });
@@ -294,7 +315,7 @@ function Topicpage({
                       {course.code}
                     </span>
                     <span className="topic-course__name">
-                      {course.name}
+                      {course.name.replace(course.code, "").trim()}
                     </span>
                   </div>
                 </div>
