@@ -8,6 +8,8 @@ import { toLookup, toTopicCards } from "../utils/topics";
 // นำเข้าข้อมูลจำลอง fallback ในกรณีที่ยังไม่ได้เปิด Backend หรือไม่มีข้อมูล
 import { fallbackSkillTree, fallbackCourseDetails } from "../data/mockSkillTree";
 import "./Homepage.css";
+import {mockSkillTree,mockCourseDetails,mockDoneTopicIds,} from "../data/mockSkillTree";
+import { USE_MOCK_DATA } from "../config/mockConfig";
 
 // ========================================
 // แปลงข้อมูลจาก backend ให้เป็นรูปแบบที่ Leftpage / Rightpage ใช้อยู่แล้ว
@@ -74,6 +76,7 @@ function Home({ onLogout }) {
 
     async function loadAll() {
       try {
+<<<<<<< HEAD
         // 1) หัวข้อที่เรารู้แล้วจาก GET /api/progress
         let progressList = [];
         try {
@@ -83,6 +86,24 @@ function Home({ onLogout }) {
           }
         } catch (err) {
           console.warn("ไม่สามารถดึง progress จาก backend ได้:", err);
+=======
+
+        if (USE_MOCK_DATA) {
+          setTree(mockSkillTree);
+          setCourseDetails(mockCourseDetails);
+          setDoneTopicIds(mockDoneTopicIds);
+          setLoadError(null);
+          return;
+        }
+
+        // 1) หัวข้อที่เรารู้แล้ว (ต้อง login — browser แนบ cookie ให้เอง)
+        const progressResponse = await fetch("/api/progress");
+
+        // session หมดอายุ (ไม่ได้ใช้งาน 30 นาที) → กลับไปหน้า login
+        if (progressResponse.status === 401) {
+          onLogout();
+          return;
+>>>>>>> origin/feature/topic-page
         }
 
         // 2) แผนผังวิชาจาก GET /api/skill-tree

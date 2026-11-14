@@ -1,4 +1,6 @@
+
 import './Upperbar.css';
+<<<<<<< HEAD
 import { useState, useRef, useEffect } from 'react';
 
 // ========================================
@@ -51,6 +53,20 @@ function Upperbar({
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+=======
+import { useState } from 'react';
+
+function Upperbar({
+  onLogout,
+  activeTab,
+  setActiveTab,
+}) {
+  const [searchText, setSearchText] = useState('');
+
+  // ข้อมูลนักศึกษาจาก localStorage
+  const student = JSON.parse(localStorage.getItem("user") || "null");
+  const studentName = student?.displayNameTh?.trim() || "";
+>>>>>>> origin/feature/topic-page
 
   return (
     <nav className="nav-container" aria-label="หน้าหลัก">
@@ -59,6 +75,7 @@ function Upperbar({
       {/* [จุดที่แก้] ปุ่มสลับแท็บ "รายวิชา" และ "รายหัวข้อ" เชื่อมกับ setActiveTab ของ Homepage */}
       <div className="tabs" role="tablist">
         <button
+<<<<<<< HEAD
           type="button"
           className={`tab ${activeTab === 'course' ? 'active' : ''}`}
           onClick={() => setActiveTab && setActiveTab('course')}
@@ -69,26 +86,47 @@ function Upperbar({
           type="button"
           className={`tab ${activeTab === 'topic' ? 'active' : ''}`}
           onClick={() => setActiveTab && setActiveTab('topic')}
+=======
+          className={`tab ${activeTab === 'course' ? 'active' : ''}`}
+          onClick={() => setActiveTab('course')}
+        >
+          รายวิชา
+        </button>
+
+        <button
+          className={`tab ${activeTab === 'topic' ? 'active' : ''}`}
+          onClick={() => setActiveTab('topic')}
+>>>>>>> origin/feature/topic-page
         >
           รายหัวข้อ
         </button>
       </div>
 
+<<<<<<< HEAD
       {/* [จุดที่แก้] กล่องค้นหาพร้อม Dropdown แสดงผลลัพธ์วิชาและหัวข้อที่ค้นเจอแบบเรียลไทม์ */}
       <div className="search-wrap" ref={searchWrapRef}>
         <label className="search-btn" htmlFor="search-input">
           <span>🔍︎</span>
+=======
+      <div className="search-wrap">
+        <label className="search-btn" htmlFor="search-input">
+          🔍︎
+>>>>>>> origin/feature/topic-page
           <input
             id="search-input"
             type="text"
             placeholder="ค้นหาหัวข้อ / วิชา"
             autoComplete="off"
             value={searchText}
+<<<<<<< HEAD
             onFocus={() => setShowDropdown(true)}
             onChange={(e) => {
               setSearchText(e.target.value);
               setShowDropdown(true);
             }}
+=======
+            onChange={(e) => setSearchText(e.target.value)}
+>>>>>>> origin/feature/topic-page
           />
         </label>
 
@@ -178,7 +216,10 @@ function Upperbar({
       </div>
 
       <div className="user" title="ข้อมูลนักศึกษา">
-        <span className="avatar">{studentName.charAt(0) || "?"}</span>
+        <span className="avatar">
+          {studentName.charAt(0) || "?"}
+        </span>
+
         <span className="who">
           <b>{studentName}</b>
           <small>วิทยาการคอมพิวเตอร์</small>

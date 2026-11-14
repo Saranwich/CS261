@@ -1,4 +1,4 @@
-﻿import { useMemo, useState } from "react";
+﻿import { useMemo, useState, useRef } from "react";
 import PanZoomCanvas from "./PanZoomCanvas";
 import "./leftpage.css";
 
