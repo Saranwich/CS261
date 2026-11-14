@@ -1,134 +1,56 @@
-﻿import TOPIC_PREREQUISITES from "./topicPrerequisites";
-
-export const fallbackSkillTree = {
-  courses: [
-    {
-      id: "c0000000-0000-0000-0000-000000000102",
-      code: "CS102",
-      name: "Programming Fundamentals",
-      desc: "รายวิชาแนะนำพื้นฐานการเขียนโปรแกรม ตัวแปร นิพจน์ คำสั่งควบคุมเงื่อนไข วนลูป และฟังก์ชัน",
-    },
-    {
-      id: "c0000000-0000-0000-0000-000000000111",
-      code: "CS111",
-      name: "Object-Oriented Programming",
-      desc: "การออกแบบและเขียนโปรแกรมเชิงวัตถุ คลาส อ็อบเจกต์ การสืบทอด และโพลีมอร์ฟิซึม",
-    },
-    {
-      id: "c0000000-0000-0000-0000-000000000101",
-      code: "CS101",
-      name: "Discrete Mathematics",
-      desc: "คณิตศาสตร์สำหรับวิทยาการคอมพิวเตอร์ ตรรกศาสตร์ เซต การพิสูจน์ ความสัมพันธ์ และกราฟ",
-    },
-    {
-      id: "c0000000-0000-0000-0000-000000000100",
-      code: "CS100",
-      name: "Web Development Basics",
-      desc: "พื้นฐานเทคโนโลยีเว็บ สถาปัตยกรรม Client-Server HTML, CSS, JavaScript และ DOM",
-    },
-  ],
-  prerequisites: [
-    {
-      courseId: "c0000000-0000-0000-0000-000000000101",
-      prerequisiteId: "c0000000-0000-0000-0000-000000000100",
-    },
-    {
-      courseId: "c0000000-0000-0000-0000-000000000102",
-      prerequisiteId: "c0000000-0000-0000-0000-000000000101",
-    },
-    {
-      courseId: "c0000000-0000-0000-0000-000000000111",
-      prerequisiteId: "c0000000-0000-0000-0000-000000000102",
-    },
-  ],
-};
-
-// สร้าง courseDetails สำรองโดยอิงหัวข้อจาก TOPIC_PREREQUISITES
-export const fallbackCourseDetails = fallbackSkillTree.courses.map((course) => {
-  const topicsMap = TOPIC_PREREQUISITES[course.code] || {};
-  const topicNames = Object.keys(topicsMap);
-
-  const topics = (topicNames.length > 0
-    ? topicNames
-    : ["Introduction", "Core Concepts", "Advanced Topics"]
-  ).map((name, idx) => ({
-    id: `t-${course.code.toLowerCase()}-${idx + 1}`,
-    name: name,
-    desc: `หัวข้อ ${name} ของรายวิชา ${course.code} ${course.name}`,
-    seqNo: idx + 1,
-  }));
-
-  return {
-    id: course.id,
-    code: course.code,
-    name: course.name,
-    desc: course.desc,
-    topics: topics,
-  };
-});
-
-
 import TOPIC_PREREQUISITES from "./topicPrerequisites";
 
 // ========================================
-// ข้อมูลรายวิชาจำลอง
+// 1) ข้อมูลรายวิชา (แหล่งเดียว)
 // ========================================
-
 const COURSE_INFO = [
-  {
-    id: 1,
-    code: "CS100",
-    name: "Web Development",
-    description: "พื้นฐานการพัฒนาเว็บไซต์",
-  },
-  {
-    id: 2,
-    code: "CS101",
-    name: "Discrete Mathematics",
-    description: "คณิตศาสตร์ไม่ต่อเนื่องสำหรับวิทยาการคอมพิวเตอร์",
-  },
-  {
-    id: 3,
-    code: "CS102",
-    name: "Programming Fundamentals",
-    description: "พื้นฐานการเขียนโปรแกรม",
-  },
-  {
-    id: 4,
-    code: "CS111",
-    name: "Object-Oriented Programming",
-    description: "การเขียนโปรแกรมเชิงวัตถุ",
-  },
+  { id: "c0000000-0000-0000-0000-000000000100", code: "CS100", name: "Web Development Basics",
+    desc: "พื้นฐานเทคโนโลยีเว็บ สถาปัตยกรรม Client-Server HTML, CSS, JavaScript และ DOM" },
+  { id: "c0000000-0000-0000-0000-000000000101", code: "CS101", name: "Discrete Mathematics",
+    desc: "คณิตศาสตร์สำหรับวิทยาการคอมพิวเตอร์ ตรรกศาสตร์ เซต การพิสูจน์ ความสัมพันธ์ และกราฟ" },
+  { id: "c0000000-0000-0000-0000-000000000102", code: "CS102", name: "Programming Fundamentals",
+    desc: "รายวิชาแนะนำพื้นฐานการเขียนโปรแกรม ตัวแปร นิพจน์ คำสั่งควบคุมเงื่อนไข วนลูป และฟังก์ชัน" },
+  { id: "c0000000-0000-0000-0000-000000000111", code: "CS111", name: "Object-Oriented Programming",
+    desc: "การออกแบบและเขียนโปรแกรมเชิงวัตถุ คลาส อ็อบเจกต์ การสืบทอด และโพลีมอร์ฟิซึม" },
+].map((c) => ({ ...c, description: c.desc })); // เผื่อโค้ดเก่าใช้ .description
+
+const courseByCode = Object.fromEntries(COURSE_INFO.map((c) => [c.code, c]));
+
+// prerequisite ระดับวิชา (ใช้ code เพื่ออ่านง่าย)
+const COURSE_PREREQ_CODES = [
+  ["CS101", "CS100"],
+  ["CS102", "CS101"],
+  ["CS111", "CS102"],
 ];
 
+const coursePrerequisites = COURSE_PREREQ_CODES.map(([course, prereq]) => ({
+  courseId: courseByCode[course].id,
+  prerequisiteId: courseByCode[prereq].id,
+}));
+
 // ========================================
-// สร้างหัวข้อทั้งหมด
+// 2) สร้างหัวข้อ
 // ========================================
+const DEFAULT_TOPICS = ["Introduction", "Core Concepts", "Advanced Topics"];
+const CROSS_REF = /^(CS\d+):\s*(.+)$/;
 
 const allTopics = [];
 
 COURSE_INFO.forEach((course) => {
-  const prerequisiteMap = TOPIC_PREREQUISITES[course.code] || {};
+  const prereqMap = TOPIC_PREREQUISITES[course.code] || {};
+  const names = new Set(Object.keys(prereqMap));
 
-  // เก็บชื่อหัวข้อที่เป็น prerequisite และหัวข้อที่ถูกอ้างถึง
-  const topicNames = new Set(Object.keys(prerequisiteMap));
-
-  Object.values(prerequisiteMap).forEach((requirements) => {
-    requirements.forEach((requirement) => {
-      const match = requirement.match(/^(CS\d+):\s*(.+)$/);
-
-      // ถ้าไม่มีรหัสวิชานำหน้า ให้เป็นหัวข้อในวิชาเดียวกัน
-      if (!match) {
-        topicNames.add(requirement);
-      }
-    });
+  Object.values(prereqMap).flat().forEach((req) => {
+    if (!CROSS_REF.test(req)) names.add(req);
   });
 
-  [...topicNames].forEach((name, index) => {
+  const list = names.size > 0 ? [...names] : DEFAULT_TOPICS;
+
+  list.forEach((name, index) => {
     allTopics.push({
-      id: course.id * 100 + index + 1,
+      id: `t-${course.code.toLowerCase()}-${index + 1}`,
       name,
-      desc: `เรียนรู้เกี่ยวกับ ${name}`,
+      desc: `หัวข้อ ${name} ของรายวิชา ${course.code} ${course.name}`,
       seqNo: index + 1,
       courseId: course.id,
       courseCode: course.code,
@@ -141,115 +63,87 @@ COURSE_INFO.forEach((course) => {
   });
 });
 
-// ========================================
-// สร้าง Lookup สำหรับค้นหาหัวข้อ
-// ========================================
-
-const topicByFullName = {};
-
-allTopics.forEach((topic) => {
-  topicByFullName[`${topic.courseCode}: ${topic.name}`] = topic;
-});
-
-// ========================================
-// เชื่อมโยง Prerequisites
-// ========================================
-
-Object.entries(TOPIC_PREREQUISITES).forEach(
-  ([courseCode, topicMap]) => {
-    Object.entries(topicMap).forEach(([topicName, requirements]) => {
-      const currentTopic = topicByFullName[
-        `${courseCode}: ${topicName}`
-      ];
-
-      if (!currentTopic) return;
-
-      requirements.forEach((requirement) => {
-        const match = requirement.match(/^(CS\d+):\s*(.+)$/);
-
-        const fullName = match
-          ? requirement
-          : `${courseCode}: ${requirement}`;
-
-        const prerequisite = topicByFullName[fullName];
-
-        if (!prerequisite) {
-          console.warn("ไม่พบ prerequisite:", fullName);
-          return;
-        }
-
-        currentTopic.prerequisites.push(prerequisite.id);
-
-        prerequisite.nextTopics.push(currentTopic.id);
-      });
-    });
-  }
+const topicById = new Map(allTopics.map((t) => [t.id, t]));
+const topicByFullName = new Map(
+  allTopics.map((t) => [`${t.courseCode}: ${t.name}`, t])
 );
 
 // ========================================
-// คำนวณ Depth ของหัวข้อ
+// 3) เชื่อม prerequisites ระดับหัวข้อ
 // ========================================
+Object.entries(TOPIC_PREREQUISITES).forEach(([courseCode, topicMap]) => {
+  Object.entries(topicMap).forEach(([topicName, requirements]) => {
+    const current = topicByFullName.get(`${courseCode}: ${topicName}`);
+    if (!current) return;
 
+    requirements.forEach((req) => {
+      const fullName = CROSS_REF.test(req) ? req : `${courseCode}: ${req}`;
+      const prereq = topicByFullName.get(fullName);
+      if (!prereq) {
+        console.warn("ไม่พบ prerequisite:", fullName);
+        return;
+      }
+      current.prerequisites.push(prereq.id);
+      prereq.nextTopics.push(current.id);
+    });
+  });
+});
+
+// ========================================
+// 4) คำนวณ depth
+// ========================================
 const visiting = new Set();
 const finished = new Set();
 
 function calculateDepth(topic) {
   if (finished.has(topic.id)) return topic.depth;
-
-  // ป้องกันข้อมูล prerequisite วนเป็นวงกลม
   if (visiting.has(topic.id)) {
     console.warn("พบ prerequisite cycle:", topic.name);
     return 0;
   }
-
   visiting.add(topic.id);
-
-  topic.depth = Math.max(
-    0,
-    ...topic.prerequisites.map((id) =>
-      calculateDepth(allTopics.find((item) => item.id === id))
-    ).filter(Number.isFinite).map((depth) => depth + 1)
-  );
-
+  topic.depth = topic.prerequisites.length
+    ? Math.max(...topic.prerequisites.map((id) => calculateDepth(topicById.get(id)) + 1))
+    : 0;
   visiting.delete(topic.id);
   finished.add(topic.id);
-
   return topic.depth;
 }
-
-allTopics.forEach((topic) => calculateDepth(topic));
+allTopics.forEach(calculateDepth);
 
 // ========================================
-// ส่งออกข้อมูลสำหรับ Homepage
+// 5) Export (ชุดเดียว ใช้ได้ทั้งชื่อเดิม fallback / mock)
 // ========================================
-
-export const mockCourseDetails = COURSE_INFO.map((course) => ({
-  ...course,
-  topics: allTopics.filter(
-    (topic) => topic.courseId === course.id
-  ),
-}));
-
-export const mockSkillTree = {
-  courses: COURSE_INFO.map((course) => ({
-    ...course,
-    prerequisites: [],
-    nextCourses: [],
+export const skillTree = {
+  courses: COURSE_INFO.map((c) => ({
+    ...c,
+    prerequisites: coursePrerequisites
+      .filter((p) => p.courseId === c.id)
+      .map((p) => p.prerequisiteId),
+    nextCourses: coursePrerequisites
+      .filter((p) => p.prerequisiteId === c.id)
+      .map((p) => p.courseId),
   })),
-  prerequisites: [
-    {
-      courseId: 4,       
-      prerequisiteId: 3 
-    }
-  ],
+  prerequisites: coursePrerequisites,
 };
 
-// หัวข้อที่จำลองว่าเรียนเสร็จแล้ว
+export const courseDetails = COURSE_INFO.map((c) => ({
+  ...c,
+  topics: allTopics.filter((t) => t.courseId === c.id),
+}));
+
+// alias ให้โค้ดเดิมยังทำงาน
+export const fallbackSkillTree = skillTree;
+export const fallbackCourseDetails = courseDetails;
+export const mockSkillTree = skillTree;
+export const mockCourseDetails = courseDetails;
+
+// หัวข้อที่จำลองว่าเรียนเสร็จแล้ว (เปลี่ยนจากเลขเป็น id ใหม่)
 export const mockDoneTopicIds = [
-  101,
-  102,
-  201,
-  301,
+  "t-cs100-1",
+  "t-cs100-2",
+  "t-cs101-1",
+  "t-cs102-1",
 ];
 
-export default mockSkillTree;
+export default skillTree;
