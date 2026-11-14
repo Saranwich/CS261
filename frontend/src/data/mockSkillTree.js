@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 ﻿import TOPIC_PREREQUISITES from "./topicPrerequisites";
 
 export const fallbackSkillTree = {
@@ -68,7 +67,6 @@ export const fallbackCourseDetails = fallbackSkillTree.courses.map((course) => {
   };
 });
 
-=======
 
 import TOPIC_PREREQUISITES from "./topicPrerequisites";
 
@@ -255,4 +253,3 @@ export const mockDoneTopicIds = [
 ];
 
 export default mockSkillTree;
->>>>>>> origin/feature/topic-page
