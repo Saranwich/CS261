@@ -1,11 +1,15 @@
 import "./Rightpage.css";
 import ResourceList from "./ResourceList";
+import Collapsible from "./Collapsible";
+import ProgressRing from "./ProgressRing";
 import COURSE_RESOURCES from "../data/courseResources";
+import { ArrowRightIcon, BookIcon, CheckIcon, DiamondIcon } from "./Icons";
 
 function Rightpage({
   selectedCourse,
   courses = [],
   courseTopics = [],
+  topicById = {},
   setSelectedCourse,
   onShowTopics,
   onSelectTopic,
@@ -14,7 +18,7 @@ function Rightpage({
   if (selectedCourse === null) {
     return (
       <aside className="right-page right-page--empty">
-        <div className="right-page__empty-icon">◇</div>
+        <div className="right-page__empty-icon"><DiamondIcon size={26} /></div>
         <h2>เลือกรายวิชาที่ต้องการเรียนรู้</h2>
         <p>
           คลิกวิชาจากแผนผังเพื่อดูรายละเอียด
@@ -46,6 +50,16 @@ function Rightpage({
           100,
           (selectedCourse.learned / selectedCourse.topics) * 100
         );
+
+  // หัวข้อที่ควรเรียนต่อ = หัวข้อแรก (ตามลำดับ) ที่ยังไม่เรียน และหัวข้อพื้นฐานของมันเรียนครบแล้ว
+  // ถ้าไม่มีหัวข้อที่พร้อมเรียน ใช้หัวข้อแรกที่ยังไม่เรียน แล้วบอกว่าต้องทบทวนพื้นฐานก่อน
+  const notDoneTopics = [...courseTopics]
+    .sort((a, b) => (a.seqNo || 0) - (b.seqNo || 0))
+    .filter((topic) => !topic.done);
+  const readyTopic = notDoneTopics.find((topic) =>
+    (topic.prerequisites || []).every((id) => topicById[id]?.done)
+  );
+  const nextUpTopic = readyTopic || notDoneTopics[0] || null;
 
   const isAllLearned =
     selectedCourse.topics > 0 &&
@@ -80,7 +94,7 @@ function Rightpage({
               isAllLearned ? "is-done" : ""
             }`}
           >
-            {isAllLearned ? "✓" : "📘"}
+            {isAllLearned ? <CheckIcon size={20} /> : <BookIcon size={20} />}
           </span>
 
           <div>
@@ -99,58 +113,52 @@ function Rightpage({
           </p>
         </section>
 
-        {/* Progress bar */}
+        {/* Progress ring (key = รหัสวิชา เพื่อให้วงรีเซ็ตเมื่อเปลี่ยนวิชา ไม่เด้งเอง) */}
         <section className="right-page__progress">
-          <div className="right-page__progress-heading">
-            <h3>ความคืบหน้าของวิชา</h3>
-            <span>
-              {selectedCourse.learned}/{selectedCourse.topics} หัวข้อ
-            </span>
-          </div>
-
-          <div className="right-page__progress-track">
-            <div
-              className="right-page__progress-fill"
-              style={{ width: `${percent}%` }}
+          <div className="progress-card">
+            <ProgressRing
+              key={selectedCourse.id}
+              value={percent}
+              done={isAllLearned}
             />
+
+            <div className="progress-card__text">
+              <h3>ความคืบหน้าของวิชา</h3>
+              <strong className="progress-card__count">
+                {selectedCourse.learned}/{selectedCourse.topics} หัวข้อ
+              </strong>
+              <p>
+                {selectedCourse.topics === 0
+                  ? "วิชานี้ยังไม่มีหัวข้อกำหนดไว้"
+                  : isAllLearned
+                  ? "คุณเรียนรู้ครบทุกหัวข้อในวิชานี้แล้ว!"
+                  : `เหลืออีก ${
+                      selectedCourse.topics - selectedCourse.learned
+                    } หัวข้อ`}
+              </p>
+            </div>
           </div>
 
-          <p>
-            {selectedCourse.topics === 0
-              ? "วิชานี้ยังไม่มีหัวข้อกำหนดไว้"
-              : isAllLearned
-              ? "คุณเรียนรู้ครบทุกหัวข้อในวิชานี้แล้ว!"
-              : `เรียนรู้ไปแล้ว ${Math.round(percent)}% (เหลืออีก ${
-                  selectedCourse.topics - selectedCourse.learned
-                } หัวข้อ)`}
-          </p>
+          {nextUpTopic && (
+            <button
+              type="button"
+              className="next-up"
+              onClick={() => onSelectTopic?.(nextUpTopic)}
+            >
+              <span className="next-up__text">
+                <span className="next-up__label">ควรเรียนต่อ</span>
+                <span className="next-up__name">{nextUpTopic.name}</span>
+                {!readyTopic && (
+                  <span className="next-up__hint">ต้องทบทวนหัวข้อพื้นฐานก่อน</span>
+                )}
+              </span>
+              <ArrowRightIcon size={16} />
+            </button>
+          )}
         </section>
 
-        {/* Action buttons */}
-        <div className="right-page__actions">
-          <button
-            type="button"
-            className="right-page__primary-btn"
-            onClick={onShowTopics}
-          >
-            ดูหัวข้อในวิชานี้ ({selectedCourse.topics})
-          </button>
-          <button
-            type="button"
-            className="right-page__secondary-btn"
-            onClick={() => setSelectedCourse?.(null)}
-          >
-            ล้าง
-          </button>
-        </div>
-
         {/* Prerequisites */}
-        <section className="right-page__section">
-          <div className="right-page__section-heading">
-            <h3>ผ่านตามลำดับ (Prerequisites)</h3>
-            <span className="right-page__count">{prereqList.length}</span>
-          </div>
-
+        <Collapsible title="ผ่านตามลำดับ (Prerequisites)" count={prereqList.length}>
           {prereqList.length === 0 ? (
             <p className="right-page__muted">
               ไม่มีวิชาก่อนหน้า (เป็นวิชาพื้นฐาน)
@@ -182,15 +190,10 @@ function Rightpage({
               ))}
             </ul>
           )}
-        </section>
+        </Collapsible>
 
         {/* Next Courses */}
-        <section className="right-page__section">
-          <div className="right-page__section-heading">
-            <h3>ต่อยอดไป (Next Courses)</h3>
-            <span className="right-page__count">{nextList.length}</span>
-          </div>
-
+        <Collapsible title="ต่อยอดไป (Next Courses)" count={nextList.length}>
           {nextList.length === 0 ? (
             <p className="right-page__muted">
               ยังไม่มีวิชาต่อยอดที่กำหนดไว้
@@ -204,7 +207,7 @@ function Rightpage({
                     className="right-page__list-button"
                     onClick={() => setSelectedCourse?.(course)}
                   >
-                    <span className="right-page__list-status">→</span>
+                    <span className="right-page__list-status"><ArrowRightIcon size={14} /></span>
                     <span className="right-page__list-text">
                       <strong>{course.name}</strong>
                       <small>
@@ -220,17 +223,10 @@ function Rightpage({
               ))}
             </ul>
           )}
-        </section>
+        </Collapsible>
 
         {/* Topics in this course */}
-        <section className="right-page__section">
-          <div className="right-page__section-heading">
-            <h3>หัวข้อในวิชานี้</h3>
-            <span className="right-page__count">
-              {courseTopics.length}
-            </span>
-          </div>
-
+        <Collapsible title="หัวข้อในวิชานี้" count={courseTopics.length}>
           {courseTopics.length === 0 ? (
             <p className="right-page__muted">
               ยังไม่มีหัวข้อในวิชานี้
@@ -256,7 +252,7 @@ function Rightpage({
                     }
                     aria-label={topic.done ? "เรียนแล้ว" : "ยังไม่เรียน"}
                   >
-                    {topic.done ? "✓" : "◇"}
+                    {topic.done ? <CheckIcon size={14} /> : <DiamondIcon size={13} />}
                   </button>
 
                   {/* ตรงกลาง: คลิกเพื่อเข้าไปดูรายละเอียดหัวข้อ */}
@@ -293,19 +289,36 @@ function Rightpage({
               ))}
             </ul>
           )}
-        </section>
+        </Collapsible>
 
-        {/* Resources */}
+        {/* Resources (ปิดไว้ก่อน เพื่อให้หน้าไม่ยาวเกิน) */}
         {resources.length > 0 && (
-          <section className="right-page__section">
-            <h3>แหล่งเรียนรู้เพิ่มเติม</h3>
+          <Collapsible title="แหล่งเรียนรู้เพิ่มเติม" count={resources.length} defaultOpen={false}>
             <p className="right-page__muted">
               เอกสารและสื่อการสอนแนะนำสำหรับวิชานี้
             </p>
-            <ResourceList topic={{ courseCode: selectedCourse.code }} />
-          </section>
+            <ResourceList links={resources} />
+          </Collapsible>
         )}
       </div>
+
+      {/* ปุ่มหลักติดขอบล่างตลอด ไม่ต้องเลื่อนหา */}
+      <footer className="right-page__footer">
+        <button
+          type="button"
+          className="right-page__primary-btn"
+          onClick={onShowTopics}
+        >
+          ดูหัวข้อในวิชานี้ ({selectedCourse.topics})
+        </button>
+        <button
+          type="button"
+          className="right-page__secondary-btn"
+          onClick={() => setSelectedCourse?.(null)}
+        >
+          ล้าง
+        </button>
+      </footer>
     </aside>
   );
 }
