@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import Rightpage from "../components/Rightpage";
 import Leftpage from "../components/leftpage";
 import Upperbar from "../components/Upperbar";
@@ -107,6 +107,7 @@ function Home({ onLogout }) {
   const [isResizing, setIsResizing] = useState(false);
   const homepageRef = useRef(null);
   const resizingRef = useRef(false);
+  const pendingPercentRef = useRef(rightPercent); // ค่าล่าสุดระหว่างลาก (ไม่ผ่าน state จึงไม่ re-render)
 
   useEffect(() => {
     try {
@@ -120,19 +121,24 @@ function Home({ onLogout }) {
     event.preventDefault();
     event.currentTarget.setPointerCapture(event.pointerId);
     resizingRef.current = true;
+    pendingPercentRef.current = rightPercent;
     setIsResizing(true);
   }
 
+  // ระหว่างลาก ตั้งค่าตัวแปร CSS ตรง ๆ ไม่ผ่าน state → ทั้งหน้าไม่ต้อง re-render ทุกพิกเซล
   function moveResize(event) {
     if (!resizingRef.current || !homepageRef.current) return;
     const rect = homepageRef.current.getBoundingClientRect();
-    const percent = ((rect.right - event.clientX) / rect.width) * 100;
-    setRightPercent(Math.round(clampRight(percent) * 10) / 10);
+    const percent = Math.round(clampRight(((rect.right - event.clientX) / rect.width) * 100) * 10) / 10;
+    pendingPercentRef.current = percent;
+    homepageRef.current.style.setProperty("--right-w", `${percent}%`);
   }
 
+  // ปล่อยเมาส์ค่อยบันทึกค่าสุดท้ายครั้งเดียว
   function endResize(event) {
     resizingRef.current = false;
     setIsResizing(false);
+    setRightPercent(pendingPercentRef.current);
     event.currentTarget.releasePointerCapture?.(event.pointerId);
   }
 
@@ -229,10 +235,17 @@ function Home({ onLogout }) {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [selectedTopicId, selectedCourseId]);
 
-  // แปลงข้อมูลให้หน้าเว็บใช้ (คำนวณใหม่ทุกครั้งที่ข้อมูลเปลี่ยน เช่น ติ๊กหัวข้อ)
-  const topics = toTopicCards(courseDetails, doneTopicIds);
-  const topicById = toLookup(topics);
-  const courses = tree ? toCourseCards(tree, topics) : [];
+  // แปลงข้อมูลให้หน้าเว็บใช้ — useMemo: คำนวณใหม่เฉพาะตอนข้อมูลเปลี่ยนจริง (เช่น ติ๊กหัวข้อ)
+  // ไม่ใช่ทุกครั้งที่หน้า re-render (ไม่งั้นผังรายหัวข้อจะจัดวางใหม่ทั้งหมดทุกครั้ง)
+  const topics = useMemo(
+    () => toTopicCards(courseDetails, doneTopicIds),
+    [courseDetails, doneTopicIds]
+  );
+  const topicById = useMemo(() => toLookup(topics), [topics]);
+  const courses = useMemo(
+    () => (tree ? toCourseCards(tree, topics) : []),
+    [tree, topics]
+  );
 
   const selectedCourse = courses.find((course) => course.id === selectedCourseId) || null;
   const selectedTopic = topicById[selectedTopicId] || null;
