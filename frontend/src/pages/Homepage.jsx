@@ -54,6 +54,26 @@ function toCourseCards(tree, topics) {
 }
 
 
+// ========================================
+// ความกว้างแผงขวา (ลากเส้นแบ่งกลางจอเพื่อปรับ) เก็บเป็น % ของจอ จำค่าไว้ใน localStorage
+// ========================================
+const RIGHT_MIN = 22;
+const RIGHT_MAX = 55;
+const RIGHT_DEFAULT = 30;
+const RIGHT_KEY = "rightPanelPercent";
+
+function loadRightPercent() {
+  try {
+    const saved = Number(localStorage.getItem(RIGHT_KEY));
+    return saved >= RIGHT_MIN && saved <= RIGHT_MAX ? saved : RIGHT_DEFAULT;
+  } catch {
+    return RIGHT_DEFAULT;
+  }
+}
+
+const clampRight = (value) => Math.min(RIGHT_MAX, Math.max(RIGHT_MIN, value));
+
+
 function Home({ onLogout }) {
 
   // ========================================
@@ -75,12 +95,57 @@ function Home({ onLogout }) {
   // ข้อความแจ้งเตือนเล็ก ๆ ด้านล่างจอ (แทน alert ที่บล็อกหน้าเว็บ)
   const [toast, setToast] = useState(null);
   const toastTimer = useRef(null);
-  function showToast(message) {
-    setToast(message);
+  function showToast(message, type = "error") {
+    setToast({ message, type });
     clearTimeout(toastTimer.current);
     toastTimer.current = setTimeout(() => setToast(null), 4000);
   }
   useEffect(() => () => clearTimeout(toastTimer.current), []);
+
+  // ----- ปรับขนาดแผงซ้าย/ขวา -----
+  const [rightPercent, setRightPercent] = useState(loadRightPercent);
+  const [isResizing, setIsResizing] = useState(false);
+  const homepageRef = useRef(null);
+  const resizingRef = useRef(false);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(RIGHT_KEY, String(rightPercent));
+    } catch {
+      /* บันทึกไม่ได้ก็ไม่เป็นไร */
+    }
+  }, [rightPercent]);
+
+  function startResize(event) {
+    event.preventDefault();
+    event.currentTarget.setPointerCapture(event.pointerId);
+    resizingRef.current = true;
+    setIsResizing(true);
+  }
+
+  function moveResize(event) {
+    if (!resizingRef.current || !homepageRef.current) return;
+    const rect = homepageRef.current.getBoundingClientRect();
+    const percent = ((rect.right - event.clientX) / rect.width) * 100;
+    setRightPercent(Math.round(clampRight(percent) * 10) / 10);
+  }
+
+  function endResize(event) {
+    resizingRef.current = false;
+    setIsResizing(false);
+    event.currentTarget.releasePointerCapture?.(event.pointerId);
+  }
+
+  // คีย์บอร์ด: ← ขยายแผงขวา / → ย่อแผงขวา
+  function handleResizerKey(event) {
+    if (event.key === "ArrowLeft") {
+      event.preventDefault();
+      setRightPercent((current) => clampRight(current + 2));
+    } else if (event.key === "ArrowRight") {
+      event.preventDefault();
+      setRightPercent((current) => clampRight(current - 2));
+    }
+  }
 
   const [selectedCourseId, setSelectedCourseId] = useState(null);
   const [selectedTopicId, setSelectedTopicId] = useState(null);
@@ -204,6 +269,16 @@ function Home({ onLogout }) {
       );
 
     setDone(!wasDone);
+
+    // เพิ่งติ๊กหัวข้อสุดท้ายของวิชา → แจ้งว่าเรียนครบวิชาแล้ว
+    const justDone = topicById[topicId];
+    if (!wasDone && justDone) {
+      const allDone = topics
+        .filter((topic) => topic.courseId === justDone.courseId)
+        .every((topic) => topic.id === topicId || topic.done);
+      if (allDone) showToast(`เรียนครบวิชา ${justDone.courseCode} แล้ว`, "success");
+    }
+
     if (USE_MOCK_DATA) return;
 
     try {
@@ -287,12 +362,35 @@ function Home({ onLogout }) {
         onSelectTopic={selectTopic}
       />
 
-      <div className="homepage">
+      <div
+        className={`homepage ${isResizing ? "is-resizing" : ""}`}
+        ref={homepageRef}
+        style={{ "--right-w": `${rightPercent}%` }}
+      >
 
         {/* ฝั่งซ้าย 70% */}
         <div className="leftPage">
           {renderLeftSide()}
         </div>
+
+        {/* เส้นแบ่ง: ลากเพื่อปรับขนาด / ดับเบิลคลิกเพื่อรีเซ็ต */}
+        <div
+          className="resizer"
+          role="separator"
+          aria-orientation="vertical"
+          aria-label="ปรับขนาดแผงรายละเอียด"
+          aria-valuemin={RIGHT_MIN}
+          aria-valuemax={RIGHT_MAX}
+          aria-valuenow={Math.round(rightPercent)}
+          tabIndex={0}
+          title="ลากเพื่อปรับขนาด (ดับเบิลคลิกเพื่อรีเซ็ต)"
+          onPointerDown={startResize}
+          onPointerMove={moveResize}
+          onPointerUp={endResize}
+          onPointerCancel={endResize}
+          onKeyDown={handleResizerKey}
+          onDoubleClick={() => setRightPercent(RIGHT_DEFAULT)}
+        />
 
         {/* ฝั่งขวา 30%: แท็บรายหัวข้อ + เลือกหัวข้อไว้ → รายละเอียดหัวข้อ / นอกนั้น → รายละเอียดวิชา */}
         <div className="rightPage">
@@ -310,6 +408,7 @@ function Home({ onLogout }) {
               setSelectedCourse={selectCourse}
               courses={courses}
               courseTopics={topics.filter((topic) => topic.courseId === selectedCourseId)}
+              allTopics={topics}
               topicById={topicById}
               onShowTopics={() => setActiveTab("topic")}
               onSelectTopic={selectTopic}
@@ -321,8 +420,8 @@ function Home({ onLogout }) {
       </div>
 
       {toast && (
-        <div className="toast" role="alert">
-          {toast}
+        <div className={`toast toast--${toast.type}`} role={toast.type === "error" ? "alert" : "status"}>
+          {toast.message}
         </div>
       )}
     </div>

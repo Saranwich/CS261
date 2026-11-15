@@ -1,8 +1,24 @@
 import './Upperbar.css';
 import { SearchIcon } from './Icons';
 import { useEffect, useRef, useState } from 'react';
+import ThemeToggle from './ThemeToggle';
 
 const MAX_RESULTS = 12; // ผลค้นหาแสดงได้สูงสุดกี่รายการ
+
+// ไฮไลต์คำที่ค้นหาในผลลัพธ์ (keyword เป็นตัวพิมพ์เล็กอยู่แล้ว)
+function Highlight({ text, keyword }) {
+  if (!keyword) return text;
+  const start = text.toLowerCase().indexOf(keyword);
+  if (start === -1) return text;
+  const end = start + keyword.length;
+  return (
+    <>
+      {text.slice(0, start)}
+      <mark className="search-mark">{text.slice(start, end)}</mark>
+      {text.slice(end)}
+    </>
+  );
+}
 
 // activeTab / setActiveTab มาจาก Homepage (Homepage ต้องรู้ว่าเลือกแท็บไหน จะได้สลับฝั่งซ้าย)
 // courses / topics = ข้อมูลที่เอามาค้น
@@ -136,8 +152,8 @@ function Upperbar({ onLogout, activeTab, setActiveTab, courses = [], topics = []
                     {result.type === 'course' ? 'วิชา' : 'หัวข้อ'}
                   </span>
                   <span className="search-result-text">
-                    <span className="search-result-title">{result.title}</span>
-                    <span className="search-result-sub">{result.sub}</span>
+                    <span className="search-result-title"><Highlight text={result.title} keyword={keyword} /></span>
+                    <span className="search-result-sub"><Highlight text={result.sub} keyword={keyword} /></span>
                   </span>
                 </button>
               </li>
@@ -153,6 +169,8 @@ function Upperbar({ onLogout, activeTab, setActiveTab, courses = [], topics = []
           <small>วิทยาการคอมพิวเตอร์</small>
         </span>
       </div>
+
+      <ThemeToggle />
 
       <button className="logout-btn" onClick={onLogout}>
         ออกจากระบบ

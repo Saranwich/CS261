@@ -1,6 +1,7 @@
 ﻿import { useMemo, useState } from "react";
 import PanZoomCanvas from "./PanZoomCanvas";
 import ProgressRing from "./ProgressRing";
+import { courseHue } from "../utils/courseColor";
 import "./leftpage.css";
 
 // ========================================
@@ -165,7 +166,7 @@ function Leftpage({ courses = [], selectedCourse, setSelectedCourse }) {
               key={course.id}
               type="button"
               className={`course-card is-${status} ${selectedCourse?.id === course.id ? "selected" : ""}`}
-              style={{ left: position.x, top: position.y, "--i": index }}
+              style={{ left: position.x, top: position.y, "--i": index, "--hue": courseHue(index) }}
               title={course.name}
               onClick={() => setSelectedCourse(course)}
               onMouseEnter={() => setHoveredCourseId(course.id)}

@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import PanZoomCanvas from "./PanZoomCanvas";
 import { CheckIcon, CircleIcon, DiamondIcon, DotIcon } from "./Icons";
 import { findAllPrerequisites, toLookup } from "../utils/topics";
+import { courseHue } from "../utils/courseColor";
 import "./Topicpage.css";
 
 // ========================================
@@ -16,8 +17,8 @@ import "./Topicpage.css";
 
 // ขนาดและระยะห่าง (หน่วย px)
 // NODE_HEIGHT ต้องพอดีกับ .topic-node ใน Topicpage.css (ขนาดจริงถูกใส่ inline จากค่าตรงนี้)
-const NODE_WIDTH = 200;
-const NODE_HEIGHT = 64;
+const NODE_WIDTH = 220;
+const NODE_HEIGHT = 72;
 const NODE_GAP_X = 18;   // ระยะห่างแนวนอน ระหว่างหัวข้อในชั้นเดียวกัน
 const NODE_GAP_Y = 46;   // ระยะห่างแนวตั้ง ระหว่างชั้นของหัวข้อ (เว้นที่ให้เส้น)
 const BOX_HEADER = 52;   // ความสูงแถบชื่อวิชา (.topic-course__heading สูง 42px)
@@ -242,6 +243,25 @@ function areaAround(ids, positions) {
 }
 
 
+// ตัวกรองหัวข้อ
+//   all   = ทั้งหมด
+//   todo  = ยังไม่เรียน
+//   ready = พร้อมเรียน (ยังไม่เรียน และหัวข้อพื้นฐานเรียนครบแล้ว)
+const FILTERS = [
+  { id: "all", label: "ทั้งหมด" },
+  { id: "todo", label: "ยังไม่เรียน" },
+  { id: "ready", label: "พร้อมเรียน" },
+];
+
+function matchesFilter(topic, filter, topicById) {
+  if (filter === "todo") return !topic.done;
+  if (filter === "ready") {
+    return !topic.done && (topic.prerequisites || []).every((id) => topicById[id]?.done);
+  }
+  return true;
+}
+
+
 function Topicpage({
   topics = [],
   courses = [],
@@ -249,6 +269,8 @@ function Topicpage({
   selectedCourse = null,
   onSelectTopic,
 }) {
+  // ตัวกรองที่เลือกอยู่ (all / todo / ready)
+  const [filter, setFilter] = useState("all");
   // หัวข้อที่เมาส์ชี้อยู่ (null = ไม่ได้ชี้อะไร)
   const [hoveredTopicId, setHoveredTopicId] = useState(null);
 
@@ -356,6 +378,14 @@ function Topicpage({
     edge.className.includes("--hover") ? 2 : edge.className.includes("--active") ? 1 : 0;
   edges.sort((a, b) => weight(a) - weight(b));
 
+  // เฉดสีประจำวิชา (ตามลำดับวิชา)
+  const hueByCourse = {};
+  courses.forEach((course, index) => {
+    hueByCourse[course.id] = courseHue(index);
+  });
+
+  const matchCount = topics.filter((topic) => matchesFilter(topic, filter, topicById)).length;
+
   return (
     <section className="topic-page">
       <header className="topic-page__header">
@@ -365,6 +395,21 @@ function Topicpage({
           <p className="topic-page__subtitle">
             คลิกหัวข้อที่เรียนไม่ทัน เพื่อดูว่าต้องย้อนไปเรียนอะไรก่อน (เส้น: ล่าง ต้องรู้ก่อน บน · เส้นประ = ข้ามวิชา)
           </p>
+        </div>
+
+        <div className="topic-page__tools">
+        <div className="topic-page__filters" role="group" aria-label="กรองหัวข้อ">
+          {FILTERS.map((item) => (
+            <button
+              key={item.id}
+              type="button"
+              className={`topic-page__filter ${filter === item.id ? "is-active" : ""}`}
+              aria-pressed={filter === item.id}
+              onClick={() => setFilter(item.id)}
+            >
+              {item.label}
+            </button>
+          ))}
         </div>
 
         <div className="topic-page__legend">
@@ -380,6 +425,7 @@ function Topicpage({
             <span className="topic-page__legend-line" />
             Prerequisite
           </span>
+        </div>
         </div>
       </header>
 
@@ -397,7 +443,7 @@ function Topicpage({
               <div
                 key={box.course.id}
                 className={`topic-course ${box.course.id === focusCourseId ? "topic-course--selected" : ""}`}
-                style={{ left: box.x, top: box.y, width: box.width, height: box.height }}
+                style={{ left: box.x, top: box.y, width: box.width, height: box.height, "--hue": hueByCourse[box.course.id] }}
               >
                 <div className="topic-course__heading">
                   <span className="topic-course__code">{box.course.code}</span>
@@ -450,6 +496,9 @@ function Topicpage({
               if (selectedCourse && selectedCourse.id === topic.courseId) {
                 classes.push("topic-node--course-match");
               }
+              if (filter !== "all" && !matchesFilter(topic, filter, topicById)) {
+                classes.push("topic-node--filtered-out");
+              }
 
               return (
                 <button
@@ -461,6 +510,7 @@ function Topicpage({
                     top: position.y,
                     width: position.width,
                     height: position.height,
+                    "--hue": hueByCourse[topic.courseId],
                   }}
                   title={`${topic.courseCode} · ${topic.name}${topic.done ? " — เรียนแล้ว" : ""}`}
                   aria-pressed={isSelected}
@@ -489,7 +539,7 @@ function Topicpage({
 
       <footer className="topic-page__footer">
         <span>
-          {topics.length} หัวข้อ · {layout.boxes.length} รายวิชา
+          {filter === "all" ? `${topics.length} หัวข้อ` : `แสดง ${matchCount} จาก ${topics.length} หัวข้อ`} · {layout.boxes.length} รายวิชา
         </span>
         <span>
           {hasPath

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import "./LoginPage.css";
+import ThemeToggle from "../components/ThemeToggle";
 
 /* ---------- Compass icon (replaces the "O" in COMPASS) ---------- */
 function CompassIcon({ size = 56 }) {
@@ -43,7 +44,7 @@ export default function LoginPage({ onSubmit }) {
     if (isStudentIdInvalid) return; // บล็อกการ submit ถ้ามีตัวอักษรปนอยู่
 
     if (!studentId.trim() || !password) {
-      setError("Please enter your Student ID and password.");
+      setError("กรุณากรอกรหัสนักศึกษาและรหัสผ่าน");
       return;
     }
 
@@ -52,7 +53,7 @@ export default function LoginPage({ onSubmit }) {
       // ต่อ API จริงของคุณที่นี่ผ่าน prop onSubmit
       if (onSubmit) await onSubmit({ studentId: studentId.trim(), password });
     } catch (err) {
-      setError(err?.message || "Login failed. Check your details and try again.");
+      setError(err?.message || "เข้าสู่ระบบไม่สำเร็จ ตรวจสอบข้อมูลแล้วลองอีกครั้ง");
     } finally {
       setLoading(false);
     }
@@ -60,6 +61,9 @@ export default function LoginPage({ onSubmit }) {
 
   return (
     <div className="cl-page">
+      <div className="cl-theme-slot">
+        <ThemeToggle />
+      </div>
       <header className="cl-header">
         <h1 className="cl-logo" aria-label="CSTU Compass">
           <span>CSTU C</span>
@@ -71,14 +75,14 @@ export default function LoginPage({ onSubmit }) {
 
       <main className="cl-main">
         <form className="cl-card" onSubmit={handleSubmit} noValidate>
-          <h2 className="cl-title">Log In</h2>
+          <h2 className="cl-title">เข้าสู่ระบบ</h2>
           <p className="cl-subtitle">
-            Enter your Student ID and password to continue.
+            กรอกรหัสนักศึกษาและรหัสผ่านเพื่อเข้าใช้งาน
           </p>
           <hr className="cl-divider" />
 
           <label className="cl-label" htmlFor="studentId">
-            Student ID
+            รหัสนักศึกษา
           </label>
           <input
             id="studentId"
@@ -86,7 +90,7 @@ export default function LoginPage({ onSubmit }) {
             type="text"
             inputMode="numeric"
             autoComplete="username"
-            placeholder="Enter Student ID"
+            placeholder="กรอกรหัสนักศึกษา"
             value={studentId}
             onChange={(e) => setStudentId(e.target.value)}
             aria-invalid={isStudentIdInvalid}
@@ -94,16 +98,16 @@ export default function LoginPage({ onSubmit }) {
           />
           {isStudentIdInvalid && (
             <p id="studentId-error" className="cl-field-error" role="alert">
-              Student ID must contain numbers only.
+              รหัสนักศึกษาต้องเป็นตัวเลขเท่านั้น
             </p>
           )}
 
           <div className="cl-label-row">
             <label className="cl-label" htmlFor="password">
-              Password
+              รหัสผ่าน
             </label>
             <a className="cl-forgot" href="/forgot-password">
-              Forgot password?
+              ลืมรหัสผ่าน?
             </a>
           </div>
           <input
@@ -111,7 +115,7 @@ export default function LoginPage({ onSubmit }) {
             className="cl-input"
             type="password"
             autoComplete="current-password"
-            placeholder="Enter password"
+            placeholder="กรอกรหัสผ่าน"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
@@ -127,7 +131,7 @@ export default function LoginPage({ onSubmit }) {
             type="submit"
             disabled={loading || isStudentIdInvalid}
           >
-            {loading ? "Logging in…" : "Log In"}
+            {loading ? "กำลังเข้าสู่ระบบ…" : "เข้าสู่ระบบ"}
           </button>
         </form>
       </main>

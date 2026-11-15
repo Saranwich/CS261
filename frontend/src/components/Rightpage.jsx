@@ -10,20 +10,144 @@ function Rightpage({
   courses = [],
   courseTopics = [],
   topicById = {},
+  allTopics = [],
   setSelectedCourse,
   onShowTopics,
   onSelectTopic,
   onToggleDone,
 }) {
   if (selectedCourse === null) {
+    // ยังไม่มีข้อมูลวิชา (กำลังโหลด) → แสดงข้อความว่างแบบเดิม
+    if (courses.length === 0) {
+      return (
+        <aside className="right-page right-page--empty">
+          <div className="right-page__empty-icon"><DiamondIcon size={26} /></div>
+          <h2>เลือกรายวิชาที่ต้องการเรียนรู้</h2>
+          <p>
+            คลิกวิชาจากแผนผังเพื่อดูรายละเอียด
+            วิชาพื้นฐานที่ต้องผ่านก่อน และวิชาที่สามารถต่อยอดได้
+          </p>
+        </aside>
+      );
+    }
+
+    // ----- ภาพรวมทั้งหลักสูตร -----
+    const totalTopics = courses.reduce((sum, course) => sum + course.topics, 0);
+    const totalLearned = courses.reduce((sum, course) => sum + course.learned, 0);
+    const overallPercent = totalTopics === 0 ? 0 : (totalLearned / totalTopics) * 100;
+    const allLearned = totalTopics > 0 && totalLearned === totalTopics;
+    const completedCourses = courses.filter(
+      (course) => course.topics > 0 && course.learned >= course.topics
+    ).length;
+
+    // หัวข้อที่ควรเรียนต่อ = หัวข้อแรกที่ยังไม่เรียน และหัวข้อพื้นฐานครบแล้ว (เรียงตามลำดับวิชา → ลำดับหัวข้อ)
+    const courseOrder = new Map(courses.map((course, index) => [course.id, index]));
+    const upcoming = allTopics
+      .filter((topic) => !topic.done)
+      .sort(
+        (a, b) =>
+          (courseOrder.get(a.courseId) ?? 0) - (courseOrder.get(b.courseId) ?? 0) ||
+          (a.seqNo || 0) - (b.seqNo || 0)
+      );
+    const firstReady = upcoming.find((topic) =>
+      (topic.prerequisites || []).every((id) => topicById[id]?.done)
+    );
+    const startTopic = firstReady || upcoming[0] || null;
+
+    // วิชาที่กำลังเรียนอยู่ (เรียนไปแล้วบางส่วน) เรียงจากใกล้ครบที่สุด
+    const inProgress = courses
+      .filter((course) => course.learned > 0 && course.learned < course.topics)
+      .sort((a, b) => b.learned / b.topics - a.learned / a.topics)
+      .slice(0, 4);
+
     return (
-      <aside className="right-page right-page--empty">
-        <div className="right-page__empty-icon"><DiamondIcon size={26} /></div>
-        <h2>เลือกรายวิชาที่ต้องการเรียนรู้</h2>
-        <p>
-          คลิกวิชาจากแผนผังเพื่อดูรายละเอียด
-          วิชาพื้นฐานที่ต้องผ่านก่อน และวิชาที่สามารถต่อยอดได้
-        </p>
+      <aside className="right-page">
+        <header className="right-page__header">
+          <div>
+            <p className="right-page__eyebrow">OVERVIEW</p>
+            <span className="right-page__course-code">
+              {completedCourses}/{courses.length} วิชา
+            </span>
+          </div>
+        </header>
+
+        <div className="right-page__body">
+          <div className="right-page__title-row">
+            <span className={`right-page__status ${allLearned ? "is-done" : ""}`}>
+              {allLearned ? <CheckIcon size={20} /> : <BookIcon size={20} />}
+            </span>
+            <div>
+              <h2 className="right-page__title">ภาพรวมการเรียนของคุณ</h2>
+              <p className="right-page__subtitle">คลิกวิชาจากแผนผังเพื่อดูรายละเอียด</p>
+            </div>
+          </div>
+
+          <section className="right-page__progress">
+            <div className="progress-card">
+              <ProgressRing key="all-overview" value={overallPercent} done={allLearned} />
+              <div className="progress-card__text">
+                <h3>ความคืบหน้าทั้งหมด</h3>
+                <strong className="progress-card__count">
+                  {totalLearned}/{totalTopics} หัวข้อ
+                </strong>
+                <p>
+                  {allLearned
+                    ? "คุณเรียนครบทุกหัวข้อแล้ว ยอดเยี่ยมมาก!"
+                    : `เหลืออีก ${totalTopics - totalLearned} หัวข้อ`}
+                </p>
+              </div>
+            </div>
+
+            {startTopic && (
+              <button
+                type="button"
+                className="next-up"
+                onClick={() => onSelectTopic?.(startTopic)}
+              >
+                <span className="next-up__text">
+                  <span className="next-up__label">ควรเรียนต่อ · {startTopic.courseCode}</span>
+                  <span className="next-up__name">{startTopic.name}</span>
+                  {!firstReady && (
+                    <span className="next-up__hint">ต้องทบทวนหัวข้อพื้นฐานก่อน</span>
+                  )}
+                </span>
+                <ArrowRightIcon size={16} />
+              </button>
+            )}
+          </section>
+
+          <Collapsible title="วิชาที่กำลังเรียน" count={inProgress.length}>
+            {inProgress.length === 0 ? (
+              <p className="right-page__muted">
+                {allLearned
+                  ? "เรียนครบทุกวิชาแล้ว"
+                  : "ยังไม่ได้เริ่มเรียนวิชาใด เริ่มจากหัวข้อที่แนะนำด้านบนได้เลย"}
+              </p>
+            ) : (
+              <ul className="right-page__list">
+                {inProgress.map((course) => (
+                  <li key={course.id}>
+                    <button
+                      type="button"
+                      className="right-page__list-button"
+                      onClick={() => setSelectedCourse?.(course)}
+                    >
+                      <span className="right-page__list-text">
+                        <strong>{course.name}</strong>
+                        <small>
+                          รู้แล้ว {course.learned}/{course.topics} หัวข้อ
+                        </small>
+                      </span>
+                      <span className="right-page__badge">
+                        {Math.round((course.learned / course.topics) * 100)}%
+                      </span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </Collapsible>
+        </div>
       </aside>
     );
   }
