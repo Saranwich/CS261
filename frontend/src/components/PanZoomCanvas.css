@@ -1,181 +1,123 @@
+/* ========================================
+   กระดานลากเลื่อน / ซูม (PanZoomCanvas.jsx)
+======================================== */
 
 .pan-zoom-canvas {
   position: relative;
 
   width: 100%;
   height: 100%;
-  min-width: 0;
-  min-height: 0;
 
+  /* ไม่ใช้ scroll เลื่อนด้วยการลากแทน */
   overflow: hidden;
 
-  background-color: #0d1018;
-  background-image: radial-gradient(
-    #252b38 1px,
-    transparent 1px
-  );
-  background-size: 18px 18px;
-
+  /* เคอร์เซอร์รูปมือ บอกว่าลากได้ */
   cursor: grab;
 
-  touch-action: none;
-  overscroll-behavior: contain;
+  /* ลากแล้วไม่ให้ไปคลุมดำเลือกตัวหนังสือ */
   user-select: none;
+
+  /* บนมือถือ/แท็บเล็ต ไม่ให้เบราว์เซอร์เอานิ้วลากไปเลื่อนหน้าเว็บเอง */
+  touch-action: none;
+
+  background: #0d1018;
+
+  background-image:
+    radial-gradient(
+      #252b38 1px,
+      transparent 1px
+    );
+
+  background-size: 18px 18px;
 }
 
-.pan-zoom-canvas.is-dragging {
+
+/* ระหว่างกดเมาส์ค้าง (กำลังลาก) เปลี่ยนเป็นมือกำ */
+.pan-zoom-canvas:active {
   cursor: grabbing;
 }
 
+
+/* ========================================
+   กล่องกระดานจริง (width / height / transform มาจาก PanZoomCanvas.jsx)
+   ของข้างในวางตำแหน่งอ้างอิงกล่องนี้
+======================================== */
+
 .pan-zoom-content {
   position: absolute;
-  top: 0;
   left: 0;
+  top: 0;
 
-  width: max-content;
-  min-width: 100%;
-  min-height: 100%;
-
+  /* ซูมโดยยึดมุมซ้ายบน (สูตรใน zoomAt คิดแบบนี้) */
   transform-origin: 0 0;
-
-  will-change: transform;
 }
 
-/* ปุ่มควบคุมมุมมอง */
-.pan-zoom-controls {
-  position: absolute;
-  top: 12px;
-  right: 12px;
 
-  z-index: 20;
+/* ตอนเลื่อนไปหาเส้นทาง ให้ค่อย ๆ เลื่อน จะได้รู้ว่าเลื่อนมาจากตรงไหน */
+.pan-zoom-content.animate {
+  transition: transform 0.35s ease;
+}
+
+
+/* ========================================
+   ปุ่มซูม มุมขวาล่าง
+======================================== */
+
+.zoom-controls {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
 
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 4px;
 
-  padding: 5px;
+  padding: 4px;
 
-  color: #e9eaf2;
-  background: rgba(20, 25, 37, 0.94);
-
-  border: 1px solid #323b4c;
+  border: 1px solid #293344;
   border-radius: 10px;
 
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.22);
+  background: #141925;
 
-  cursor: default;
-  user-select: none;
+  z-index: 3;
 }
 
-.pan-zoom-controls button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
 
-  min-width: 30px;
-  height: 30px;
+.zoom-controls button {
+  min-width: 36px;
+  height: 32px;
 
-  padding: 0 8px;
+  padding: 0 10px;
 
-  border: 1px solid transparent;
-  border-radius: 6px;
+  border: 0;
+  border-radius: 7px;
 
-  color: #e9eaf2;
   background: transparent;
 
-  font-family: inherit;
+  color: #e9eaf2;
+
   font-size: 16px;
-  line-height: 1;
 
   cursor: pointer;
 }
 
-.pan-zoom-controls button:hover:not(:disabled) {
-  background: #252d3d;
-  border-color: #3b465b;
+
+.zoom-controls button:hover {
+  background: #252b38;
 }
 
-.pan-zoom-controls button:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
+
+.zoom-controls .zoom-fit {
+  font-size: 12px;
 }
 
-.pan-zoom-level {
-  min-width: 45px;
 
-  color: #aab4c5;
+.zoom-value {
+  min-width: 44px;
 
-  font-size: 11px;
+  color: #7f8999;
+
+  font-size: 12px;
+
   text-align: center;
-  font-variant-numeric: tabular-nums;
-}
-
-.pan-zoom-controls .pan-zoom-reset {
-  padding: 0 9px;
-
-  border-left: 1px solid #323b4c;
-  border-radius: 0;
-
-  color: #55d7bd;
-  font-size: 11px;
-}
-
-.pan-zoom-controls button:focus-visible {
-  outline: 2px solid #55d7bd;
-  outline-offset: 2px;
-}
-
-@media (max-width: 600px) {
-  .pan-zoom-controls {
-    top: 8px;
-    right: 8px;
-    gap: 2px;
-    padding: 3px;
-  }
-
-  .pan-zoom-controls button {
-    min-width: 27px;
-    height: 27px;
-  }
-
-  .pan-zoom-level {
-    min-width: 38px;
-    font-size: 10px;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .pan-zoom-content {
-    will-change: auto;
-  }
-}
-
-/* ปุ่มควบคุมการซูม */
-.pan-zoom-controls {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  z-index: 9999;
-
-  display: flex !important;
-  align-items: center;
-  gap: 5px;
-
-  padding: 5px;
-  background: #202738;
-  border: 1px solid #46516a;
-  border-radius: 10px;
-}
-
-.pan-zoom-controls button {
-  display: inline-flex !important;
-  min-width: 30px;
-  height: 30px;
-  color: white;
-  background: transparent;
-  cursor: pointer;
-}
-
-.pan-zoom-level {
-  color: white;
 }

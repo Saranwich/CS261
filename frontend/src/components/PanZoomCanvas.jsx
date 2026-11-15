@@ -1,422 +1,298 @@
-
-import {
-  useState,
-  useRef,
-  useEffect,
-  useCallback,
-} from "react";
+import { useEffect, useRef, useState } from "react";
 import "./PanZoomCanvas.css";
 
-const MIN_ZOOM = 0.25;
-const MAX_ZOOM = 2.5;
-const ZOOM_STEP = 0.15;
-const FOCUS_PADDING = 48;
+// ========================================
+// กระดานที่ลากเลื่อน / ซูมเข้าออกได้
+// ใช้ทั้งแผนผังรายวิชา (leftpage.jsx) และแผนผังรายหัวข้อ (Topicpage.jsx)
+//
+// วิธีใช้
+//   <PanZoomCanvas width={1200} height={800}>
+//     ...ของที่จะวาด (วางตำแหน่งด้วย left / top ภายในขนาด width x height)
+//   </PanZoomCanvas>
+//
+//   - ลากด้วยเมาส์ = เลื่อน
+//   - ล้อเมาส์ / pinch บน trackpad = ซูม
+//   - ปุ่ม − + พอดีจอ มุมขวาล่าง
+//   - ขนาด width / height เปลี่ยนเมื่อไร จะจัดให้พอดีจอใหม่เอง
+//
+//   ถ้าส่ง focusArea = { x, y, width, height } มาด้วย
+//   จะซูมไปให้เห็นพื้นที่นั้นพอดีจอแทน (เช่น เส้นทางของหัวข้อที่เลือก)
+//   และมีปุ่ม "ไปที่เส้นทาง" เพิ่มที่มุมขวาล่าง
+// ========================================
 
-/**
- * PanZoomCanvas
- *
- * Props:
- * - children: เนื้อหาภายใน Canvas เช่น การ์ดหัวข้อและ SVG
- * - focusArea: พื้นที่ที่ต้องการโฟกัส { x, y, width, height }
- * - className: class เพิ่มเติมสำหรับ Canvas
- * - minZoom: ระดับซูมต่ำสุด
- * - maxZoom: ระดับซูมสูงสุด
- * - initialZoom: ระดับซูมเริ่มต้น
- * - onZoomChange: callback เมื่อระดับซูมเปลี่ยน
- *
- * พิกัดของ focusArea อ้างอิงจากจุด (0, 0)
- * ของพื้นที่ children ก่อนใช้ transform
- */
-function PanZoomCanvas({
-  children,
-  focusArea = null,
-  className = "",
-  minZoom = MIN_ZOOM,
-  maxZoom = MAX_ZOOM,
-  initialZoom = 1,
-  onZoomChange,
-}) {
-  const viewportRef = useRef(null);
-  const contentRef = useRef(null);
-  const dragRef = useRef(null);
-  const suppressClickRef = useRef(false);
-  const clickTimerRef = useRef(null);
+const MIN_ZOOM = 0.1; // ซูมออกได้สุด 10% (แผนผังทุกหัวข้อใหญ่มาก)
+const MAX_ZOOM = 2;   // ซูมเข้าได้สุด 200%
 
-  const [zoom, setZoom] = useState(() =>
-    clamp(initialZoom, minZoom, maxZoom)
-  );
 
-  const [position, setPosition] = useState({
-    x: 0,
-    y: 0,
-  });
+// ========================================
+// view = { x, y, scale }
+//   x, y  = เลื่อนกระดานไปกี่ px จากมุมซ้ายบนของกล่อง
+//   scale = ขนาด (1 = 100%)
+// ========================================
 
-  const [viewportSize, setViewportSize] = useState({
-    width: 0,
-    height: 0,
-  });
-
-  const [isDragging, setIsDragging] = useState(false);
-
-  // เก็บค่าปัจจุบันไว้ให้ Event Handler อ่านได้
-  const transformRef = useRef({
-    zoom: clamp(initialZoom, minZoom, maxZoom),
-    x: 0,
-    y: 0,
-  });
-
-  // จำกัดระดับซูมให้อยู่ในช่วงที่กำหนด
-  function clamp(value, min, max) {
-    return Math.min(max, Math.max(min, value));
+// view ที่ทำให้เห็นพื้นที่ area = { x, y, width, height } พอดีกล่อง และอยู่ตรงกลาง
+// (อยากเห็นทั้งกระดาน ก็ส่ง area = { x: 0, y: 0, width, height })
+function fitToBox(box, area) {
+  // กันค่าเพี้ยน (NaN / 0) ไม่ให้ transform พังทั้งกระดาน
+  if (![area.x, area.y, area.width, area.height].every(Number.isFinite) || area.width <= 0 || area.height <= 0) {
+    return { scale: 1, x: 0, y: 0 };
   }
-
-  // อัปเดตตำแหน่งและระดับซูม
-  const updateTransform = useCallback(
-    (next) => {
-      const nextZoom = clamp(next.zoom, minZoom, maxZoom);
-
-      transformRef.current = {
-        zoom: nextZoom,
-        x: next.x,
-        y: next.y,
-      };
-
-      setZoom(nextZoom);
-      setPosition({
-        x: next.x,
-        y: next.y,
-      });
-
-      onZoomChange?.(nextZoom);
-    },
-    [minZoom, maxZoom, onZoomChange]
+  const scale = Math.max(
+    MIN_ZOOM,
+    Math.min(1, box.clientWidth / area.width, box.clientHeight / area.height)
   );
+  return {
+    scale: scale,
+    x: (box.clientWidth - area.width * scale) / 2 - area.x * scale,
+    y: (box.clientHeight - area.height * scale) / 2 - area.y * scale,
+  };
+}
 
-  // อ่านขนาดพื้นที่แสดงผล
+// ซูมเข้า/ออก โดยให้จุด (pointX, pointY) บนจออยู่ที่เดิม
+// (เช่น ซูมด้วยเมาส์ จุดใต้เมาส์จะไม่หนีไปไหน)
+function zoomAt(view, pointX, pointY, factor) {
+  const scale = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, view.scale * factor));
+  const ratio = scale / view.scale;
+  return {
+    scale: scale,
+    x: pointX - (pointX - view.x) * ratio,
+    y: pointY - (pointY - view.y) * ratio,
+  };
+}
+
+
+// ขนาดสูงสุดของแผนที่ย่อ (px)
+const MINIMAP_MAX_WIDTH = 170;
+const MINIMAP_MAX_HEIGHT = 120;
+
+// minimapRects = [{ x, y, width, height }] ถ้าส่งมา จะมีแผนที่ย่อมุมซ้ายล่าง
+// (โผล่เฉพาะตอนซูมเข้าจนเห็นไม่ครบทั้งกระดาน) กดหรือลากบนแผนที่ย่อเพื่อเลื่อนไปที่นั่น
+function PanZoomCanvas({ width, height, focusArea = null, minimapRects = null, children }) {
+  const boxRef = useRef(null);          // กล่องกระดาน (ใช้วัดขนาดและรับ event ล้อเมาส์)
+  const dragRef = useRef(null);         // ข้อมูลตอนกำลังลาก (null = ไม่ได้ลาก)
+  const justDraggedRef = useRef(false); // เพิ่งลากเสร็จไหม (ถ้าใช่ จะไม่นับเป็นการคลิก)
+  const isFirstFitRef = useRef(true);   // จัดพอดีจอครั้งแรกไหม (ครั้งแรกไม่ต้องเล่นอนิเมชัน)
+  const [view, setView] = useState({ x: 0, y: 0, scale: 1 });
+  const [isAnimating, setIsAnimating] = useState(false); // กำลังเลื่อนไปหาเส้นทางแบบนุ่ม ๆ
+  const minimapRef = useRef(null);
+  const minimapDraggingRef = useRef(false);
+  const [boxSize, setBoxSize] = useState({ width: 0, height: 0 }); // ขนาดกล่องที่เห็นอยู่ (ใช้วาดกรอบบนแผนที่ย่อ)
+
   useEffect(() => {
-    const viewport = viewportRef.current;
-    if (!viewport) return;
-
-    const measure = () => {
-      const rect = viewport.getBoundingClientRect();
-
-      setViewportSize({
-        width: rect.width,
-        height: rect.height,
-      });
-    };
-
-    measure();
-
-    const observer = new ResizeObserver(measure);
-    observer.observe(viewport);
-
+    const box = boxRef.current;
+    const update = () => setBoxSize({ width: box.clientWidth, height: box.clientHeight });
+    update();
+    const observer = new ResizeObserver(update);
+    observer.observe(box);
     return () => observer.disconnect();
   }, []);
 
-  // ยกเลิก Timer เมื่อตัว Component ถูกถอดออก
+  // พื้นที่ที่อยากให้เห็น: มี focusArea ใช้อันนั้น ไม่มีก็ทั้งกระดาน
+  // (แยกเป็นตัวเลขทีละตัว เพราะ useEffect เทียบตัวเลขได้ตรง ๆ ว่าเปลี่ยนจริงไหม)
+  const areaX = focusArea ? focusArea.x : 0;
+  const areaY = focusArea ? focusArea.y : 0;
+  const areaWidth = focusArea ? focusArea.width : width;
+  const areaHeight = focusArea ? focusArea.height : height;
+
+  // พื้นที่ที่อยากให้เห็นเปลี่ยน (โหลดข้อมูลเสร็จ / เลือกหัวข้อใหม่) → เลื่อน + ซูมไปหา
   useEffect(() => {
-    return () => {
-      if (clickTimerRef.current) {
-        clearTimeout(clickTimerRef.current);
-      }
-    };
+    setView(fitToBox(boxRef.current, { x: areaX, y: areaY, width: areaWidth, height: areaHeight }));
+
+    if (isFirstFitRef.current) {
+      isFirstFitRef.current = false;
+      return;
+    }
+    // เปิดอนิเมชันแป๊บเดียว (ระหว่างลาก / ซูมด้วยล้อเมาส์ต้องไม่มีอนิเมชัน ไม่งั้นจะหน่วง)
+    setIsAnimating(true);
+    const timer = setTimeout(() => setIsAnimating(false), 400);
+    return () => clearTimeout(timer);
+  }, [areaX, areaY, areaWidth, areaHeight]);
+
+  // ล้อเมาส์ / pinch บน trackpad = ซูม
+  // ต้องผูก event เองด้วย passive: false ถึงจะ preventDefault ได้
+  // (ไม่อย่างนั้น pinch จะไปซูมทั้งหน้าเว็บแทน)
+  useEffect(() => {
+    const box = boxRef.current;
+
+    function handleWheel(event) {
+      event.preventDefault();
+      const rect = box.getBoundingClientRect();
+      const mouseX = event.clientX - rect.left;
+      const mouseY = event.clientY - rect.top;
+      // pinch บน trackpad จะมาเป็น ctrlKey + deltaY ค่าเล็ก ๆ จึงคูณให้ไวกว่า
+      const speed = event.ctrlKey ? 0.01 : 0.002;
+      const factor = Math.exp(-event.deltaY * speed);
+      setView((current) => zoomAt(current, mouseX, mouseY, factor));
+    }
+
+    box.addEventListener("wheel", handleWheel, { passive: false });
+    return () => box.removeEventListener("wheel", handleWheel);
   }, []);
 
-  // โฟกัสพื้นที่ที่ได้รับจาก focusArea
-  useEffect(() => {
-    if (!focusArea || !viewportSize.width || !viewportSize.height) {
-      return;
-    }
+  // ===== ลากเพื่อเลื่อนกระดาน =====
 
-    const { x, y, width, height } = focusArea;
-
-    if (
-      !Number.isFinite(x) ||
-      !Number.isFinite(y) ||
-      !Number.isFinite(width) ||
-      !Number.isFinite(height) ||
-      width <= 0 ||
-      height <= 0
-    ) {
-      return;
-    }
-
-    const availableWidth = Math.max(
-      1,
-      viewportSize.width - FOCUS_PADDING * 2
-    );
-
-    const availableHeight = Math.max(
-      1,
-      viewportSize.height - FOCUS_PADDING * 2
-    );
-
-    // คำนวณระดับซูมที่ทำให้พื้นที่เป้าหมายอยู่ใน Canvas
-    const fitZoom = clamp(
-      Math.min(
-        availableWidth / width,
-        availableHeight / height
-      ),
-      minZoom,
-      maxZoom
-    );
-
-    // จัดกึ่งกลางพื้นที่เป้าหมาย
-    const nextX =
-      viewportSize.width / 2 -
-      (x + width / 2) * fitZoom;
-
-    const nextY =
-      viewportSize.height / 2 -
-      (y + height / 2) * fitZoom;
-
-    updateTransform({
-      zoom: fitZoom,
-      x: nextX,
-      y: nextY,
-    });
-  }, [
-    focusArea?.x,
-    focusArea?.y,
-    focusArea?.width,
-    focusArea?.height,
-    viewportSize.width,
-    viewportSize.height,
-    minZoom,
-    maxZoom,
-    updateTransform,
-  ]);
-
-  // ซูมโดยยึดตำแหน่งเมาส์เป็นจุดอ้างอิง
-  const zoomAtPoint = useCallback(
-    (nextZoom, clientX, clientY) => {
-      const viewport = viewportRef.current;
-      if (!viewport) return;
-
-      const rect = viewport.getBoundingClientRect();
-      const current = transformRef.current;
-      const clampedZoom = clamp(nextZoom, minZoom, maxZoom);
-
-      const pointerX = clientX - rect.left;
-      const pointerY = clientY - rect.top;
-
-      // แปลงพิกัดหน้าจอกลับเป็นพิกัดใน Canvas
-      const contentX = (pointerX - current.x) / current.zoom;
-      const contentY = (pointerY - current.y) / current.zoom;
-
-      // คำนวณตำแหน่งใหม่เพื่อให้จุดใต้เมาส์อยู่ที่เดิม
-      updateTransform({
-        zoom: clampedZoom,
-        x: pointerX - contentX * clampedZoom,
-        y: pointerY - contentY * clampedZoom,
-      });
-    },
-    [minZoom, maxZoom, updateTransform]
-  );
-
-    // ซูมด้วยล้อเมาส์
-  const handleWheel = useCallback(
-    (event) => {
-      event.preventDefault();
-
-      const current = transformRef.current;
-      const factor = event.deltaY < 0 ? 1.1 : 1 / 1.1;
-
-      zoomAtPoint(
-        current.zoom * factor,
-        event.clientX,
-        event.clientY
-      );
-    },
-    [zoomAtPoint]
-  );
-
-  // รองรับการซูมด้วย Scroll Wheel
-  useEffect(() => {
-    const viewport = viewportRef.current;
-    if (!viewport) return;
-
-    viewport.addEventListener("wheel", handleWheel, {
-      passive: false,
-    });
-
-    return () => {
-      viewport.removeEventListener("wheel", handleWheel);
-    };
-  }, [handleWheel]);
-
-  // เริ่มลาก Canvas
-  const handlePointerDown = (event) => {
-    if (event.button !== 0) return;
-
-    // ไม่แย่งการคลิกการ์ด ปุ่ม ลิงก์ หรือช่องกรอกข้อมูล
-    if (
-      event.target.closest(
-        "button, a, input, textarea, select, [data-no-pan]"
-      )
-    ) {
-      return;
-    }
-
-    const current = transformRef.current;
-
+  function handlePointerDown(event) {
+    if (event.button !== 0) return; // รับแค่คลิกซ้าย
     dragRef.current = {
-      pointerId: event.pointerId,
       startX: event.clientX,
       startY: event.clientY,
-      originX: current.x,
-      originY: current.y,
+      viewX: view.x,
+      viewY: view.y,
       moved: false,
     };
+    justDraggedRef.current = false;
+  }
 
-    event.currentTarget.setPointerCapture(event.pointerId);
-  };
-
-  // เลื่อน Canvas ระหว่างลาก
-  const handlePointerMove = (event) => {
+  function handlePointerMove(event) {
     const drag = dragRef.current;
-
-    if (!drag || drag.pointerId !== event.pointerId) return;
+    if (!drag) return;
 
     const dx = event.clientX - drag.startX;
     const dy = event.clientY - drag.startY;
 
-    if (Math.abs(dx) > 3 || Math.abs(dy) > 3) {
-      drag.moved = true;
-      setIsDragging(true);
-    }
+    // ขยับน้อยกว่า 5px ยังถือว่าเป็นการคลิก ไม่ใช่การลาก
+    if (!drag.moved && Math.hypot(dx, dy) < 5) return;
 
-    updateTransform({
-      ...transformRef.current,
-      x: drag.originX + dx,
-      y: drag.originY + dy,
-    });
-  };
+    drag.moved = true;
+    setView((current) => ({ ...current, x: drag.viewX + dx, y: drag.viewY + dy }));
+  }
 
-  // จบการลาก
-  const handlePointerUp = (event) => {
-    const drag = dragRef.current;
-
-    if (!drag || drag.pointerId !== event.pointerId) return;
-
-    if (drag.moved) {
-      suppressClickRef.current = true;
-
-      if (clickTimerRef.current) {
-        clearTimeout(clickTimerRef.current);
-      }
-
-      clickTimerRef.current = setTimeout(() => {
-        suppressClickRef.current = false;
-      }, 0);
-    }
-
+  function handlePointerUp() {
+    justDraggedRef.current = dragRef.current?.moved || false;
     dragRef.current = null;
-    setIsDragging(false);
+  }
+
+  // ถ้าเพิ่งลากเสร็จ ไม่ให้ไปกดปุ่มที่ปล่อยเมาส์ทับ
+  function handleClickCapture(event) {
+    if (justDraggedRef.current) {
+      event.stopPropagation();
+      justDraggedRef.current = false;
+    }
+  }
+
+  // ===== ปุ่มซูม (ซูมรอบจุดกลางกล่อง) =====
+
+  function zoomFromCenter(factor) {
+    const box = boxRef.current;
+    setView((current) => zoomAt(current, box.clientWidth / 2, box.clientHeight / 2, factor));
+  }
+
+  // ===== แผนที่ย่อ =====
+  const miniScale = Math.min(MINIMAP_MAX_WIDTH / width, MINIMAP_MAX_HEIGHT / height);
+  const viewport = {
+    x: -view.x / view.scale,
+    y: -view.y / view.scale,
+    width: boxSize.width / view.scale,
+    height: boxSize.height / view.scale,
   };
+  // เห็นทั้งกระดานอยู่แล้ว ไม่ต้องโชว์แผนที่ย่อ
+  const showMinimap =
+    Boolean(minimapRects) &&
+    boxSize.width > 0 &&
+    (viewport.width < width * 0.98 || viewport.height < height * 0.98);
 
-  // Reset กลับสู่ระดับซูมเริ่มต้น
-  const handleReset = () => {
-    updateTransform({
-      zoom: clamp(initialZoom, minZoom, maxZoom),
-      x: 0,
-      y: 0,
-    });
-  };
+  // เลื่อนกระดานให้จุดที่กดบนแผนที่ย่อ มาอยู่กลางจอ
+  function centerOnMinimap(event) {
+    const rect = minimapRef.current.getBoundingClientRect();
+    const boardX = (event.clientX - rect.left) / miniScale;
+    const boardY = (event.clientY - rect.top) / miniScale;
+    setView((current) => ({
+      scale: current.scale,
+      x: boxSize.width / 2 - boardX * current.scale,
+      y: boxSize.height / 2 - boardY * current.scale,
+    }));
+  }
 
-  const handleZoomIn = () => {
-    const viewport = viewportRef.current;
-    if (!viewport) return;
+  function handleMinimapDown(event) {
+    event.stopPropagation(); // ไม่ให้กลายเป็นการลากกระดานหลัก
+    minimapDraggingRef.current = true;
+    event.currentTarget.setPointerCapture(event.pointerId);
+    centerOnMinimap(event);
+  }
 
-    const rect = viewport.getBoundingClientRect();
+  function handleMinimapMove(event) {
+    if (minimapDraggingRef.current) centerOnMinimap(event);
+  }
 
-    zoomAtPoint(
-      transformRef.current.zoom + ZOOM_STEP,
-      rect.left + rect.width / 2,
-      rect.top + rect.height / 2
-    );
-  };
-
-  const handleZoomOut = () => {
-    const viewport = viewportRef.current;
-    if (!viewport) return;
-
-    const rect = viewport.getBoundingClientRect();
-
-    zoomAtPoint(
-      transformRef.current.zoom - ZOOM_STEP,
-      rect.left + rect.width / 2,
-      rect.top + rect.height / 2
-    );
-  };
+  function handleMinimapUp(event) {
+    minimapDraggingRef.current = false;
+    event.currentTarget.releasePointerCapture?.(event.pointerId);
+  }
 
   return (
     <div
-      ref={viewportRef}
-      className={[
-        "pan-zoom-canvas",
-        isDragging ? "is-dragging" : "",
-        className,
-      ]
-        .filter(Boolean)
-        .join(" ")}
+      className="pan-zoom-canvas"
+      ref={boxRef}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
-      onPointerCancel={handlePointerUp}
-      onClickCapture={(event) => {
-        if (suppressClickRef.current) {
-          event.preventDefault();
-          event.stopPropagation();
-          suppressClickRef.current = false;
-        }
-      }}
+      onPointerLeave={handlePointerUp}
+      onClickCapture={handleClickCapture}
     >
-      <div className="pan-zoom-controls" data-no-pan>
-        <button
-          type="button"
-          onClick={handleZoomIn}
-          aria-label="ซูมเข้า"
-          title="ซูมเข้า"
-          disabled={zoom >= maxZoom}
-        >
-          +
-        </button>
-
-        <span className="pan-zoom-level">
-          {Math.round(zoom * 100)}%
-        </span>
-
-        <button
-          type="button"
-          onClick={handleZoomOut}
-          aria-label="ซูมออก"
-          title="ซูมออก"
-          disabled={zoom <= minZoom}
-        >
-          -
-        </button>
-
-        <button
-          type="button"
-          className="pan-zoom-reset"
-          onClick={handleReset}
-          title="รีเซ็ตมุมมอง"
-          aria-label="รีเซ็ตมุมมอง"
-        >
-          รีเซ็ต
-        </button>
-      </div>
-
+      {/* กล่องขนาดเท่ากระดานจริง เลื่อน/ซูมด้วย transform ทั้งกล่อง */}
       <div
-        ref={contentRef}
-        className="pan-zoom-content"
+        className={`pan-zoom-content ${isAnimating ? "animate" : ""}`}
         style={{
-          transform: `translate(${position.x}px, ${position.y}px) scale(${zoom})`,
+          width,
+          height,
+          transform: `translate(${view.x}px, ${view.y}px) scale(${view.scale})`,
         }}
       >
         {children}
+      </div>
+
+      {/* ===== แผนที่ย่อ มุมซ้ายล่าง ===== */}
+      {showMinimap && (
+        <div
+          className="minimap"
+          ref={minimapRef}
+          style={{ width: width * miniScale, height: height * miniScale }}
+          onPointerDown={handleMinimapDown}
+          onPointerMove={handleMinimapMove}
+          onPointerUp={handleMinimapUp}
+          title="กดหรือลากเพื่อเลื่อนไปจุดนั้น"
+          aria-hidden="true"
+        >
+          {minimapRects.map((rect, index) => (
+            <span
+              key={index}
+              className="minimap__rect"
+              style={{
+                left: rect.x * miniScale,
+                top: rect.y * miniScale,
+                width: rect.width * miniScale,
+                height: rect.height * miniScale,
+              }}
+            />
+          ))}
+          <span
+            className="minimap__view"
+            style={{
+              left: viewport.x * miniScale,
+              top: viewport.y * miniScale,
+              width: viewport.width * miniScale,
+              height: viewport.height * miniScale,
+            }}
+          />
+        </div>
+      )}
+
+      {/* ===== ปุ่มซูม มุมขวาล่าง ===== */}
+      <div className="zoom-controls">
+        <button onClick={() => zoomFromCenter(1 / 1.2)} aria-label="ซูมออก">−</button>
+        <span className="zoom-value">{Math.round(view.scale * 100)}%</span>
+        <button onClick={() => zoomFromCenter(1.2)} aria-label="ซูมเข้า">+</button>
+        {focusArea && (
+          <button className="zoom-fit" onClick={() => setView(fitToBox(boxRef.current, focusArea))}>
+            ไปที่เส้นทาง
+          </button>
+        )}
+        <button
+          className="zoom-fit"
+          onClick={() => setView(fitToBox(boxRef.current, { x: 0, y: 0, width, height }))}
+        >
+          พอดีจอ
+        </button>
       </div>
     </div>
   );
