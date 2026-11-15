@@ -1,4 +1,3 @@
-
 .topic-page {
   display: flex;
   flex-direction: column;
@@ -470,4 +469,48 @@
   .topic-course {
     transition: none;
   }
+}
+
+
+/* ===== ปรับขนาดการ์ดหัวข้อให้กะทัดรัด (NODE_HEIGHT = 64 ใน Topicpage.jsx) ===== */
+.topic-node { gap: 8px; padding: 8px 10px; }
+.topic-node__content { gap: 3px; }
+.topic-node__name { font-size: 11px; line-height: 1.3; }
+
+/* เส้นที่ต่อเข้า/ออกหัวข้อที่เมาส์ชี้ = หนาสุด */
+.topic-edge--hover {
+  stroke: #c1c9ff;
+  stroke-width: 3;
+  stroke-opacity: 1;
+}
+
+
+/* ===== เส้นเชื่อม: ปกติจาง ๆ ให้เห็นภาพรวม / เส้นทางที่เลือกเด่น / ข้ามวิชา = เส้นประ ===== */
+.topic-edge {
+  stroke: #8298c5;
+  stroke-width: 1.2;
+  stroke-opacity: 0.38;
+}
+.topic-edge--cross {
+  stroke-dasharray: 6 5;
+}
+.topic-edge--faded {
+  stroke-opacity: 0.08;
+}
+.topic-edge--active {
+  stroke: #9baaff;
+  stroke-width: 2.2;
+  stroke-opacity: 1;
+}
+.topic-edge--hover {
+  stroke: #d7dcff;
+  stroke-width: 3;
+  stroke-opacity: 1;
+}
+
+.topic-course__count {
+  margin-left: 6px;
+  color: #7f8ba3;
+  font-size: 11px;
+  font-weight: 500;
 }
