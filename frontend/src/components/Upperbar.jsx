@@ -105,16 +105,33 @@ function Upperbar({ onLogout, activeTab, setActiveTab, courses = [], topics = []
 
   return (
     <nav className="nav-container" aria-label="หน้าหลัก">
-      <span className="brand">CSTUCOM</span>
+      <span className="brand">CSTU COMPASS</span>
 
+      {/* แท็บ 2 อัน กว้างเท่ากัน แถบพื้นหลังเลื่อนไปมาระหว่างสองอัน (สไตล์อยู่ใน extras.css) */}
       <div className="tabs" role="tablist">
-        <button className={`tab ${activeTab === 'course' ? 'active' : ''}`} 
-        onClick={() => setActiveTab('course')}>รายวิชา</button>
-        <button  className={`tab ${activeTab === 'topic' ? 'active' : ''}`} 
-          onClick={() => setActiveTab('topic')}>รายหัวข้อ</button>
+        <span
+          className={`tab-indicator ${activeTab === 'topic' ? 'is-second' : ''}`}
+          aria-hidden="true"
+        />
+        <button
+          role="tab"
+          aria-selected={activeTab === 'course'}
+          className={`tab ${activeTab === 'course' ? 'active' : ''}`}
+          onClick={() => setActiveTab('course')}
+        >
+          รายวิชา
+        </button>
+        <button
+          role="tab"
+          aria-selected={activeTab === 'topic'}
+          className={`tab ${activeTab === 'topic' ? 'active' : ''}`}
+          onClick={() => setActiveTab('topic')}
+        >
+          รายหัวข้อ
+        </button>
       </div>
 
-     
+
       <div className="search-wrap">
         <label className="search-btn" htmlFor="search-input">
           <SearchIcon size={15} />
