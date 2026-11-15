@@ -1,0 +1,803 @@
+/* ========================================
+   polish.css — ชั้นปรับแต่งหน้าตา (import ท้ายสุดใน main.jsx จึงทับ CSS เดิมได้)
+   1) แท็บ  2) ขนาดตัวหนังสือภาษาไทยให้อ่านง่ายขึ้น  3) ไอคอน SVG
+   ภายหลังอยากรวมเข้าไฟล์ของแต่ละคอมโพเนนต์ ก็ย้ายบล็อกไปวางได้เลย
+======================================== */
+
+
+/* ===== 1) Upperbar: แท็บที่ไม่ได้เลือกเดิมเป็นเขียวเข้มบนพื้นดำ อ่านแทบไม่ออก ===== */
+
+.tab {
+  color: var(--text-muted);
+}
+
+.tab:hover {
+  color: var(--text);
+}
+
+.tab.active {
+  background-color: rgba(139, 154, 255, 0.14);
+  color: var(--accent-strong);
+  box-shadow: 0 0 0 1px rgba(139, 154, 255, 0.35);
+}
+
+.tab:focus-visible,
+.logout-btn:focus-visible {
+  outline: 2px solid var(--accent-strong);
+  outline-offset: 2px;
+}
+
+.tab {
+  font-size: 13px;
+}
+
+.who small {
+  font-size: 12px;
+}
+
+.search-btn svg {
+  flex-shrink: 0;
+}
+
+.search-btn input {
+  font-size: 14px;
+}
+
+.search-empty {
+  font-size: 13px;
+}
+
+.search-result-type {
+  width: 46px;
+  font-size: 11px;
+}
+
+.search-result-sub {
+  font-size: 12px;
+}
+
+
+/* ===== 2) ขนาดตัวหนังสือ: ภาษาไทยเล็กกว่า 12px อ่านยาก ===== */
+
+/* --- ฝั่งขวา: รายละเอียดวิชา (Rightpage) --- */
+.right-page__eyebrow { font-size: 11px; }
+.right-page__course-code { font-size: 11px; }
+.right-page__subtitle { font-size: 12px; }
+.right-page__section h3,
+.right-page__progress-heading h3 { font-size: 13px; }
+.right-page__progress-heading span { font-size: 12px; }
+.right-page__description { font-size: 13px; }
+.right-page__muted { font-size: 12px; }
+.right-page__progress > p { font-size: 12px; }
+.right-page__count { font-size: 11px; }
+.right-page__primary-btn,
+.right-page__secondary-btn { font-size: 13px; }
+.right-page__list-text strong { font-size: 13px; }
+.right-page__list-text small { font-size: 12px; }
+.right-page__badge { font-size: 11px; }
+.right-page__badge-btn { font-size: 11px; }
+.right-page--empty h2 { font-size: 17px; }
+.right-page--empty p { font-size: 13px; }
+
+/* --- ฝั่งขวา: รายละเอียดหัวข้อ (TopicDetail) --- */
+.topic-detail__eyebrow { font-size: 11px; }
+.topic-detail__course { font-size: 11px; }
+.topic-detail__subtitle { font-size: 12px; }
+.topic-detail__section h3,
+.topic-detail__progress-heading h3 { font-size: 13px; }
+.topic-detail__progress-heading span { font-size: 12px; }
+.topic-detail__description { font-size: 13px; }
+.topic-detail__muted { font-size: 12px; }
+.topic-detail__progress > p { font-size: 12px; }
+.topic-detail__count { font-size: 11px; }
+.topic-detail__start small { font-size: 11px; }
+.topic-detail__start strong { font-size: 13px; }
+.topic-detail__list-text strong { font-size: 13px; }
+.topic-detail__list-text small { font-size: 12px; }
+.topic-detail__badge { font-size: 11px; }
+.topic-detail--empty h2 { font-size: 17px; }
+.topic-detail--empty p { font-size: 13px; }
+
+/* ปุ่มล่าง: ไอคอน + ข้อความจัดกึ่งกลางเรียงกัน */
+.topic-detail__done-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 13px;
+}
+
+/* --- แผนผังหัวข้อ (Topicpage) --- */
+.topic-page__eyebrow { font-size: 11px; }
+.topic-page__subtitle { font-size: 13px; }
+.topic-page__legend-item { font-size: 12px; }
+.topic-page__footer { font-size: 12px; }
+.topic-page__empty p { font-size: 13px; }
+.topic-node__name { font-size: 12px; }
+.topic-node__meta { font-size: 10px; }
+.topic-node__selected-label { font-size: 8px; }
+.topic-course__count { font-size: 12px; }
+
+/* --- รายการลิงก์แหล่งเรียน (ResourceList) --- */
+.resource-type { width: 54px; font-size: 11px; }
+.resource-title { font-size: 13px; }
+.resource-note { font-size: 12px; }
+
+/* --- ปุ่มซูม --- */
+.zoom-controls .zoom-fit { font-size: 13px; }
+.zoom-value { font-size: 13px; }
+
+
+/* ===== 3) ไอคอน SVG ที่มาแทนอีโมจิ / ตัวอักษร ===== */
+
+.right-page__status svg,
+.topic-detail__status svg,
+.right-page__list-status svg,
+.topic-detail__list-status svg,
+.topic-node__status svg,
+.right-page__empty-icon svg,
+.topic-detail__empty-icon svg,
+.topic-page__empty-icon svg {
+  display: block;
+}
+
+
+/* ===== ปรับขนาดตัวหนังสือบนจอแคบ ===== */
+
+@media (max-width: 1100px) {
+  .right-page__description,
+  .topic-detail__description {
+    font-size: 12.5px;
+  }
+}
+
+
+/* ========================================
+   รอบ 2: วงแหวนความคืบหน้า / หัวข้อพับได้ / ปุ่มล่างติดขอบ
+======================================== */
+
+/* ----- กล่องความคืบหน้า (วงแหวน + ข้อความ) ----- */
+
+.right-page__progress,
+.topic-detail__progress {
+  margin-top: 20px;
+}
+
+.progress-card {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.progress-card__text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.progress-card__text h3 {
+  margin: 0;
+  color: #dce3f3;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.progress-card__count {
+  color: var(--accent-strong);
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.progress-card__text p {
+  margin: 0;
+  color: #8e9bb4;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+/* ถ้าครบแล้ว ตัวเลขเป็นสีเขียว */
+.progress-ring.is-done ~ .progress-card__text .progress-card__count {
+  color: var(--success);
+}
+
+.topic-detail__progress .topic-detail__start {
+  margin-top: 16px;
+}
+
+/* ----- วงแหวน ----- */
+
+.progress-ring {
+  position: relative;
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+}
+
+/* หมุนเฉพาะตัววงแหวน (svg ลูกตรง) ให้เริ่มเติมจากบนสุด
+   ไม่หมุนไอคอนติ๊กถูกในป้ายตรงกลาง */
+.progress-ring > svg {
+  display: block;
+  transform: rotate(-90deg);
+}
+
+.progress-ring__label svg {
+  display: block;
+}
+
+.progress-ring__track {
+  stroke: #293146;
+}
+
+.progress-ring__bar {
+  transition: stroke-dashoffset 0.5s ease, stroke 0.3s ease;
+}
+
+.progress-ring__label {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.progress-ring.is-done .progress-ring__label {
+  color: var(--success);
+}
+
+/* เพิ่งเรียนครบ: วงเด้งเล็กน้อย + คลื่นแผ่ออกครั้งเดียว */
+.progress-ring--burst {
+  animation: ring-pop 0.7s ease;
+}
+
+.progress-ring--burst::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 2px solid var(--success);
+  border-radius: 50%;
+  pointer-events: none;
+  animation: ring-wave 0.9s ease-out forwards;
+}
+
+@keyframes ring-pop {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.12); }
+  100% { transform: scale(1); }
+}
+
+@keyframes ring-wave {
+  from { transform: scale(1);   opacity: 0.8; }
+  to   { transform: scale(1.7); opacity: 0; }
+}
+
+/* ----- หัวข้อพับ / ขยายได้ ----- */
+
+.collapsible {
+  margin-top: 18px;
+  padding-top: 4px;
+  border-top: 1px solid var(--border);
+}
+
+.collapsible__head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 0;
+  border: 0;
+  background: transparent;
+  color: #dce3f3;
+  text-align: left;
+  cursor: pointer;
+}
+
+.collapsible__title {
+  flex: 1;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.collapsible__head:hover .collapsible__title {
+  color: var(--accent-strong);
+}
+
+.collapsible__head:focus-visible {
+  outline: 2px solid var(--accent-strong);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+.collapsible__count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 5px;
+  border-radius: 7px;
+  color: var(--accent-strong);
+  background: rgba(139, 154, 255, 0.1);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.collapsible__chevron {
+  display: grid;
+  place-items: center;
+  color: var(--text-faint);
+  transition: transform 0.18s ease;
+}
+
+.collapsible__head[aria-expanded="false"] .collapsible__chevron {
+  transform: rotate(-90deg);
+}
+
+.collapsible__body {
+  padding-bottom: 4px;
+}
+
+.collapsible__body > .right-page__list,
+.collapsible__body > .topic-detail__list {
+  margin-top: 4px;
+}
+
+/* ----- ปุ่มหลักฝั่งวิชา ติดขอบล่างเหมือนฝั่งหัวข้อ ----- */
+
+.right-page__footer {
+  display: flex;
+  flex-shrink: 0;
+  gap: 10px;
+  padding: 14px 22px;
+  border-top: 1px solid rgba(151, 164, 191, 0.13);
+  background: #111621;
+}
+
+@media (max-width: 900px) {
+  .right-page__footer {
+    padding: 12px 17px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .progress-ring--burst,
+  .progress-ring--burst::after {
+    animation: none;
+  }
+
+  .progress-ring__bar,
+  .collapsible__chevron {
+    transition: none;
+  }
+}
+
+
+/* ========================================
+   รอบ 3: ใช้งานง่ายขึ้น
+   แผนที่ย่อ / ควรเรียนต่อ / skeleton + ลองใหม่ / toast / รองรับจอเล็ก
+======================================== */
+
+/* ----- แผนที่ย่อ (มุมซ้ายล่างของแผนผังหัวข้อ) ----- */
+
+.minimap {
+  position: absolute;
+  left: 16px;
+  bottom: 16px;
+  z-index: 3;
+  overflow: hidden;
+  border: 1px solid #293344;
+  border-radius: 8px;
+  background: rgba(20, 25, 37, 0.92);
+  cursor: pointer;
+  touch-action: none;
+}
+
+.minimap__rect {
+  position: absolute;
+  border: 1px solid rgba(124, 143, 184, 0.45);
+  border-radius: 2px;
+  background: rgba(124, 143, 184, 0.14);
+  pointer-events: none;
+}
+
+/* กรอบสี่เหลี่ยมแสดงส่วนที่กำลังเห็นอยู่ */
+.minimap__view {
+  position: absolute;
+  border: 1.5px solid var(--accent);
+  border-radius: 2px;
+  background: rgba(139, 154, 255, 0.14);
+  pointer-events: none;
+}
+
+/* ----- "ควรเรียนต่อ" ในกล่องความคืบหน้า ----- */
+
+.next-up {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  margin-top: 14px;
+  padding: 12px 14px;
+  border: 1px solid rgba(139, 154, 255, 0.3);
+  border-radius: 12px;
+  color: #dce3f3;
+  background: rgba(139, 154, 255, 0.08);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.18s ease, background 0.18s ease;
+}
+
+.next-up:hover {
+  border-color: var(--accent);
+  background: rgba(139, 154, 255, 0.15);
+}
+
+.next-up:focus-visible {
+  outline: 2px solid var(--accent-strong);
+  outline-offset: 2px;
+}
+
+.next-up__text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.next-up__label {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.next-up__name {
+  font-size: 14px;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.next-up__hint {
+  color: var(--text-faint);
+  font-size: 12px;
+}
+
+/* ----- ตอนโหลดข้อมูล: โครงการ์ดเรืองแสงแทนข้อความ ----- */
+
+.skeleton-map {
+  display: flex;
+  align-items: center;
+  gap: 110px;
+  width: 100%;
+  height: 100%;
+  padding: 60px;
+  overflow: hidden;
+  background: #0d1018;
+  background-image: radial-gradient(rgba(139, 154, 255, 0.12) 1px, transparent 1px);
+  background-size: 18px 18px;
+}
+
+.skeleton-card {
+  flex: 0 0 240px;
+  height: 112px;
+  border-radius: 14px;
+  background: linear-gradient(100deg, #171d2c 30%, #222b42 50%, #171d2c 70%);
+  background-size: 250% 100%;
+  animation: skeleton-shimmer 1.5s linear infinite;
+}
+
+@keyframes skeleton-shimmer {
+  from { background-position: 150% 0; }
+  to   { background-position: -100% 0; }
+}
+
+/* ----- โหลดไม่สำเร็จ: บอกสาเหตุ + ปุ่มลองใหม่ ----- */
+
+.load-error {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 40px;
+  color: #ff8a84;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.load-error strong {
+  font-size: 16px;
+}
+
+.load-error span {
+  color: var(--text-muted);
+}
+
+.retry-btn {
+  margin-top: 8px;
+  padding: 10px 18px;
+  border: 1px solid rgba(139, 154, 255, 0.4);
+  border-radius: 10px;
+  color: #dce1ff;
+  background: rgba(139, 154, 255, 0.14);
+  font-size: 13px;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.retry-btn:hover {
+  border-color: var(--accent-strong);
+  background: rgba(139, 154, 255, 0.24);
+}
+
+/* ----- ข้อความแจ้งเตือนด้านล่างจอ ----- */
+
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 28px;
+  z-index: 50;
+  max-width: calc(100vw - 32px);
+  padding: 12px 18px;
+  border: 1px solid rgba(248, 113, 113, 0.45);
+  border-radius: 12px;
+  color: #fecaca;
+  background: #2a1517;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
+  font-size: 13px;
+  transform: translateX(-50%);
+  animation: toast-in 0.2s ease-out;
+}
+
+@keyframes toast-in {
+  from { opacity: 0; transform: translate(-50%, 8px); }
+  to   { opacity: 1; transform: translate(-50%, 0); }
+}
+
+/* ----- จอแคบ (แท็บเล็ตแนวตั้ง / มือถือ): แผนผังอยู่บน แผงรายละเอียดอยู่ล่าง ----- */
+
+@media (max-width: 900px) {
+  .homepage {
+    flex-direction: column;
+  }
+
+  .leftPage {
+    flex: 55 1 0;
+    width: 100%;
+    height: auto;
+    min-height: 0;
+  }
+
+  .rightPage {
+    flex: 45 1 0;
+    width: 100%;
+    height: auto;
+    min-height: 0;
+    border-left: 0;
+    border-top: 1px solid #29303d;
+  }
+
+  .nav-container {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .search-wrap {
+    order: 5;
+    flex: 1 1 100%;
+    max-width: none;
+  }
+
+  .who,
+  .search-btn kbd {
+    display: none;
+  }
+
+  .skeleton-map {
+    gap: 40px;
+    padding: 30px;
+  }
+
+  .minimap {
+    display: none; /* จอเล็กใช้นิ้วลากแผนผังโดยตรงแทน */
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton-card {
+    animation: none;
+  }
+
+  .toast {
+    animation: none;
+  }
+}
+
+
+/* ========================================
+   รอบ 4: ความจึ้ง
+   พื้นหลังออโรรา / แผงภาพรวมกระจกฝ้า / เส้นเรืองแสงไหลตามเส้นทาง
+   การ์ดไล่เข้าตอนเปิดหน้า / เศษกระดาษตอนเรียนครบ
+======================================== */
+
+/* ----- พื้นหลัง: จุดตารางเดิม + แสงม่วงมุมซ้ายบน + แสงเขียวมุมขวาล่าง ----- */
+
+.pan-zoom-canvas,
+.course-map {
+  background-image:
+    radial-gradient(rgba(139, 154, 255, 0.12) 1px, transparent 1px),
+    radial-gradient(900px 520px at 6% 0%, rgba(124, 140, 255, 0.12), transparent 62%),
+    radial-gradient(800px 520px at 100% 100%, rgba(69, 214, 174, 0.08), transparent 62%);
+  background-size: 18px 18px, 100% 100%, 100% 100%;
+  background-repeat: repeat, no-repeat, no-repeat;
+}
+
+/* ----- แผงภาพรวม (กระจกฝ้า) ----- */
+
+.overview {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 18px 12px 12px;
+  border: 1px solid rgba(139, 154, 255, 0.24);
+  border-radius: 18px;
+  background: rgba(20, 25, 37, 0.7);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.38);
+  animation: overview-in 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) 0.25s backwards;
+}
+
+.overview__text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.overview__title {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.overview__count {
+  color: var(--accent-strong);
+  font-size: 19px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.overview__sub {
+  color: var(--text-faint);
+  font-size: 12px;
+}
+
+.overview .progress-ring__label {
+  font-size: 13px;
+}
+
+@keyframes overview-in {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ----- เส้นที่อยู่บนเส้นทาง: แสงไหลจากวิชา/หัวข้อพื้นฐาน → ต่อยอด ----- */
+
+.topic-edge--active,
+.topic-edge--hover,
+.course-line.active {
+  stroke-dasharray: 8 6;
+  animation: edge-flow 0.9s linear infinite;
+}
+
+@keyframes edge-flow {
+  to { stroke-dashoffset: -14; }
+}
+
+/* ----- การ์ดวิชา: ไล่เข้าทีละใบตอนเปิดหน้า + กดเลือกแล้วมีแสงกระเพื่อมครั้งเดียว ----- */
+
+.course-card {
+  animation: card-in 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+  animation-delay: calc(var(--i, 0) * 70ms);
+}
+
+.course-card.selected {
+  animation:
+    card-in 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) backwards,
+    select-pulse 0.7s ease-out;
+  animation-delay: calc(var(--i, 0) * 70ms), 0s;
+}
+
+@keyframes card-in {
+  from { opacity: 0; transform: translateY(14px) scale(0.97); }
+}
+
+@keyframes select-pulse {
+  0%   { box-shadow: 0 0 0 1px #8b9aff, 0 0 0 0 rgba(139, 154, 255, 0.5); }
+  100% { box-shadow: 0 0 0 1px #8b9aff, 0 0 0 16px rgba(139, 154, 255, 0); }
+}
+
+/* วิชาที่เรียนครบ: พื้นการ์ดอมเขียวนิด ๆ ให้เด่นออกมาจากวิชาอื่น */
+.course-card.is-done {
+  background: linear-gradient(135deg, rgba(27, 53, 52, 0.98), rgba(23, 31, 44, 0.98));
+  box-shadow: 0 5px 18px rgba(69, 214, 174, 0.1);
+}
+
+/* วิชาที่ครบและกำลังเลือกอยู่ ยังต้องเห็นกรอบม่วงของการเลือก */
+.course-card.is-done.selected {
+  box-shadow:
+    0 0 0 1px #8b9aff,
+    0 10px 24px rgba(45, 59, 133, 0.45);
+}
+
+.course-card.is-done:hover {
+  background: linear-gradient(135deg, rgba(32, 62, 60, 0.98), rgba(26, 36, 50, 0.98));
+}
+
+/* ----- หัวแผงขวา: ไล่สีม่วงจาง ๆ จากบน ----- */
+
+.right-page__header,
+.topic-detail__header {
+  background: linear-gradient(180deg, rgba(139, 154, 255, 0.1), rgba(139, 154, 255, 0));
+}
+
+.right-page__title,
+.topic-detail__title {
+  font-size: 20px;
+  letter-spacing: -0.3px;
+}
+
+/* ----- เศษกระดาษตอนเรียนครบ (วงแหวน) ----- */
+
+.confetti {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 2;
+  width: 5px;
+  height: 10px;
+  border-radius: 2px;
+  background: var(--color);
+  pointer-events: none;
+  opacity: 0;
+  animation: confetti-burst 0.95s cubic-bezier(0.15, 0.7, 0.3, 1) forwards;
+}
+
+@keyframes confetti-burst {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -50%) rotate(var(--angle)) translateY(0) rotate(0deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) rotate(var(--angle))
+      translateY(calc(var(--distance) * -1px)) rotate(240deg);
+  }
+}
+
+@media (max-width: 900px) {
+  .overview {
+    top: 10px;
+    left: 10px;
+    padding: 8px 12px 8px 8px;
+  }
+
+  .overview__sub {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .overview,
+  .course-card,
+  .course-card.selected,
+  .topic-edge--active,
+  .topic-edge--hover,
+  .course-line.active,
+  .confetti {
+    animation: none;
+  }
+}
