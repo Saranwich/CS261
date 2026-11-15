@@ -22,14 +22,18 @@
 }
 
 /* ========================================
-   กล่องรายวิชา (Node Card)
+   การ์ดรายวิชา (ขนาดต้องตรงกับ CARD_WIDTH / CARD_HEIGHT ใน leftpage.jsx)
 ======================================== */
 
 .course-card {
   position: absolute;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 4px;
   width: 240px;
-  height: 84px;
-  padding: 13px 15px;
+  height: 112px;
+  padding: 12px 14px;
   border: 1px solid rgba(126, 143, 179, 0.24);
   border-radius: 14px;
   background: linear-gradient(
@@ -47,12 +51,8 @@
     border-color 0.18s ease,
     background 0.18s ease,
     box-shadow 0.18s ease;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
 }
 
-/* Hover */
 .course-card:hover {
   transform: translateY(-2px);
   border-color: rgba(139, 154, 255, 0.68);
@@ -65,7 +65,11 @@
   z-index: 4;
 }
 
-/* วิชาที่เลือก */
+.course-card:focus-visible {
+  outline: 2px solid #a5b0ff;
+  outline-offset: 3px;
+}
+
 .course-card.selected {
   border-color: #8b9aff;
   box-shadow:
@@ -75,7 +79,7 @@
 }
 
 /* ========================================
-   ส่วนหัวของการ์ด
+   แถวบนของการ์ด: จุดสถานะ + รหัสวิชา + เปอร์เซ็นต์
 ======================================== */
 
 .course-card-header {
@@ -84,37 +88,80 @@
   gap: 8px;
 }
 
-/* จุดสถานะ */
 .course-dot {
   width: 8px;
   height: 8px;
   flex-shrink: 0;
   border-radius: 50%;
-  background: #45d6ae;
-  box-shadow: 0 0 8px rgba(69, 214, 174, 0.35);
+  background: #596780;
   transition: background 0.18s ease, box-shadow 0.18s ease;
 }
 
-.course-card.selected .course-dot {
+.course-code {
+  padding: 2px 7px;
+  border: 1px solid rgba(139, 154, 255, 0.22);
+  border-radius: 6px;
+  color: #aab5ff;
+  background: rgba(104, 119, 215, 0.1);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
+
+.course-percent {
+  margin-left: auto;
+  color: #8e9bb4;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* ชื่อวิชา: ขึ้นได้ 2 บรรทัด ไม่ตัดเป็น "…" เร็วเกินไป */
+.course-name {
+  display: -webkit-box;
+  overflow: hidden;
+  color: #f0f3fc;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
+
+.course-info {
+  color: #8e9bb4;
+  font-size: 12px;
+}
+
+/* ========================================
+   สถานะของวิชา  เทา = ยังไม่เริ่ม / ม่วง = กำลังเรียน / เขียว = ครบ
+======================================== */
+
+.course-card.is-progress .course-dot {
   background: #8b9aff;
   box-shadow: 0 0 8px rgba(139, 154, 255, 0.45);
 }
 
-/* ชื่อวิชา */
-.course-name {
-  color: #f0f3fc;
-  font-size: 13px;
-  font-weight: 700;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  letter-spacing: -0.2px;
+.course-card.is-progress .course-percent {
+  color: #aab5ff;
 }
 
-/* ข้อมูลย่อย */
-.course-info {
-  color: #8e9bb4;
-  font-size: 11px;
+.course-card.is-done {
+  border-color: rgba(69, 214, 174, 0.38);
+}
+
+.course-card.is-done .course-dot {
+  background: #45d6ae;
+  box-shadow: 0 0 8px rgba(69, 214, 174, 0.4);
+}
+
+.course-card.is-done .course-percent {
+  color: #60dfb8;
+}
+
+.course-card.is-done .progress {
+  background: #45d6ae;
 }
 
 /* ========================================
@@ -132,7 +179,7 @@
 .progress {
   height: 100%;
   border-radius: 10px;
-  background: linear-gradient(90deg, #45d6ae, #8b9aff);
+  background: linear-gradient(90deg, #7c8cff, #8b9aff);
   transition: width 0.3s ease;
 }
 
@@ -151,9 +198,9 @@
 
 .course-line {
   fill: none;
-  stroke: #4b5872;
+  stroke: #5d6c8a;
   stroke-width: 1.7;
-  stroke-opacity: 0.62;
+  stroke-opacity: 0.7;
   transition:
     stroke 180ms ease,
     stroke-opacity 180ms ease,
@@ -179,16 +226,14 @@
 
 @media (max-width: 1100px) {
   .course-name {
-    font-size: 12px;
+    font-size: 13px;
   }
 }
 
-@media (max-width: 850px) {
-  .course-name {
-    font-size: 11px;
-  }
-
-  .course-info {
-    font-size: 10px;
+@media (prefers-reduced-motion: reduce) {
+  .course-card,
+  .course-line,
+  .progress {
+    transition: none;
   }
 }
