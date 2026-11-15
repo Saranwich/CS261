@@ -1,0 +1,98 @@
+/* ========================================
+   extras.css
+   1) แท็บ รายวิชา / รายหัวข้อ ที่มีแถบพื้นหลังเลื่อนไปมา (Upperbar.jsx)
+   2) วงแหวนความคืบหน้าเล็ก ๆ บนการ์ดวิชา (leftpage.jsx)
+======================================== */
+
+/* ----- 1) แท็บแถบเลื่อน ----- */
+
+.tabs {
+  position: relative;
+  display: inline-grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr; /* สองแท็บกว้างเท่ากัน แถบถึงเลื่อนพอดี */
+}
+
+.tab {
+  position: relative;
+  z-index: 1;
+  padding: 0 16px;
+  white-space: nowrap;
+}
+
+/* พื้นหลังของแท็บที่เลือกย้ายไปอยู่ที่ตัวแถบเลื่อนแทน */
+.tab.active {
+  background-color: transparent;
+  box-shadow: none;
+}
+
+.tab-indicator {
+  position: absolute;
+  top: 2px;
+  bottom: 2px;
+  left: 2px;
+  width: calc((100% - 4px) / 2);
+  border-radius: 6px;
+  background-color: var(--surface);
+  box-shadow: var(--shadow-sm), 0 0 0 1px var(--border);
+  transition: transform 0.38s var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1));
+  pointer-events: none;
+}
+
+.tab-indicator.is-second { transform: translateX(100%); }
+
+@media (prefers-reduced-motion: reduce) {
+  .tab-indicator { transition: none; }
+}
+
+
+/* ----- 2) วงแหวนบนการ์ดวิชา ----- */
+
+.mini-ring {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  display: grid;
+  place-items: center;
+}
+
+.mini-ring svg {
+  display: block;
+  transform: rotate(-90deg); /* เริ่มเติมจากบนสุด */
+}
+
+.mini-ring__track { stroke: var(--surface-3); }
+
+.mini-ring__bar {
+  stroke: var(--course-color, var(--accent));
+  transition: stroke-dashoffset 0.8s var(--ease-out, ease), stroke 0.3s ease;
+}
+
+.mini-ring.is-done .mini-ring__bar { stroke: var(--success); }
+
+.mini-ring__label {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  color: var(--text-muted);
+  font-size: 10px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.mini-ring.is-done .mini-ring__label { color: var(--success); }
+
+/* ไอคอนติ๊กถูกข้างใน ไม่ต้องหมุนตามวง */
+.mini-ring__label svg { transform: none; }
+
+
+/* ----- 3) สลับธีมแบบเฟดทั้งหน้า (View Transitions — ใช้คู่กับ setTheme ใน theme.js) ----- */
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.55s;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ระหว่างเฟดไม่ให้เมาส์ไปโดน hover ของของข้างใต้ */
+::view-transition { pointer-events: none; }
