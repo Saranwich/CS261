@@ -55,12 +55,18 @@ export function toTopicCards(courseDetails = [], doneTopicIds = []) {
     Object.entries(TOPIC_PREREQUISITES).forEach(([courseCode, topicList]) => {
       Object.entries(topicList).forEach(([topicName, needList]) => {
         const topic = topicByFullName[`${courseCode}: ${topicName}`];
-        if (!topic) return;
+        if (!topic) {
+          console.warn(`topicPrerequisites.js: ไม่เจอหัวข้อ "${courseCode}: ${topicName}"`);
+          return;
+        }
 
         needList.forEach((need) => {
           const fullName = /^CS\d+: /.test(need) ? need : `${courseCode}: ${need}`;
           const needTopic = topicByFullName[fullName];
-          if (!needTopic) return;
+          if (!needTopic) {
+            console.warn(`topicPrerequisites.js: ไม่เจอหัวข้อ "${fullName}" (ที่ ${courseCode}: ${topicName} ต้องรู้ก่อน)`);
+            return;
+          }
 
           topic.prerequisites.push(needTopic.id);
           needTopic.nextTopics.push(topic.id);
