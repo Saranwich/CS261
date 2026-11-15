@@ -158,3 +158,75 @@
   color: #ff6b63;
   background-color: rgba(179, 38, 30, 0.1);
 }
+
+/* ========================================
+   Dropdown ผลการค้นหา
+======================================== */
+
+.search-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  width: max(100%, 340px);
+  max-height: 60vh;
+  overflow-y: auto;
+  background-color: #1B1D25;
+  color: #E9EAF2;
+  border: 1px solid #323548;
+  border-radius: 10px;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.45);
+  z-index: 1000;
+}
+
+.search-dropdown ul {
+  list-style: none;
+  margin: 0;
+  padding: 4px 0;
+}
+
+.search-group {
+  padding: 8px 12px 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #7F8299;
+}
+
+.search-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 7px 12px;
+  cursor: pointer;
+  border-left: 2px solid transparent;
+}
+
+.search-item.active {
+  background-color: #252836;
+  border-left-color: #22C55E;
+}
+
+.search-item-main {
+  font-size: 13px;
+  color: #E9EAF2;
+}
+
+.search-item-sub {
+  font-size: 11px;
+  color: #A3A6BC;
+}
+
+.search-empty {
+  padding: 14px 12px;
+  font-size: 13px;
+  color: #7F8299;
+}
+
+/* scrollbar ให้เข้ากับธีมมืด */
+.search-dropdown::-webkit-scrollbar {
+  width: 8px;
+}
+
+.search-dropdown::-webkit-scrollbar-thumb {
+  background-color: #323548;
+  border-radius: 4px;
+}
