@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { ChevronDownIcon } from "./Icons";
 
-// หัวข้อที่กดพับ / ขยายได้ (ใช้ในแผงขวา เพื่อให้ไม่ต้องเลื่อนยาว)
+// หัวข้อที่กดพับ / ขยายได้ (เนื้อหาเลื่อนเปิด-ปิดแบบนุ่ม ๆ ด้วย CSS ใน smooth.css)
 //   title = ชื่อหัวข้อ   count = ตัวเลขท้ายชื่อ (ไม่ใส่ก็ได้)   defaultOpen = เปิดไว้ตอนแรกไหม
 function Collapsible({ title, count, defaultOpen = true, children }) {
   const [open, setOpen] = useState(defaultOpen);
@@ -19,7 +19,12 @@ function Collapsible({ title, count, defaultOpen = true, children }) {
         <span className="collapsible__chevron"><ChevronDownIcon size={16} /></span>
       </button>
 
-      {open && <div className="collapsible__body">{children}</div>}
+      {/* เรนเดอร์เนื้อหาไว้เสมอ แล้วให้ CSS ยุบความสูงเป็น 0 (ถ้าไม่เรนเดอร์ จะเลื่อนปิดไม่ได้) */}
+      <div className={`collapsible__panel ${open ? "is-open" : ""}`}>
+        <div className="collapsible__inner">
+          <div className="collapsible__body">{children}</div>
+        </div>
+      </div>
     </section>
   );
 }
