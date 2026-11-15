@@ -5,6 +5,7 @@ const MAX_COURSES = 5;
 const MAX_TOPICS = 8;
 
 // แยกคำค้นเป็นคำ ๆ ไม่สนตัวพิมพ์เล็กใหญ่ ทุกคำต้องเจอ
+// เช่น "cs 101", "cs101", "linked list" ใช้ได้หมด
 // คืนค่า 0 = ไม่ตรง, ยิ่งมากยิ่งตรง
 function matchScore(query, text, code = "") {
   const tokens = query.toLowerCase().split(/\s+/).filter(Boolean);
@@ -12,10 +13,10 @@ function matchScore(query, text, code = "") {
   if (tokens.length === 0 || !tokens.every((t) => haystack.includes(t))) return 0;
 
   const q = query.toLowerCase().trim();
-  if (code.toLowerCase() === q) return 4;
-  if (code.toLowerCase().startsWith(q)) return 3;
-  if (text.toLowerCase().startsWith(q)) return 3;
-  return 1;
+  if (code.toLowerCase() === q) return 4;          // รหัสวิชาตรงเป๊ะ
+  if (code.toLowerCase().startsWith(q)) return 3;  // ขึ้นต้นด้วยรหัสวิชา
+  if (text.toLowerCase().startsWith(q)) return 3;  // ขึ้นต้นด้วยชื่อ
+  return 1;                                        // มีคำอยู่ตรงไหนสักที่
 }
 
 function Upperbar({
@@ -32,9 +33,13 @@ function Upperbar({
   const [activeIndex, setActiveIndex] = useState(-1);
   const wrapRef = useRef(null);
 
+  // ข้อมูลนักศึกษาจาก localStorage
   const student = JSON.parse(localStorage.getItem("user") || "null");
   const studentName = student?.displayNameTh?.trim() || "";
 
+  // ========================================
+  // ค้นหา (คำนวณทุกครั้งที่พิมพ์ ข้อมูลไม่เยอะจึงไม่ต้อง debounce)
+  // ========================================
   const query = searchText.trim();
 
   const courseResults = query
@@ -60,8 +65,12 @@ function Upperbar({
         .map((r) => ({ type: "topic", item: r.item }))
     : [];
 
+  // รวมเป็นลิสต์เดียว เอาไว้ใช้กับปุ่มลูกศรขึ้น/ลง
   const results = [...courseResults, ...topicResults];
 
+  // ========================================
+  // เลือกผลลัพธ์
+  // ========================================
   function handleSelect(result) {
     if (result.type === "course") {
       onSelectCourse(result.item);
@@ -72,6 +81,30 @@ function Upperbar({
     setSearchText('');
     setIsOpen(false);
     setActiveIndex(-1);
+  }
+
+  // ========================================
+  // คีย์บอร์ด: ↑ ↓ เลื่อน, Enter เลือก, Esc ปิด
+  // ========================================
+  function handleKeyDown(e) {
+    if (e.key === "Escape") {
+      setIsOpen(false);
+      return;
+    }
+    if (results.length === 0) return;
+
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setIsOpen(true);
+      setActiveIndex((i) => (i + 1) % results.length);
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setActiveIndex((i) => (i <= 0 ? results.length - 1 : i - 1));
+    } else if (e.key === "Enter") {
+      e.preventDefault();
+      // ไม่ได้เลื่อนเลือก → เลือกอันแรกให้
+      handleSelect(results[activeIndex >= 0 ? activeIndex : 0]);
+    }
   }
 
   // คลิกนอกช่องค้นหา → ปิด dropdown
@@ -97,7 +130,7 @@ function Upperbar({
         className={`search-item ${isActive ? "active" : ""}`}
         onMouseEnter={() => setActiveIndex(index)}
         onMouseDown={(e) => {
-          e.preventDefault();
+          e.preventDefault(); // กัน input เสีย focus ก่อนคลิกทำงาน
           handleSelect(result);
         }}
       >
@@ -148,6 +181,7 @@ function Upperbar({
               setActiveIndex(-1);
             }}
             onFocus={() => setIsOpen(true)}
+            onKeyDown={handleKeyDown}
           />
         </label>
 
@@ -173,7 +207,10 @@ function Upperbar({
       </div>
 
       <div className="user" title="ข้อมูลนักศึกษา">
-        <span className="avatar">{studentName.charAt(0) || "?"}</span>
+        <span className="avatar">
+          {studentName.charAt(0) || "?"}
+        </span>
+
         <span className="who">
           <b>{studentName}</b>
           <small>วิทยาการคอมพิวเตอร์</small>
