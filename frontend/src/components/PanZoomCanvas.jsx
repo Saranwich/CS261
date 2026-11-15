@@ -2,38 +2,25 @@ import { useEffect, useRef, useState } from "react";
 import "./PanZoomCanvas.css";
 
 // ========================================
-// กระดานที่ลากเลื่อน / ซูมเข้าออกได้
-// ใช้ทั้งแผนผังรายวิชา (leftpage.jsx) และแผนผังรายหัวข้อ (Topicpage.jsx)
+// กระดานที่ลากเลื่อน / ซูมเข้าออกได้ (เวอร์ชันลื่น)
+// API เหมือนเดิมทุกอย่าง:
+//   <PanZoomCanvas width height focusArea minimapRects>...</PanZoomCanvas>
 //
-// วิธีใช้
-//   <PanZoomCanvas width={1200} height={800}>
-//     ...ของที่จะวาด (วางตำแหน่งด้วย left / top ภายในขนาด width x height)
-//   </PanZoomCanvas>
-//
-//   - ลากด้วยเมาส์ = เลื่อน
-//   - ล้อเมาส์ / pinch บน trackpad = ซูม
-//   - ปุ่ม − + พอดีจอ มุมขวาล่าง
-//   - ขนาด width / height เปลี่ยนเมื่อไร จะจัดให้พอดีจอใหม่เอง
-//
-//   ถ้าส่ง focusArea = { x, y, width, height } มาด้วย
-//   จะซูมไปให้เห็นพื้นที่นั้นพอดีจอแทน (เช่น เส้นทางของหัวข้อที่เลือก)
-//   และมีปุ่ม "ไปที่เส้นทาง" เพิ่มที่มุมขวาล่าง
+// ที่เปลี่ยน
+//   - ซูม (ล้อเมาส์ / ปุ่ม / พอดีจอ / ไปที่เส้นทาง) = ไหลเข้าหาเป้าหมายแบบนุ่ม ๆ ด้วย requestAnimationFrame
+//   - ปล่อยมือตอนลาก = กระดานไหลต่ออีกนิด (แรงเฉื่อย)
+//   - ระหว่างลาก ปิด pointer-events ของของข้างใน ไม่ให้การ์ดโดน hover แล้ว re-render ทั้งผัง
 // ========================================
 
-const MIN_ZOOM = 0.1; // ซูมออกได้สุด 10% (แผนผังทุกหัวข้อใหญ่มาก)
-const MAX_ZOOM = 2;   // ซูมเข้าได้สุด 200%
+const MIN_ZOOM = 0.1;
+const MAX_ZOOM = 2;
+
+const GLIDE = 0.2;        // ความเร็วที่ไหลเข้าหาเป้า (0-1 ต่อ 1 เฟรม @60fps) ยิ่งมากยิ่งไว
+const INERTIA_MS = 260;   // ลากเร็วแค่ไหนปล่อยแล้วไหลต่อไกลแค่ไหน (px = ความเร็ว px/ms * ค่านี้)
+const MIN_FLING = 0.15;   // ความเร็วขั้นต่ำ (px/ms) ถึงจะไหลต่อ
 
 
-// ========================================
-// view = { x, y, scale }
-//   x, y  = เลื่อนกระดานไปกี่ px จากมุมซ้ายบนของกล่อง
-//   scale = ขนาด (1 = 100%)
-// ========================================
-
-// view ที่ทำให้เห็นพื้นที่ area = { x, y, width, height } พอดีกล่อง และอยู่ตรงกลาง
-// (อยากเห็นทั้งกระดาน ก็ส่ง area = { x: 0, y: 0, width, height })
 function fitToBox(box, area) {
-  // กันค่าเพี้ยน (NaN / 0) ไม่ให้ transform พังทั้งกระดาน
   if (![area.x, area.y, area.width, area.height].every(Number.isFinite) || area.width <= 0 || area.height <= 0) {
     return { scale: 1, x: 0, y: 0 };
   }
@@ -48,8 +35,6 @@ function fitToBox(box, area) {
   };
 }
 
-// ซูมเข้า/ออก โดยให้จุด (pointX, pointY) บนจออยู่ที่เดิม
-// (เช่น ซูมด้วยเมาส์ จุดใต้เมาส์จะไม่หนีไปไหน)
 function zoomAt(view, pointX, pointY, factor) {
   const scale = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, view.scale * factor));
   const ratio = scale / view.scale;
@@ -61,22 +46,84 @@ function zoomAt(view, pointX, pointY, factor) {
 }
 
 
-// ขนาดสูงสุดของแผนที่ย่อ (px)
 const MINIMAP_MAX_WIDTH = 170;
 const MINIMAP_MAX_HEIGHT = 120;
 
-// minimapRects = [{ x, y, width, height }] ถ้าส่งมา จะมีแผนที่ย่อมุมซ้ายล่าง
-// (โผล่เฉพาะตอนซูมเข้าจนเห็นไม่ครบทั้งกระดาน) กดหรือลากบนแผนที่ย่อเพื่อเลื่อนไปที่นั่น
 function PanZoomCanvas({ width, height, focusArea = null, minimapRects = null, children }) {
-  const boxRef = useRef(null);          // กล่องกระดาน (ใช้วัดขนาดและรับ event ล้อเมาส์)
-  const dragRef = useRef(null);         // ข้อมูลตอนกำลังลาก (null = ไม่ได้ลาก)
-  const justDraggedRef = useRef(false); // เพิ่งลากเสร็จไหม (ถ้าใช่ จะไม่นับเป็นการคลิก)
-  const isFirstFitRef = useRef(true);   // จัดพอดีจอครั้งแรกไหม (ครั้งแรกไม่ต้องเล่นอนิเมชัน)
-  const [view, setView] = useState({ x: 0, y: 0, scale: 1 });
-  const [isAnimating, setIsAnimating] = useState(false); // กำลังเลื่อนไปหาเส้นทางแบบนุ่ม ๆ
+  const boxRef = useRef(null);
+  const dragRef = useRef(null);
+  const justDraggedRef = useRef(false);
+  const isFirstFitRef = useRef(true);
   const minimapRef = useRef(null);
   const minimapDraggingRef = useRef(false);
-  const [boxSize, setBoxSize] = useState({ width: 0, height: 0 }); // ขนาดกล่องที่เห็นอยู่ (ใช้วาดกรอบบนแผนที่ย่อ)
+
+  // view ล่าสุดเก็บไว้ใน ref ด้วย เพื่อให้ลูป animation อ่านค่าล่าสุดได้โดยไม่ต้องรอ render
+  const viewRef = useRef({ x: 0, y: 0, scale: 1 });
+  const targetRef = useRef(null); // เป้าหมายที่กำลังไหลเข้าหา (null = อยู่นิ่ง)
+  const rafRef = useRef(0);
+  const [view, setView] = useState(viewRef.current);
+  const [boxSize, setBoxSize] = useState({ width: 0, height: 0 });
+
+  function commit(next) {
+    viewRef.current = next;
+    setView(next);
+  }
+
+  function stopGlide() {
+    if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    rafRef.current = 0;
+    targetRef.current = null;
+  }
+
+  // ไหลไปหา target แบบนุ่ม ๆ (เรียกซ้ำระหว่างทางได้ แค่เปลี่ยนเป้า)
+  function glideTo(target) {
+    targetRef.current = target;
+    if (rafRef.current) return;
+
+    let last = performance.now();
+    const step = (now) => {
+      const goal = targetRef.current;
+      if (!goal) {
+        rafRef.current = 0;
+        return;
+      }
+
+      // ปรับตามเวลาจริง จอ 120Hz กับ 60Hz จึงนุ่มเท่ากัน
+      const dt = Math.min(48, now - last);
+      last = now;
+      const k = 1 - Math.pow(1 - GLIDE, dt / 16.67);
+
+      const cur = viewRef.current;
+      const next = {
+        scale: cur.scale + (goal.scale - cur.scale) * k,
+        x: cur.x + (goal.x - cur.x) * k,
+        y: cur.y + (goal.y - cur.y) * k,
+      };
+
+      const arrived =
+        Math.abs(goal.scale - next.scale) < 0.0008 &&
+        Math.abs(goal.x - next.x) < 0.4 &&
+        Math.abs(goal.y - next.y) < 0.4;
+
+      if (arrived) {
+        commit(goal);
+        targetRef.current = null;
+        rafRef.current = 0;
+        return;
+      }
+
+      commit(next);
+      rafRef.current = requestAnimationFrame(step);
+    };
+    rafRef.current = requestAnimationFrame(step);
+  }
+
+  function jumpTo(next) {
+    stopGlide();
+    commit(next);
+  }
+
+  useEffect(() => () => stopGlide(), []);
 
   useEffect(() => {
     const box = boxRef.current;
@@ -87,30 +134,23 @@ function PanZoomCanvas({ width, height, focusArea = null, minimapRects = null, c
     return () => observer.disconnect();
   }, []);
 
-  // พื้นที่ที่อยากให้เห็น: มี focusArea ใช้อันนั้น ไม่มีก็ทั้งกระดาน
-  // (แยกเป็นตัวเลขทีละตัว เพราะ useEffect เทียบตัวเลขได้ตรง ๆ ว่าเปลี่ยนจริงไหม)
   const areaX = focusArea ? focusArea.x : 0;
   const areaY = focusArea ? focusArea.y : 0;
   const areaWidth = focusArea ? focusArea.width : width;
   const areaHeight = focusArea ? focusArea.height : height;
 
-  // พื้นที่ที่อยากให้เห็นเปลี่ยน (โหลดข้อมูลเสร็จ / เลือกหัวข้อใหม่) → เลื่อน + ซูมไปหา
+  // พื้นที่ที่อยากให้เห็นเปลี่ยน → ครั้งแรกวางเลย ครั้งต่อไปไหลไปหา
   useEffect(() => {
-    setView(fitToBox(boxRef.current, { x: areaX, y: areaY, width: areaWidth, height: areaHeight }));
-
+    const target = fitToBox(boxRef.current, { x: areaX, y: areaY, width: areaWidth, height: areaHeight });
     if (isFirstFitRef.current) {
       isFirstFitRef.current = false;
-      return;
+      jumpTo(target);
+    } else {
+      glideTo(target);
     }
-    // เปิดอนิเมชันแป๊บเดียว (ระหว่างลาก / ซูมด้วยล้อเมาส์ต้องไม่มีอนิเมชัน ไม่งั้นจะหน่วง)
-    setIsAnimating(true);
-    const timer = setTimeout(() => setIsAnimating(false), 400);
-    return () => clearTimeout(timer);
   }, [areaX, areaY, areaWidth, areaHeight]);
 
-  // ล้อเมาส์ / pinch บน trackpad = ซูม
-  // ต้องผูก event เองด้วย passive: false ถึงจะ preventDefault ได้
-  // (ไม่อย่างนั้น pinch จะไปซูมทั้งหน้าเว็บแทน)
+  // ล้อเมาส์ / pinch = ซูม (บวกเข้าเป้าหมายเดิม ล้อหมุนรัว ๆ จึงต่อเนื่อง ไม่กระตุก)
   useEffect(() => {
     const box = boxRef.current;
 
@@ -119,10 +159,10 @@ function PanZoomCanvas({ width, height, focusArea = null, minimapRects = null, c
       const rect = box.getBoundingClientRect();
       const mouseX = event.clientX - rect.left;
       const mouseY = event.clientY - rect.top;
-      // pinch บน trackpad จะมาเป็น ctrlKey + deltaY ค่าเล็ก ๆ จึงคูณให้ไวกว่า
       const speed = event.ctrlKey ? 0.01 : 0.002;
       const factor = Math.exp(-event.deltaY * speed);
-      setView((current) => zoomAt(current, mouseX, mouseY, factor));
+      const base = targetRef.current || viewRef.current;
+      glideTo(zoomAt(base, mouseX, mouseY, factor));
     }
 
     box.addEventListener("wheel", handleWheel, { passive: false });
@@ -132,12 +172,19 @@ function PanZoomCanvas({ width, height, focusArea = null, minimapRects = null, c
   // ===== ลากเพื่อเลื่อนกระดาน =====
 
   function handlePointerDown(event) {
-    if (event.button !== 0) return; // รับแค่คลิกซ้าย
+    if (event.button !== 0) return;
+    stopGlide(); // จับกระดานที่กำลังไหลอยู่ให้หยุด
+    const now = performance.now();
     dragRef.current = {
       startX: event.clientX,
       startY: event.clientY,
-      viewX: view.x,
-      viewY: view.y,
+      viewX: viewRef.current.x,
+      viewY: viewRef.current.y,
+      lastX: event.clientX,
+      lastY: event.clientY,
+      lastT: now,
+      vx: 0,
+      vy: 0,
       moved: false,
     };
     justDraggedRef.current = false;
@@ -149,20 +196,40 @@ function PanZoomCanvas({ width, height, focusArea = null, minimapRects = null, c
 
     const dx = event.clientX - drag.startX;
     const dy = event.clientY - drag.startY;
-
-    // ขยับน้อยกว่า 5px ยังถือว่าเป็นการคลิก ไม่ใช่การลาก
     if (!drag.moved && Math.hypot(dx, dy) < 5) return;
 
+    if (!drag.moved) boxRef.current?.classList.add("is-panning");
     drag.moved = true;
-    setView((current) => ({ ...current, x: drag.viewX + dx, y: drag.viewY + dy }));
+
+    // ความเร็วล่าสุด (px/ms) เฉลี่ยแบบนุ่ม ๆ ไว้ใช้ตอนปล่อยมือ
+    const now = performance.now();
+    const elapsed = Math.max(1, now - drag.lastT);
+    drag.vx = drag.vx * 0.7 + ((event.clientX - drag.lastX) / elapsed) * 0.3;
+    drag.vy = drag.vy * 0.7 + ((event.clientY - drag.lastY) / elapsed) * 0.3;
+    drag.lastX = event.clientX;
+    drag.lastY = event.clientY;
+    drag.lastT = now;
+
+    commit({ ...viewRef.current, x: drag.viewX + dx, y: drag.viewY + dy });
   }
 
   function handlePointerUp() {
-    justDraggedRef.current = dragRef.current?.moved || false;
+    const drag = dragRef.current;
+    justDraggedRef.current = drag?.moved || false;
+
+    // ปล่อยมือทันทีหลังลากเร็ว ๆ → ไหลต่อ
+    if (drag?.moved && performance.now() - drag.lastT < 80) {
+      const speed = Math.hypot(drag.vx, drag.vy);
+      if (speed > MIN_FLING) {
+        const cur = viewRef.current;
+        glideTo({ ...cur, x: cur.x + drag.vx * INERTIA_MS, y: cur.y + drag.vy * INERTIA_MS });
+      }
+    }
+
+    boxRef.current?.classList.remove("is-panning");
     dragRef.current = null;
   }
 
-  // ถ้าเพิ่งลากเสร็จ ไม่ให้ไปกดปุ่มที่ปล่อยเมาส์ทับ
   function handleClickCapture(event) {
     if (justDraggedRef.current) {
       event.stopPropagation();
@@ -170,11 +237,12 @@ function PanZoomCanvas({ width, height, focusArea = null, minimapRects = null, c
     }
   }
 
-  // ===== ปุ่มซูม (ซูมรอบจุดกลางกล่อง) =====
+  // ===== ปุ่มซูม =====
 
   function zoomFromCenter(factor) {
     const box = boxRef.current;
-    setView((current) => zoomAt(current, box.clientWidth / 2, box.clientHeight / 2, factor));
+    const base = targetRef.current || viewRef.current;
+    glideTo(zoomAt(base, box.clientWidth / 2, box.clientHeight / 2, factor));
   }
 
   // ===== แผนที่ย่อ =====
@@ -185,26 +253,25 @@ function PanZoomCanvas({ width, height, focusArea = null, minimapRects = null, c
     width: boxSize.width / view.scale,
     height: boxSize.height / view.scale,
   };
-  // เห็นทั้งกระดานอยู่แล้ว ไม่ต้องโชว์แผนที่ย่อ
   const showMinimap =
     Boolean(minimapRects) &&
     boxSize.width > 0 &&
     (viewport.width < width * 0.98 || viewport.height < height * 0.98);
 
-  // เลื่อนกระดานให้จุดที่กดบนแผนที่ย่อ มาอยู่กลางจอ
   function centerOnMinimap(event) {
     const rect = minimapRef.current.getBoundingClientRect();
     const boardX = (event.clientX - rect.left) / miniScale;
     const boardY = (event.clientY - rect.top) / miniScale;
-    setView((current) => ({
-      scale: current.scale,
-      x: boxSize.width / 2 - boardX * current.scale,
-      y: boxSize.height / 2 - boardY * current.scale,
-    }));
+    const cur = viewRef.current;
+    jumpTo({
+      scale: cur.scale,
+      x: boxSize.width / 2 - boardX * cur.scale,
+      y: boxSize.height / 2 - boardY * cur.scale,
+    });
   }
 
   function handleMinimapDown(event) {
-    event.stopPropagation(); // ไม่ให้กลายเป็นการลากกระดานหลัก
+    event.stopPropagation();
     minimapDraggingRef.current = true;
     event.currentTarget.setPointerCapture(event.pointerId);
     centerOnMinimap(event);
@@ -229,9 +296,8 @@ function PanZoomCanvas({ width, height, focusArea = null, minimapRects = null, c
       onPointerLeave={handlePointerUp}
       onClickCapture={handleClickCapture}
     >
-      {/* กล่องขนาดเท่ากระดานจริง เลื่อน/ซูมด้วย transform ทั้งกล่อง */}
       <div
-        className={`pan-zoom-content ${isAnimating ? "animate" : ""}`}
+        className="pan-zoom-content"
         style={{
           width,
           height,
@@ -241,7 +307,6 @@ function PanZoomCanvas({ width, height, focusArea = null, minimapRects = null, c
         {children}
       </div>
 
-      {/* ===== แผนที่ย่อ มุมซ้ายล่าง ===== */}
       {showMinimap && (
         <div
           className="minimap"
@@ -277,19 +342,18 @@ function PanZoomCanvas({ width, height, focusArea = null, minimapRects = null, c
         </div>
       )}
 
-      {/* ===== ปุ่มซูม มุมขวาล่าง ===== */}
       <div className="zoom-controls">
         <button onClick={() => zoomFromCenter(1 / 1.2)} aria-label="ซูมออก">−</button>
         <span className="zoom-value">{Math.round(view.scale * 100)}%</span>
         <button onClick={() => zoomFromCenter(1.2)} aria-label="ซูมเข้า">+</button>
         {focusArea && (
-          <button className="zoom-fit" onClick={() => setView(fitToBox(boxRef.current, focusArea))}>
+          <button className="zoom-fit" onClick={() => glideTo(fitToBox(boxRef.current, focusArea))}>
             ไปที่เส้นทาง
           </button>
         )}
         <button
           className="zoom-fit"
-          onClick={() => setView(fitToBox(boxRef.current, { x: 0, y: 0, width, height }))}
+          onClick={() => glideTo(fitToBox(boxRef.current, { x: 0, y: 0, width, height }))}
         >
           พอดีจอ
         </button>
