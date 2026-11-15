@@ -4,6 +4,9 @@ import './index.css'
 import App from './App.jsx'
 import './polish.css'
 import './theme.css'
+import './smooth.css'
+import './refine.css'
+import './extras.css'
 import { initTheme } from './utils/theme'
 
 initTheme()
