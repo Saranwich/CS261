@@ -1,6 +1,7 @@
 ﻿import { useMemo, useState } from "react";
 import PanZoomCanvas from "./PanZoomCanvas";
 import ProgressRing from "./ProgressRing";
+import { CheckIcon } from "./Icons";
 import { courseHue } from "../utils/courseColor";
 import "./leftpage.css";
 
@@ -86,6 +87,40 @@ function statusOf(course) {
   if (course.topics > 0 && course.learned >= course.topics) return "done";
   if (course.learned > 0) return "progress";
   return "idle";
+}
+
+
+// วงแหวนความคืบหน้าเล็ก ๆ มุมขวาบนของการ์ด (ใช้สีประจำวิชา / ครบแล้วเป็นเขียว + เครื่องหมายถูก)
+function MiniRing({ percent, done, size = 28, stroke = 3.5 }) {
+  const radius = (size - stroke) / 2;
+  const circumference = 2 * Math.PI * radius;
+
+  return (
+    <span
+      className={`mini-ring ${done ? "is-done" : ""}`}
+      style={{ width: size, height: size }}
+      role="img"
+      aria-label={`ความคืบหน้า ${Math.round(percent)}%`}
+    >
+      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} aria-hidden="true">
+        <circle className="mini-ring__track" cx={size / 2} cy={size / 2} r={radius} fill="none" strokeWidth={stroke} />
+        <circle
+          className="mini-ring__bar"
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          fill="none"
+          strokeWidth={stroke}
+          strokeLinecap="round"
+          strokeDasharray={circumference}
+          strokeDashoffset={circumference * (1 - percent / 100)}
+        />
+      </svg>
+      <span className="mini-ring__label">
+        {done ? <CheckIcon size={13} /> : Math.round(percent)}
+      </span>
+    </span>
+  );
 }
 
 
@@ -177,19 +212,14 @@ function Leftpage({ courses = [], selectedCourse, setSelectedCourse }) {
               <div className="course-card-header">
                 <span className="course-dot" />
                 <span className="course-code">{course.code}</span>
-                <span className="course-percent">
-                  {status === "done" ? "ครบแล้ว" : `${Math.round(percent)}%`}
-                </span>
               </div>
+
+              <MiniRing percent={percent} done={status === "done"} />
 
               <span className="course-name">{title}</span>
 
               <div className="course-info">
                 {course.topics} หัวข้อ • รู้แล้ว {course.learned}
-              </div>
-
-              <div className="progress-bar">
-                <div className="progress" style={{ width: `${percent}%` }} />
               </div>
             </button>
           );
