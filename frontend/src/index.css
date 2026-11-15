@@ -1,17 +1,49 @@
-/* ส่วนนี่ทำเพื่อไม่ให้มีขอบขาวในหน้าจอ เพราะ 
-ปกติแท็ก <body> จะมีระยะขอบ margin: 8px 
-และมีพื้นหลังเป็นสีขาวติดมาด้วยเสมอ ทำให้ตัว Upperbar
-สีดำลอยอยู่ตรงกลางและถูกล้อมรอบด้วยขอบสีขาวครับ*/
+/* ฟอนต์: Inter (อังกฤษ/ตัวเลข) + Noto Sans Thai (ไทย) โหลดที่เดียวทั้งเว็บ
+   (@import ต้องอยู่บนสุดของไฟล์) */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap');
+
+/* ========================================
+   ชุดสีและค่ากลางของทั้งเว็บ (design tokens)
+   อยากเปลี่ยนธีม แก้ที่นี่ที่เดียว
+     --accent  = สีหลักของปุ่ม/การเลือก/ลิงก์
+     --success = เรียนแล้ว / สำเร็จ
+     --brand   = สีโลโก้ (ตรงกับหน้า login)
+======================================== */
+:root {
+  --bg: #0d1018;
+  --surface: #141925;
+  --surface-2: #1a2030;
+  --border: rgba(151, 164, 191, 0.16);
+
+  --text: #edf1fa;
+  --text-muted: #9aa6bd;
+  --text-faint: #7f8ba3;
+
+  --accent: #8b9aff;
+  --accent-strong: #aab5ff;
+  --success: #45d6ae;
+  --brand: #22c55e;
+
+  --font: Inter, "Noto Sans Thai", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
 
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-} 
-html, body {
-  margin: 0;
-  padding: 0;
+}
+
+html,
+body {
   width: 100%;
   min-height: 100vh;
-  background-color: #667cf7;
+  background-color: var(--bg); /* เดิมเป็นน้ำเงิน แล้วจะแวบเห็นตอนโหลด */
+  color: var(--text);
+  font-family: var(--font);
+  -webkit-font-smoothing: antialiased;
+}
+
+button,
+input {
+  font-family: inherit;
 }

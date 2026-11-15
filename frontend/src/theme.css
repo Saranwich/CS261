@@ -1,0 +1,1344 @@
+/* ========================================
+   theme.css — ธีม SaaS เรียบหรู มี Light / Dark
+   import เป็นไฟล์ "สุดท้าย" ใน main.jsx (หลัง polish.css) เพื่อให้ทับ CSS เดิมได้
+   สลับธีมด้วย <html data-theme="light|dark">  (ดู theme.js)
+
+   พาเลตต์ (เขียวเข้ม + Slate)
+     Primary = ปุ่มหลัก / การเลือก / ลิงก์   Accent (--accent-bright) = ไฮไลต์สดใส เช่น โลโก้ แถบความคืบหน้า
+     Success / Warning / Error / Info = สถานะ    ที่เหลือคือโทน Slate
+======================================== */
+
+/* ===== Dark (ค่าตั้งต้น) ===== */
+:root,
+:root[data-theme="dark"] {
+  /* พาเลตต์หลัก */
+  --primary: #4ADE80;
+  --primary-hover: #86EFAC;
+  --accent-bright: #22C55E;
+  --bg: #0B1220;
+  --surface: #111C2E;
+  --surface-2: #1E293B;
+  --text: #F8FAFC;
+  --text-muted: #A8B6CB;
+  --border: #34445C;
+  --success: #4ADE80;
+  --warning: #FBBF24;
+  --danger: #F87171;
+  --info: #60A5FA;
+
+  /* ค่าช่วย (derive จากพาเลตต์) */
+  --surface-3: #263349;
+  --border-strong: #4B5E7C;
+  --text-faint: #8B9AB0;
+  --on-primary: #052E16;
+  --on-success: #052E16;
+
+  --accent: var(--primary);
+  --accent-strong: #86EFAC;
+  --accent-solid: var(--primary);
+  --accent-solid-hover: var(--primary-hover);
+  --accent-soft: rgba(74, 222, 128, 0.12);
+  --accent-softer: rgba(74, 222, 128, 0.06);
+  --accent-line: rgba(74, 222, 128, 0.35);
+
+  --success-soft: rgba(74, 222, 128, 0.12);
+  --success-line: rgba(74, 222, 128, 0.35);
+  --danger-soft: rgba(248, 113, 113, 0.12);
+  --warning-soft: rgba(251, 191, 36, 0.12);
+  --info-soft: rgba(96, 165, 250, 0.12);
+
+  --brand: var(--accent-bright);
+  --edge: #7487A6;
+  --grid: rgba(255, 255, 255, 0.045);
+  --glow-1: rgba(34, 197, 94, 0.07);
+  --glow-2: rgba(96, 165, 250, 0.045);
+  --glass: rgba(17, 28, 46, 0.8);
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.35);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.4);
+  --focus: 0 0 0 3px rgba(74, 222, 128, 0.28);
+}
+
+/* ===== Light (เน้นอ่านง่าย สบายตา: พื้นเทาอ่อนไม่จ้า + การ์ดขาว + ตัวอักษรเข้มชัด) ===== */
+:root[data-theme="light"] {
+  /* พาเลตต์หลัก */
+  --primary: #166534;
+  --primary-hover: #14532D;
+  --accent-bright: #22C55E;
+  --bg: #F1F5F9;
+  --surface: #FFFFFF;
+  --surface-2: #F1F5F9;
+  --text: #0F172A;
+  --text-muted: #475569;
+  --border: #C8D2E0;
+  --success: #15803D;
+  --warning: #B45309;
+  --danger: #B91C1C;
+  --info: #1D4ED8;
+
+  /* ค่าช่วย (derive จากพาเลตต์) */
+  --surface-3: #E2E8F0;
+  --border-strong: #A3B1C5;
+  --text-faint: #5B6B80;
+  --on-primary: #FFFFFF;
+  --on-success: #FFFFFF;
+
+  --accent: var(--primary);
+  --accent-strong: #14532D;
+  --accent-solid: var(--primary);
+  --accent-solid-hover: var(--primary-hover);
+  --accent-soft: rgba(22, 101, 52, 0.10);
+  --accent-softer: rgba(22, 101, 52, 0.05);
+  --accent-line: rgba(22, 101, 52, 0.38);
+
+  --success-soft: rgba(21, 128, 61, 0.10);
+  --success-line: rgba(21, 128, 61, 0.38);
+  --danger-soft: rgba(185, 28, 28, 0.08);
+  --warning-soft: rgba(180, 83, 9, 0.10);
+  --info-soft: rgba(29, 78, 216, 0.08);
+
+  --brand: var(--primary);
+  --edge: #6E7F99;
+  --grid: rgba(15, 23, 42, 0.06);
+  --glow-1: rgba(34, 197, 94, 0.035);
+  --glow-2: rgba(29, 78, 216, 0.02);
+  --glass: rgba(255, 255, 255, 0.9);
+
+  --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.08), 0 1px 3px rgba(15, 23, 42, 0.05);
+  --shadow-md: 0 6px 20px rgba(15, 23, 42, 0.10);
+  --focus: 0 0 0 3px rgba(22, 101, 52, 0.22);
+}
+
+/* เปลี่ยนธีมแล้วค่อย ๆ เฟด (ไม่กระทบ animation อื่น) */
+body,
+.nav-container,
+.right-page,
+.topic-detail,
+.topic-page,
+.course-card,
+.topic-node {
+  transition-property: background-color, border-color, color, box-shadow, opacity, transform;
+  transition-duration: 0.2s;
+}
+
+
+/* ========================================
+   พื้นหลังและโครงหลัก
+======================================== */
+
+html,
+body,
+.app-shell {
+  background-color: var(--bg);
+  color: var(--text);
+}
+
+.rightPage {
+  border-color: var(--border);
+}
+
+.pan-zoom-canvas,
+.course-map,
+.skeleton-map {
+  background-color: var(--bg);
+  background-image:
+    radial-gradient(var(--grid) 1px, transparent 1px),
+    radial-gradient(900px 520px at 6% 0%, var(--glow-1), transparent 62%),
+    radial-gradient(800px 520px at 100% 100%, var(--glow-2), transparent 62%);
+  background-size: 18px 18px, 100% 100%, 100% 100%;
+  background-repeat: repeat, no-repeat, no-repeat;
+}
+
+.course-map,
+.topic-page {
+  color: var(--text);
+}
+
+.topic-page {
+  background: var(--bg);
+}
+
+
+/* ========================================
+   แถบบน (Upperbar)
+======================================== */
+
+.nav-container {
+  background-color: var(--glass);
+  border-bottom-color: var(--border);
+  color: var(--text);
+}
+
+.brand {
+  color: var(--brand);
+}
+
+.tabs {
+  background-color: var(--surface-2);
+  border-color: var(--border);
+}
+
+.tab {
+  color: var(--text-muted);
+}
+
+.tab:hover {
+  color: var(--text);
+}
+
+.tab.active {
+  background-color: var(--surface);
+  color: var(--accent-strong);
+  box-shadow: var(--shadow-sm), 0 0 0 1px var(--border);
+}
+
+.search-btn {
+  background-color: var(--surface);
+  border-color: var(--border);
+  color: var(--text-faint);
+}
+
+.search-btn:focus-within {
+  border-color: var(--accent-line);
+  box-shadow: var(--focus);
+}
+
+.search-btn input { color: var(--text); }
+.search-btn input::placeholder { color: var(--text-faint); }
+
+.search-btn kbd {
+  color: var(--text-muted);
+  background-color: var(--surface-2);
+  border-color: var(--border);
+}
+
+.avatar {
+  background-color: var(--accent-soft);
+  border-color: var(--accent-line);
+  color: var(--accent-strong);
+}
+
+.who b { color: var(--text); }
+.who small { color: var(--text-muted); }
+
+.logout-btn {
+  background-color: var(--surface);
+  border-color: var(--border);
+  color: var(--text-muted);
+}
+
+.logout-btn:hover {
+  border-color: var(--danger);
+  color: var(--danger);
+  background-color: var(--danger-soft);
+}
+
+.search-results {
+  background-color: var(--surface);
+  border-color: var(--border);
+  box-shadow: var(--shadow-md);
+}
+
+.search-empty { color: var(--text-faint); }
+.search-result { color: var(--text); }
+.search-result.active { background-color: var(--surface-2); }
+.search-result-sub { color: var(--text-faint); }
+
+.search-result-type.course {
+  background-color: var(--accent-soft);
+  color: var(--accent-strong);
+}
+
+.search-result-type.topic {
+  background-color: var(--info-soft);
+  color: var(--info);
+}
+
+/* ปุ่มสลับธีม (ThemeToggle.jsx) */
+.theme-toggle {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text-muted);
+  background: var(--surface);
+  cursor: pointer;
+  transition: color 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+}
+
+.theme-toggle:hover {
+  color: var(--text);
+  border-color: var(--border-strong);
+  background: var(--surface-2);
+}
+
+.theme-toggle:focus-visible,
+.tab:focus-visible,
+.logout-btn:focus-visible,
+.next-up:focus-visible,
+.collapsible__head:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.theme-toggle svg { display: block; }
+
+
+/* ========================================
+   แผนผังรายวิชา (Leftpage)
+======================================== */
+
+.course-card {
+  background: var(--surface);
+  border-color: var(--border);
+  color: var(--text);
+  box-shadow: var(--shadow-sm);
+}
+
+.course-card:hover {
+  background: var(--surface);
+  border-color: var(--accent-line);
+  box-shadow: var(--shadow-md);
+}
+
+.course-card.selected {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent), var(--shadow-md);
+}
+
+.course-card.is-done {
+  background: linear-gradient(var(--success-soft), var(--success-soft)), var(--surface);
+  border-color: var(--success-line);
+  box-shadow: var(--shadow-sm);
+}
+
+.course-card.is-done:hover {
+  background: linear-gradient(var(--success-soft), var(--success-soft)), var(--surface);
+}
+
+.course-card.is-done.selected {
+  box-shadow: 0 0 0 1px var(--accent), var(--shadow-md);
+}
+
+.course-dot { background: var(--text-faint); }
+.course-card.is-progress .course-dot { background: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.course-card.is-done .course-dot { background: var(--success); box-shadow: 0 0 0 3px var(--success-soft); }
+
+.course-code,
+.topic-course__code,
+.right-page__course-code,
+.topic-detail__course {
+  color: var(--accent-strong);
+  background: var(--accent-soft);
+  border-color: var(--accent-line);
+}
+
+.course-percent,
+.course-info { color: var(--text-faint); }
+.course-card.is-progress .course-percent { color: var(--accent-strong); }
+.course-card.is-done .course-percent { color: var(--success); }
+.course-name { color: var(--text); }
+
+.progress-bar { background: var(--surface-3); }
+.progress { background: var(--accent-bright); }
+.course-card.is-done .progress { background: var(--success); }
+
+.course-line {
+  stroke: var(--edge);
+  stroke-opacity: 0.6;
+}
+
+.course-line.hovered,
+.course-line.active {
+  stroke: var(--accent);
+  stroke-opacity: 1;
+  filter: none;
+}
+
+#course-arrow path { fill: var(--edge); }
+#course-arrow-active path,
+#topic-arrow-active path { fill: var(--accent); }
+#topic-arrow-hover path { fill: var(--accent-strong); }
+
+/* แผงภาพรวมกระจกฝ้า */
+.overview {
+  background: var(--glass);
+  border-color: var(--border);
+  box-shadow: var(--shadow-md);
+}
+
+.overview__title,
+.overview__sub { color: var(--text-faint); }
+.overview__count { color: var(--text); }
+
+
+/* ========================================
+   แผนผังรายหัวข้อ (Topicpage)
+======================================== */
+
+.topic-page__header,
+.topic-page__footer {
+  background: var(--surface);
+  border-color: var(--border);
+}
+
+.topic-page__eyebrow { color: var(--accent); }
+.topic-page__title { color: var(--text); }
+.topic-page__subtitle,
+.topic-page__legend-item,
+.topic-page__footer,
+.topic-page__empty p { color: var(--text-muted); }
+.topic-page__empty h3 { color: var(--text); }
+
+.topic-page__legend-dot--done { background: var(--success); box-shadow: none; }
+.topic-page__legend-dot--selected { background: var(--accent); box-shadow: none; }
+.topic-page__legend-line { background: var(--edge); }
+
+.topic-page__empty-icon,
+.right-page__empty-icon,
+.topic-detail__empty-icon {
+  color: var(--accent);
+  background: var(--accent-soft);
+  border-color: var(--accent-line);
+}
+
+.topic-course {
+  background: var(--surface-2);
+  border-color: var(--border);
+}
+
+.topic-course--selected {
+  background: var(--surface-2);
+  border-color: var(--accent-line);
+}
+
+.topic-course__heading { border-bottom-color: var(--border); }
+.topic-course__name { color: var(--text); }
+.topic-course__count { color: var(--text-faint); }
+
+.topic-edge {
+  stroke: var(--edge);
+  stroke-opacity: 0.45;
+}
+
+.topic-edge--faded { stroke-opacity: 0.1; }
+
+.topic-edge--active {
+  stroke: var(--accent);
+  stroke-opacity: 1;
+}
+
+.topic-edge--hover {
+  stroke: var(--accent-strong);
+  stroke-opacity: 1;
+}
+
+.topic-node {
+  background: var(--surface);
+  border-color: var(--border);
+  color: var(--text);
+  box-shadow: var(--shadow-sm);
+}
+
+.topic-node:hover {
+  background: var(--surface);
+  border-color: var(--accent-line);
+  box-shadow: var(--shadow-md);
+}
+
+.topic-node:focus-visible { outline-color: var(--accent); }
+
+.topic-node--done { border-color: var(--success-line); }
+
+.topic-node--selected,
+.topic-node--selected:hover {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent), var(--shadow-md);
+}
+
+.topic-node--in-path:not(.topic-node--selected) {
+  background: var(--surface);
+  border-color: var(--accent-line);
+}
+
+.topic-node__status {
+  color: var(--text-faint);
+  background: var(--surface-2);
+}
+
+.topic-node--done .topic-node__status {
+  color: var(--success);
+  background: var(--success-soft);
+}
+
+.topic-node--selected .topic-node__status,
+.topic-node--in-path:not(.topic-node--selected) .topic-node__status {
+  color: var(--accent-strong);
+  background: var(--accent-soft);
+}
+
+.topic-node__name { color: var(--text); }
+.topic-node__meta { color: var(--text-faint); }
+.topic-node__selected-label { color: var(--accent-strong); }
+
+
+/* ========================================
+   ปุ่มซูม / แผนที่ย่อ
+======================================== */
+
+.zoom-controls,
+.minimap {
+  background: var(--glass);
+  border-color: var(--border);
+  box-shadow: var(--shadow-sm);
+}
+
+.zoom-controls button { color: var(--text); }
+.zoom-controls button:hover { background: var(--surface-2); }
+.zoom-value { color: var(--text-faint); }
+
+.minimap__rect {
+  background: var(--surface-3);
+  border-color: var(--border-strong);
+}
+
+.minimap__view {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+
+/* ========================================
+   แผงขวา (Rightpage + TopicDetail)
+======================================== */
+
+.right-page,
+.topic-detail,
+.right-page__footer,
+.topic-detail__footer {
+  background: var(--surface);
+  color: var(--text);
+}
+
+.right-page__header,
+.topic-detail__header {
+  background: transparent;
+  border-bottom-color: var(--border);
+}
+
+.right-page__footer,
+.topic-detail__footer { border-top-color: var(--border); }
+
+.right-page__eyebrow,
+.topic-detail__eyebrow { color: var(--accent); }
+
+.right-page__title,
+.topic-detail__title,
+.right-page--empty h2,
+.topic-detail--empty h2 { color: var(--text); }
+
+.right-page__subtitle,
+.right-page__muted,
+.topic-detail__subtitle,
+.topic-detail__muted,
+.right-page--empty p,
+.topic-detail--empty p,
+.progress-card__text p,
+.right-page__progress > p,
+.topic-detail__progress > p { color: var(--text-muted); }
+
+.right-page__description,
+.topic-detail__description { color: var(--text-muted); }
+
+.right-page__section h3,
+.topic-detail__section h3,
+.progress-card__text h3,
+.collapsible__head,
+.right-page__list-text strong,
+.topic-detail__list-text strong { color: var(--text); }
+
+.right-page__list-text small,
+.topic-detail__list-text small { color: var(--text-faint); }
+
+.right-page__close,
+.right-page__secondary-btn {
+  color: var(--text-muted);
+  background: var(--surface);
+  border-color: var(--border);
+}
+
+.right-page__close:hover,
+.right-page__secondary-btn:hover {
+  color: var(--text);
+  background: var(--surface-2);
+  border-color: var(--border-strong);
+}
+
+.topic-detail__close {
+  color: var(--text-muted);
+  background: var(--surface);
+  border-color: var(--border);
+}
+
+.topic-detail__close:hover {
+  color: var(--text);
+  background: var(--surface-2);
+  border-color: var(--border-strong);
+}
+
+.right-page__status,
+.topic-detail__status {
+  color: var(--accent);
+  background: var(--accent-soft);
+  border-color: var(--accent-line);
+}
+
+.right-page__status.is-done,
+.topic-detail__status.is-done {
+  color: var(--success);
+  background: var(--success-soft);
+  border-color: var(--success-line);
+}
+
+/* กล่องความคืบหน้า */
+.right-page__progress,
+.topic-detail__progress {
+  background: var(--surface-2);
+  border-color: var(--border);
+}
+
+.progress-card__count { color: var(--text); }
+.progress-ring.is-done ~ .progress-card__text .progress-card__count { color: var(--success); }
+
+.progress-ring__track { stroke: var(--surface-3); }
+.progress-ring__label { color: var(--text); }
+.progress-ring.is-done .progress-ring__label { color: var(--success); }
+.progress-ring.is-done .progress-ring__bar { stroke: var(--success); }
+.progress-ring stop:first-child { stop-color: var(--accent-bright); }
+.progress-ring stop:last-child { stop-color: var(--primary); }
+.progress-ring--burst::after { border-color: var(--success); }
+
+/* "ควรเรียนต่อ" / "แนะนำให้เริ่มจาก" */
+.next-up,
+.topic-detail__start {
+  color: var(--text);
+  background: var(--surface);
+  border-color: var(--accent-line);
+}
+
+.next-up:hover,
+.topic-detail__start:hover {
+  background: var(--accent-softer);
+  border-color: var(--accent);
+}
+
+.next-up__label,
+.topic-detail__start small { color: var(--text-muted); }
+.next-up__name { color: var(--text); }
+.next-up__hint { color: var(--text-faint); }
+.topic-detail__start strong { color: var(--accent-strong); }
+
+/* หัวข้อพับได้ */
+.collapsible { border-top-color: var(--border); }
+.collapsible__head:hover .collapsible__title { color: var(--accent-strong); }
+.collapsible__chevron { color: var(--text-faint); }
+
+.collapsible__count,
+.right-page__count,
+.topic-detail__count {
+  color: var(--accent-strong);
+  background: var(--accent-soft);
+}
+
+/* รายการ */
+.right-page__list-button,
+.right-page__topic-item,
+.topic-detail__list-button {
+  background: var(--surface);
+  border-color: var(--border);
+  color: var(--text);
+}
+
+.right-page__list-button:hover,
+.right-page__topic-item:hover,
+.topic-detail__list-button:hover {
+  background: var(--surface-2);
+  border-color: var(--accent-line);
+}
+
+.right-page__list-status,
+.topic-detail__list-status {
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.right-page__list-status.is-done,
+.topic-detail__list-status.is-done {
+  color: var(--success);
+  background: var(--success-soft);
+}
+
+.right-page__list-status--clickable:hover { box-shadow: none; filter: none; }
+.right-page__list-text--clickable:hover strong { color: var(--accent); }
+
+.right-page__badge,
+.topic-detail__badge--todo,
+.right-page__badge-btn {
+  color: var(--text-muted);
+  background: var(--surface-2);
+  border-color: var(--border);
+}
+
+.right-page__badge.is-done,
+.topic-detail__badge--done,
+.right-page__badge-btn.is-done {
+  color: var(--success);
+  background: var(--success-soft);
+  border-color: var(--success-line);
+}
+
+.topic-detail__badge--start {
+  color: var(--accent-strong);
+  background: var(--accent-soft);
+}
+
+.right-page__badge-btn:hover {
+  color: var(--success);
+  background: var(--success-soft);
+  border-color: var(--success-line);
+  box-shadow: none;
+}
+
+.right-page__badge-btn.is-done:hover {
+  color: var(--danger);
+  background: var(--danger-soft);
+  border-color: var(--danger);
+}
+
+/* ปุ่มหลัก = Primary ทึบ (จุดเด่นของหน้า) */
+.right-page__primary-btn,
+.topic-detail__done-button,
+.retry-btn,
+.cl-button {
+  color: var(--on-primary);
+  background: var(--accent-solid);
+  border-color: var(--accent-solid);
+  box-shadow: var(--shadow-sm);
+}
+
+.right-page__primary-btn:hover,
+.topic-detail__done-button:hover,
+.retry-btn:hover,
+.cl-button:hover:not(:disabled) {
+  background: var(--accent-solid-hover);
+  border-color: var(--accent-solid-hover);
+}
+
+/* หลังกด "ฉันเข้าใจหัวข้อนี้แล้ว" = เขียวอ่อน + กรอบเขียว (ต่างจากปุ่มหลักที่ทึบ) */
+.topic-detail__done-button.is-done {
+  color: var(--success);
+  background: var(--success-soft);
+  border-color: var(--success-line);
+  box-shadow: none;
+}
+
+.topic-detail__done-button.is-done:hover {
+  background: var(--success-soft);
+  border-color: var(--success);
+}
+
+
+/* ========================================
+   ลิงก์แหล่งเรียน
+======================================== */
+
+.resource-item {
+  background: var(--surface);
+  border-color: var(--border);
+  color: var(--text);
+}
+
+.resource-item:hover {
+  background: var(--surface-2);
+  border-color: var(--border-strong);
+}
+
+.resource-type {
+  background: var(--surface-3);
+  color: var(--text-muted);
+}
+
+.resource-type.video { background: var(--danger-soft); color: var(--danger); }
+.resource-type.course { background: var(--success-soft); color: var(--success); }
+.resource-type.search,
+.resource-type.web { background: var(--info-soft); color: var(--info); }
+.resource-type.book { background: var(--warning-soft); color: var(--warning); }
+.resource-note { color: var(--text-faint); }
+
+
+/* ========================================
+   สถานะโหลด / แจ้งเตือน
+======================================== */
+
+.skeleton-card {
+  background: linear-gradient(100deg, var(--surface-2) 30%, var(--surface-3) 50%, var(--surface-2) 70%);
+  background-size: 250% 100%;
+}
+
+.load-error { color: var(--danger); }
+.load-error span { color: var(--text-muted); }
+.load-message { color: var(--text-muted); }
+
+.toast {
+  color: var(--danger);
+  background: var(--surface);
+  border-color: var(--danger);
+  box-shadow: var(--shadow-md);
+}
+
+
+/* ========================================
+   หน้า Login
+======================================== */
+
+.cl-page {
+  --bg: var(--surface-2);
+  --ink: var(--text);
+  --muted: var(--text-faint);
+  --green: var(--accent-solid);
+  --green-dark: var(--accent-solid-hover);
+  background: var(--bg);
+  color: var(--text);
+}
+
+.cl-logo { color: var(--text); }
+.cl-compass { color: var(--accent-solid); }
+.cl-header-rule { background: var(--accent-solid); }
+
+.cl-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-md);
+}
+
+.cl-subtitle { color: var(--text-muted); }
+.cl-divider { background: var(--border); }
+.cl-label { color: var(--text); }
+
+.cl-input {
+  --ink: var(--text);
+  background: var(--surface-2);
+  border: 1px solid var(--border-strong);
+  border-radius: 12px;
+  color: var(--text);
+}
+
+.cl-input:focus {
+  border-color: var(--accent);
+  box-shadow: var(--focus);
+}
+
+.cl-input--error { border-color: var(--danger); }
+.cl-input--error:focus { box-shadow: 0 0 0 3px var(--danger-soft); }
+.cl-field-error,
+.cl-error { color: var(--danger); }
+.cl-forgot:hover { color: var(--accent); }
+.cl-button { border-radius: 12px; }
+
+@media (max-width: 520px) {
+  .cl-card { border-radius: 18px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body,
+  .nav-container,
+  .right-page,
+  .topic-detail,
+  .topic-page,
+  .course-card,
+  .topic-node,
+  .theme-toggle {
+    transition: none;
+  }
+}
+
+
+/* ========================================
+   Light mode: ปรับให้เห็นชัดขึ้น (Dark ไม่โดน)
+======================================== */
+
+/* กล่องวิชาในแผนผังหัวข้อ: พื้นขาวโปร่ง แยกจากพื้นหลังชัดขึ้น */
+:root[data-theme="light"] .topic-course {
+  background: rgba(255, 255, 255, 0.6);
+  border-color: var(--border-strong);
+}
+
+:root[data-theme="light"] .topic-course--selected {
+  background: rgba(255, 255, 255, 0.8);
+  border-color: var(--accent-line);
+}
+
+/* เส้นเชื่อมเห็นชัดขึ้นบนพื้นสว่าง */
+:root[data-theme="light"] .topic-edge { stroke-opacity: 0.75; }
+:root[data-theme="light"] .topic-edge--faded { stroke-opacity: 0.2; }
+:root[data-theme="light"] .topic-edge--active,
+:root[data-theme="light"] .topic-edge--hover { stroke-opacity: 1; }
+:root[data-theme="light"] .course-line { stroke-opacity: 0.85; }
+
+/* การ์ดมีขอบชัดขึ้นนิดหนึ่ง */
+:root[data-theme="light"] .course-card,
+:root[data-theme="light"] .topic-node {
+  border-color: var(--border-strong);
+}
+
+:root[data-theme="light"] .course-card.is-done,
+:root[data-theme="light"] .topic-node--done {
+  border-color: var(--success-line);
+}
+
+:root[data-theme="light"] .course-card.selected,
+:root[data-theme="light"] .topic-node--selected {
+  border-color: var(--accent);
+}
+
+/* ปุ่มและกล่องช่วยเล็ก ๆ ให้มีขอบเห็นชัด */
+:root[data-theme="light"] .search-btn,
+:root[data-theme="light"] .tabs,
+:root[data-theme="light"] .theme-toggle,
+:root[data-theme="light"] .logout-btn {
+  border-color: var(--border-strong);
+}
+
+
+/* ========================================
+   ส่วนเพิ่ม: หน้า Login / ตัวกรองหัวข้อ
+======================================== */
+
+/* ----- หน้า Login ให้เข้ากับธีมที่เหลือ ----- */
+
+.cl-page {
+  position: relative;
+  font-family: var(--font);
+}
+
+.cl-theme-slot {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 2;
+}
+
+.cl-header { padding-top: 12vh; gap: 16px; }
+.cl-header-rule { height: 3px; border-radius: 2px; width: min(280px, 100%); }
+.cl-main { padding-top: 20px; }
+
+.cl-card {
+  max-width: 380px;
+  padding: 1.75rem;
+  border-radius: 16px;
+}
+
+.cl-title { font-size: 1.35rem; font-weight: 700; }
+.cl-subtitle { font-size: 0.85rem; font-weight: 400; line-height: 1.6; }
+.cl-label { font-size: 0.85rem; }
+.cl-input { font-size: 0.95rem; }
+.cl-input::placeholder { color: var(--text-faint); opacity: 1; }
+.cl-forgot { font-size: 0.8rem; color: var(--text-muted); }
+.cl-field-error,
+.cl-error { font-size: 0.82rem; }
+.cl-button { font-size: 0.95rem; }
+
+/* ----- ตัวกรองหัวข้อ (Topicpage) ----- */
+
+.topic-page__tools {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px 22px;
+}
+
+.topic-page__filters {
+  display: inline-flex;
+  padding: 2px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: var(--surface-2);
+}
+
+.topic-page__filter {
+  height: 28px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 7px;
+  color: var(--text-muted);
+  background: transparent;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color 0.18s ease, background 0.18s ease;
+}
+
+.topic-page__filter:hover { color: var(--text); }
+
+.topic-page__filter.is-active {
+  color: var(--accent-strong);
+  background: var(--surface);
+  font-weight: 600;
+  box-shadow: var(--shadow-sm), 0 0 0 1px var(--border);
+}
+
+.topic-page__filter:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* หัวข้อที่ไม่ตรงตัวกรอง: จางลงแต่ยังอยู่ที่เดิม (เส้นและผังไม่ขยับ) */
+.topic-node--filtered-out { opacity: 0.2; }
+.topic-node--filtered-out:hover { opacity: 0.85; }
+
+@media (max-width: 900px) {
+  .topic-page__tools { gap: 10px 16px; }
+}
+
+
+/* ========================================
+   Polish รอบ 2
+   สีประจำวิชา / ไฮไลต์คำค้น / ตัวอักษรไทย / scrollbar / จังหวะเคลื่อนไหวเบา ๆ
+======================================== */
+
+/* ----- สีประจำวิชา: ความสว่างเปลี่ยนตามธีม เฉดมาจาก --hue ที่ใส่ inline ----- */
+
+:root,
+:root[data-theme="dark"] { --course-l: 66%; }
+:root[data-theme="light"] { --course-l: 34%; }
+
+.course-card,
+.topic-course,
+.topic-node {
+  --course-color: hsl(var(--hue, 152) 48% var(--course-l));
+  --course-soft: hsl(var(--hue, 152) 55% var(--course-l) / 0.14);
+  --course-line: hsl(var(--hue, 152) 55% var(--course-l) / 0.38);
+}
+
+/* แถบสีเล็ก ๆ ด้านซ้ายของการ์ด */
+.course-card::before,
+.topic-node::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 12px;
+  bottom: 12px;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: var(--course-color);
+  pointer-events: none;
+}
+
+/* กล่องวิชาในแผนผังหัวข้อ: เส้นสีบาง ๆ ด้านบน */
+.topic-course {
+  box-shadow: inset 0 2px 0 var(--course-color);
+}
+
+.course-code,
+.topic-course__code {
+  color: var(--course-color);
+  background: var(--course-soft);
+  border-color: var(--course-line);
+}
+
+/* ----- ไฮไลต์คำที่ค้นหา ----- */
+
+.search-mark {
+  padding: 0 1px;
+  border-radius: 3px;
+  color: var(--accent-strong);
+  background: var(--accent-soft);
+  font-weight: inherit;
+}
+
+/* ----- toast สำเร็จ ----- */
+
+.toast--success {
+  color: var(--success);
+  border-color: var(--success-line);
+}
+
+/* ----- ตัวอักษร: ภาษาไทยไม่ควรบีบตัวอักษร และตัวเล็กสุดไม่ต่ำกว่า 11-12px ----- */
+
+body { line-height: 1.6; }
+
+.right-page__title,
+.topic-detail__title { letter-spacing: 0; }
+
+.right-page__badge,
+.right-page__badge-btn,
+.topic-detail__badge,
+.collapsible__count,
+.right-page__count,
+.topic-detail__count,
+.resource-type,
+.search-result-type { font-size: 12px; }
+
+.topic-node__meta { font-size: 11px; }
+
+/* ----- เลือกข้อความ + โฟกัสคีย์บอร์ด ----- */
+
+::selection {
+  background: color-mix(in srgb, var(--primary) 28%, transparent);
+}
+
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* ----- scrollbar บาง ๆ ตามธีม ----- */
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-strong) transparent;
+}
+
+.right-page__body,
+.topic-detail__body,
+.search-results {
+  scrollbar-color: var(--border-strong) transparent;
+}
+
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  border: 2px solid transparent;
+  border-radius: 8px;
+  background: var(--border-strong);
+  background-clip: padding-box;
+}
+
+/* ----- จังหวะเคลื่อนไหว: แผงขวาไหลเข้าเบา ๆ / สลับแผนผังแบบเฟด ----- */
+
+.right-page,
+.topic-detail {
+  animation: panel-in 0.28s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+}
+
+.course-map,
+.topic-page {
+  animation: view-in 0.25s ease backwards;
+}
+
+@keyframes panel-in {
+  from { opacity: 0; transform: translateX(10px); }
+}
+
+@keyframes view-in {
+  from { opacity: 0; }
+}
+
+/* ปุ่มหลัก: กดแล้วยุบลงนิดหนึ่ง */
+.right-page__primary-btn:active,
+.topic-detail__done-button:active,
+.retry-btn:active,
+.cl-button:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .right-page,
+  .topic-detail,
+  .course-map,
+  .topic-page { animation: none; }
+}
+
+
+/* ========================================
+   Readability: ให้ทั้ง Light และ Dark อ่านง่ายขึ้น
+   (ตัวหนังสือใหญ่ขึ้น สถานะเห็นชัดขึ้น เส้นเชื่อมหนาขึ้น)
+======================================== */
+
+/* ----- ขนาดตัวอักษร: เนื้อหา 14px / รอง 12-13px ----- */
+
+.right-page__description,
+.topic-detail__description {
+  font-size: 14px;
+  line-height: 1.8;
+  color: var(--text-muted);
+}
+
+.right-page__section h3,
+.topic-detail__section h3,
+.progress-card__text h3,
+.collapsible__title { font-size: 14px; }
+
+.right-page__list-text strong,
+.topic-detail__list-text strong,
+.resource-title,
+.search-result-title { font-size: 14px; }
+
+.right-page__list-text small,
+.topic-detail__list-text small,
+.resource-note,
+.next-up__label,
+.next-up__hint { font-size: 12px; }
+
+.right-page__subtitle,
+.topic-detail__subtitle,
+.right-page__muted,
+.topic-detail__muted,
+.right-page__progress > p,
+.topic-detail__progress > p,
+.progress-card__text p { font-size: 13px; }
+
+.next-up__name { font-size: 15px; }
+
+.right-page__primary-btn,
+.right-page__secondary-btn,
+.topic-detail__done-button { font-size: 14px; }
+
+.course-name,
+.topic-course__name { font-size: 15px; }
+
+.course-info,
+.course-percent,
+.topic-page__subtitle,
+.topic-page__legend-item,
+.topic-page__footer { font-size: 13px; }
+
+/* การ์ดหัวข้อ (ขนาดการ์ดใน Topicpage.jsx ขยายเป็น 220x72 แล้ว) */
+.topic-node__name {
+  font-size: 13px;
+  font-weight: 650;
+  line-height: 1.3;
+}
+
+.topic-node__meta { font-size: 12px; }
+.topic-node__selected-label { font-size: 9px; }
+
+/* ----- สถานะเห็นชัด: เรียนแล้ว = วงเขียวทึบ + เครื่องหมายถูก / เลือกอยู่ = วงสีหลักทึบ ----- */
+
+.topic-node--done .topic-node__status,
+.topic-node--done:not(.topic-node--selected) .topic-node__status {
+  color: var(--on-success);
+  background: var(--success);
+}
+
+.topic-node--selected .topic-node__status,
+.topic-node--selected:not(.topic-node--in-path) .topic-node__status {
+  color: var(--on-primary);
+  background: var(--primary);
+}
+
+.right-page__list-status.is-done,
+.topic-detail__list-status.is-done {
+  color: var(--on-success);
+  background: var(--success);
+}
+
+.topic-node--dimmed { opacity: 0.4; }
+.topic-node--dimmed:hover { opacity: 0.9; }
+.topic-node--filtered-out { opacity: 0.3; }
+
+/* ----- เส้นเชื่อมหนาขึ้น (ต้องอยู่หลังกฎ .topic-edge ด้านบน เพราะความเฉพาะเจาะจงเท่ากัน) ----- */
+
+.topic-edge {
+  stroke-width: 1.5;
+  stroke-opacity: 0.55;
+}
+
+.topic-edge--faded { stroke-opacity: 0.14; }
+
+.topic-edge--active {
+  stroke-width: 2.6;
+  stroke-opacity: 1;
+}
+
+.topic-edge--hover {
+  stroke-width: 3.4;
+  stroke-opacity: 1;
+}
+
+.course-line {
+  stroke-width: 2;
+  stroke-opacity: 0.8;
+}
+
+.course-line.hovered,
+.course-line.active {
+  stroke-width: 3;
+  stroke-opacity: 1;
+}
+
+:root[data-theme="light"] .topic-edge { stroke-opacity: 0.75; }
+:root[data-theme="light"] .topic-edge--faded { stroke-opacity: 0.2; }
+:root[data-theme="light"] .topic-edge--active,
+:root[data-theme="light"] .topic-edge--hover { stroke-opacity: 1; }
+
+
+/* ========================================
+   ลากปรับขนาดแผงซ้าย/ขวา (Homepage.jsx)
+   ความกว้างแผงขวามาจากตัวแปร --right-w ที่ใส่ที่ .homepage
+   จอแคบ (<= 900px) แผงซ้อนกันแนวตั้งอยู่แล้ว จึงไม่ใช้ตัวปรับ
+======================================== */
+
+@media (min-width: 901px) {
+  .leftPage { width: calc(100% - var(--right-w, 30%)); }
+
+  .rightPage {
+    width: var(--right-w, 30%);
+    min-width: 300px;
+  }
+
+  .resizer {
+    position: relative;
+    z-index: 30;
+    flex: 0 0 0;
+    width: 0;
+    outline: none;
+    touch-action: none;
+  }
+
+  /* พื้นที่จับให้กว้างกว่าเส้นที่เห็น ลากง่าย */
+  .resizer::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: -6px;
+    width: 12px;
+    cursor: col-resize;
+  }
+
+  /* เส้นที่เห็นตอนชี้ / โฟกัส / กำลังลาก */
+  .resizer::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: -1px;
+    width: 3px;
+    border-radius: 2px;
+    background: transparent;
+    pointer-events: none;
+    transition: background 0.15s ease;
+  }
+
+  .resizer:hover::after,
+  .resizer:focus-visible::after,
+  .homepage.is-resizing .resizer::after {
+    background: var(--accent);
+  }
+}
+
+@media (max-width: 900px) {
+  .resizer { display: none; }
+}
+
+.homepage.is-resizing {
+  cursor: col-resize;
+  user-select: none;
+}

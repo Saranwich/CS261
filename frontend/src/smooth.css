@@ -1,0 +1,220 @@
+/* ========================================
+   smooth.css — ความนุ่มนวลของทั้งเว็บ
+======================================== */
+
+:root {
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+html { scroll-behavior: smooth; }
+
+.right-page__body,
+.topic-detail__body,
+.search-results {
+  scroll-behavior: smooth;
+  overscroll-behavior: contain;
+}
+
+button,
+a { -webkit-tap-highlight-color: transparent; }
+
+
+/* ----- กดแล้วยุบลงนิดหนึ่ง (ทุกปุ่ม) ----- */
+
+button:not(:disabled):active {
+  transform: scale(0.975);
+  transition-duration: 0.08s;
+}
+
+/* การ์ดบนกระดานมี transform ของตัวเอง ไม่ให้กดแล้วกระโดด */
+.course-card:active,
+.topic-node:active { transform: translateY(-1px) scale(0.985); }
+
+.zoom-controls button:active,
+.theme-toggle:active { transform: scale(0.92); }
+
+
+/* ----- การ์ดวิชา / การ์ดหัวข้อ: hover ยกขึ้นนุ่ม ๆ เงาตามมา ----- */
+
+.course-card {
+  transition:
+    transform 0.32s var(--ease-out),
+    border-color 0.25s ease,
+    background-color 0.25s ease,
+    background 0.25s ease,
+    box-shadow 0.35s var(--ease-out),
+    opacity 0.3s ease;
+}
+
+.topic-node {
+  transition:
+    transform 0.3s var(--ease-out),
+    border-color 0.25s ease,
+    background-color 0.25s ease,
+    background 0.25s ease,
+    box-shadow 0.35s var(--ease-out),
+    opacity 0.4s ease;
+}
+
+/* เส้นเชื่อม: สี ความหนา ความทึบ เปลี่ยนนุ่มพร้อมกัน */
+.topic-edge,
+.course-line {
+  transition:
+    stroke 0.3s ease,
+    stroke-width 0.3s var(--ease-out),
+    stroke-opacity 0.35s ease;
+}
+
+/* แถบความคืบหน้า */
+.progress,
+.topic-detail__progress-fill {
+  transition: width 0.6s var(--ease-out), background-color 0.3s ease;
+}
+
+.progress-ring__bar {
+  transition: stroke-dashoffset 0.8s var(--ease-out), stroke 0.3s ease;
+}
+
+
+/* ----- ปุ่ม / รายการในแผงขวา ----- */
+
+.right-page__list-button,
+.topic-detail__list-button,
+.right-page__topic-item,
+.next-up,
+.topic-detail__start,
+.resource-item,
+.search-result {
+  transition:
+    transform 0.25s var(--ease-out),
+    border-color 0.2s ease,
+    background-color 0.2s ease,
+    box-shadow 0.25s ease;
+}
+
+.right-page__list-button:hover,
+.topic-detail__list-button:hover,
+.next-up:hover,
+.topic-detail__start:hover,
+.resource-item:hover {
+  transform: translateX(2px);
+}
+
+.right-page__primary-btn,
+.right-page__secondary-btn,
+.topic-detail__done-button,
+.logout-btn,
+.tab,
+.theme-toggle,
+.topic-page__filter,
+.retry-btn,
+.cl-button {
+  transition:
+    transform 0.2s var(--ease-out),
+    background-color 0.22s ease,
+    border-color 0.22s ease,
+    color 0.22s ease,
+    box-shadow 0.25s ease;
+}
+
+.right-page__primary-btn:hover,
+.topic-detail__done-button:hover {
+  transform: translateY(-1px);
+}
+
+
+/* ----- หัวข้อพับ / ขยาย: เลื่อนความสูงจริง (ใช้ grid 0fr → 1fr ไม่ต้องรู้ความสูงล่วงหน้า) ----- */
+
+.collapsible__panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  visibility: hidden;
+  /* ตอนปิด: ยุบก่อน แล้วค่อยซ่อน (ปุ่มข้างในจะไม่ถูก Tab ไปโดน) */
+  transition:
+    grid-template-rows 0.34s var(--ease-in-out),
+    opacity 0.22s ease,
+    visibility 0s linear 0.34s;
+}
+
+.collapsible__panel.is-open {
+  grid-template-rows: 1fr;
+  opacity: 1;
+  visibility: visible;
+  transition:
+    grid-template-rows 0.38s var(--ease-out),
+    opacity 0.3s ease 0.05s,
+    visibility 0s;
+}
+
+.collapsible__inner {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.collapsible__chevron { transition: transform 0.3s var(--ease-out), color 0.2s ease; }
+
+
+/* ----- กล่องผลค้นหา: เด้งเปิดนุ่ม ๆ ----- */
+
+.search-results { animation: pop-in 0.18s var(--ease-out); transform-origin: top center; }
+
+@keyframes pop-in {
+  from { opacity: 0; transform: translateY(-6px) scale(0.98); }
+}
+
+
+/* ----- สลับ Light/Dark: สีทั้งหน้าไล่เฉดแทนที่จะเปลี่ยนวับ ----- */
+/* (class นี้ถูกใส่ชั่วคราวโดย setTheme ใน theme.js) */
+
+html.theme-fade *,
+html.theme-fade *::before,
+html.theme-fade *::after {
+  transition:
+    background-color 0.35s ease,
+    border-color 0.35s ease,
+    color 0.35s ease,
+    fill 0.35s ease,
+    stroke 0.35s ease,
+    box-shadow 0.35s ease !important;
+}
+
+
+/* ----- กระดานตอนกำลังลาก ----- */
+
+.pan-zoom-canvas.is-panning { cursor: grabbing; }
+
+/* ระหว่างลากไม่ให้การ์ดข้างล่างรับ hover (กันผังทั้งหน้า re-render ตอนเมาส์ผ่าน) */
+.pan-zoom-canvas.is-panning .pan-zoom-content { pointer-events: none; }
+
+/* ซูมใช้ rAF ใน PanZoomCanvas.jsx แล้ว ห้ามมี transition ซ้อน ไม่งั้นจะหน่วง */
+.pan-zoom-content,
+.pan-zoom-content.animate { transition: none; }
+
+
+/* ----- ปรับขนาดแผงขวา: ระหว่างลากปิดอนิเมชันที่ไม่จำเป็น ----- */
+
+.homepage.is-resizing * { transition: none !important; animation: none !important; }
+
+
+/* ----- ผู้ใช้ตั้งค่าลดการเคลื่อนไหว ----- */
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+
+  .collapsible__panel,
+  .collapsible__panel.is-open,
+  .search-results,
+  .course-card,
+  .topic-node,
+  .right-page__list-button,
+  .topic-detail__list-button,
+  .next-up,
+  .resource-item {
+    transition-duration: 0.01ms;
+    animation: none;
+  }
+
+  button:not(:disabled):active { transform: none; }
+}

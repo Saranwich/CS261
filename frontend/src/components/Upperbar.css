@@ -1,4 +1,3 @@
-
 .nav-container {
   display: flex;
   align-items: center;
@@ -14,14 +13,12 @@
   color: #E9EAF2;
 }
 
-
 .brand {
   font-size: 14px;
   font-weight: 700;
   color: #22C55E;
   padding: 0 6px 0 8px;
 }
-
 
 .tabs {
   display: flex;
@@ -30,7 +27,6 @@
   border-radius: 8px;
   padding: 2px;
 }
-
 
 .tab {
   border: 0;
@@ -45,20 +41,17 @@
   transition: all 0.2s;
 }
 
-
 .tab.active {
   background-color: #252836;
   color: #22C55E;
   box-shadow: 0 0 0 1px #323548;
 }
 
-
 .search-wrap {
   position: relative;
   flex: 1;
   max-width: 420px;
 }
-
 
 .search-btn {
   display: flex;
@@ -75,7 +68,6 @@
   box-sizing: border-box;
 }
 
-
 .search-btn input {
   flex: 1;
   background: transparent;
@@ -85,11 +77,9 @@
   font-size: 13px;
 }
 
-
 .search-btn input::placeholder {
   color: #7F8299;
 }
-
 
 .search-btn kbd {
   font-family: 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, monospace;
@@ -101,7 +91,6 @@
   padding: 1px 5px;
   background-color: #1B1D25;
 }
-
 
 .user {
   margin-left: auto; 
@@ -122,7 +111,6 @@
   font-weight: 600;
   font-size: 15px;
 }
-
 
 .who {
   display: flex;
@@ -157,4 +145,84 @@
   border-color: #b3261e;
   color: #ff6b63;
   background-color: rgba(179, 38, 30, 0.1);
+}
+
+/* กล่องผลค้นหา (ลอยใต้ช่องค้นหา) */
+.search-results {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  max-height: 420px;
+  overflow-y: auto;
+  margin: 0;
+  padding: 6px;
+  list-style: none;
+  border: 1px solid #323548;
+  border-radius: 10px;
+  background-color: #14151B;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
+}
+
+.search-empty {
+  padding: 12px;
+  color: #7F8299;
+  font-size: 12px;
+}
+
+.search-result {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: #E9EAF2;
+  text-align: left;
+  cursor: pointer;
+}
+
+/* ตัวที่ไฮไลต์อยู่ (เมาส์ชี้ หรือกดลูกศรมา) */
+.search-result.active {
+  background-color: #252836;
+}
+
+.search-result-type {
+  flex-shrink: 0;
+  width: 42px;
+  padding: 2px 0;
+  border-radius: 5px;
+  font-size: 10px;
+  text-align: center;
+}
+
+.search-result-type.course {
+  background-color: rgba(34, 197, 94, 0.15);
+  color: #22C55E;
+}
+
+.search-result-type.topic {
+  background-color: rgba(240, 181, 47, 0.15);
+  color: #F0B52F;
+}
+
+.search-result-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.search-result-title {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.search-result-sub {
+  color: #7F8299;
+  font-size: 11px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
