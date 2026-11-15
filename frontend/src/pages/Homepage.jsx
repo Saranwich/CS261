@@ -1,28 +1,36 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Rightpage from "../components/Rightpage";
 import Leftpage from "../components/leftpage";
 import Upperbar from "../components/Upperbar";
 import Topicpage from "../components/Topicpage";
 import TopicDetail from "../components/TopicDetail";
 import { toLookup, toTopicCards } from "../utils/topics";
-// นำเข้าข้อมูลจำลอง fallback ในกรณีที่ยังไม่ได้เปิด Backend หรือไม่มีข้อมูล
-import { fallbackSkillTree, fallbackCourseDetails } from "../data/mockSkillTree";
-import "./Homepage.css";
-import {mockSkillTree,mockCourseDetails,mockDoneTopicIds,} from "../data/mockSkillTree";
 import { USE_MOCK_DATA } from "../config/mockConfig";
+import { mockSkillTree, mockCourseDetails, mockDoneTopicIds } from "../data/mockSkillTree";
+import "./Homepage.css";
 
-// ========================================
-// แปลงข้อมูลจาก backend ให้เป็นรูปแบบที่ Leftpage / Rightpage ใช้อยู่แล้ว
-// ========================================
+// key ที่ใช้เก็บความคืบหน้าของโหมด mock ใน localStorage แยกตามรหัสนักศึกษา
+// (App.jsx เก็บ studentId ไว้ตอน login) จึงไม่ปนกันถ้ามีหลายคนใช้เครื่องเดียวกัน
+// และไม่ถูกล้างตอน logout ทำให้ login กลับมาแล้วความคืบหน้ายังอยู่
+function mockProgressKey() {
+  return `mockDoneTopicIds:${localStorage.getItem("studentId") || "guest"}`;
+}
 
-function toCourseCards(tree, topics = []) {
-  if (!tree || !tree.courses) return [];
+// อ่านความคืบหน้าของโหมด mock ที่เคยบันทึกไว้ ถ้าไม่มี/อ่านไม่ได้ ใช้ค่าตั้งต้นจาก mockSkillTree.js
+function loadMockProgress() {
+  try {
+    const saved = localStorage.getItem(mockProgressKey());
+    return saved ? JSON.parse(saved) : mockDoneTopicIds;
+  } catch {
+    return mockDoneTopicIds;
+  }
+}
 
+// แปลงข้อมูลจาก backend ให้เป็นรูปแบบที่ Leftpage / Rightpage ใช้
+function toCourseCards(tree, topics) {
   return tree.courses.map((course) => {
-    // หัวข้อของวิชานี้
-    const courseTopics = (topics || []).filter((topic) => topic.courseId === course.id);
+    const courseTopics = topics.filter((topic) => topic.courseId === course.id);
 
-    // วิชาที่ต้องผ่านก่อนวิชานี้
     const prerequisites = (tree.prerequisites || [])
       .filter((link) => link.courseId === course.id)
       .map((link) => link.prerequisiteId);
@@ -45,111 +53,118 @@ function toCourseCards(tree, topics = []) {
   });
 }
 
+
 function Home({ onLogout }) {
-  // เริ่มต้นด้วย fallbackSkillTree ทันที เพื่อป้องกันหน้าจอว่างเปล่า
-  const [tree, setTree] = useState(fallbackSkillTree);
-  const [courseDetails, setCourseDetails] = useState(fallbackCourseDetails);
-  const [doneTopicIds, setDoneTopicIds] = useState(() => {
-    try {
-      const saved = localStorage.getItem("learnedTopicIds");
-      return saved ? JSON.parse(saved) : [];
-    } catch {
-      return [];
-    }
-  });
 
+  // ========================================
+  // ข้อมูล: โหมดจริงดึงจาก backend  / โหมด mock (เฉพาะตอน dev) ใช้ข้อมูลจำลองทันที
+  //   tree          = แผนผังวิชา + เส้น prerequisite   null = ยังโหลดไม่เสร็จ
+  //   courseDetails = รายละเอียด + หัวข้อ ของทุกวิชา
+  //   doneTopicIds  = id ของหัวข้อที่รู้แล้ว
+  //                   โหมดจริง: เก็บที่ backend ที่เดียว
+  //                   โหมด mock: เก็บใน localStorage แยกรายรหัสนักศึกษา (รีเฟรช / logout แล้วไม่หาย)
+  // ========================================
+  const [tree, setTree] = useState(USE_MOCK_DATA ? mockSkillTree : null);
+  const [courseDetails, setCourseDetails] = useState(USE_MOCK_DATA ? mockCourseDetails : []);
+  const [doneTopicIds, setDoneTopicIds] = useState(() =>
+    USE_MOCK_DATA ? loadMockProgress() : []
+  );
   const [loadError, setLoadError] = useState(false);
+  const [reloadKey, setReloadKey] = useState(0); // เพิ่มค่า = สั่งโหลดข้อมูลใหม่ (ปุ่มลองอีกครั้ง)
 
-  // สิ่งที่เลือกอยู่ (เก็บเฉพาะ id ตอนเริ่มเป็น null)
+  // ข้อความแจ้งเตือนเล็ก ๆ ด้านล่างจอ (แทน alert ที่บล็อกหน้าเว็บ)
+  const [toast, setToast] = useState(null);
+  const toastTimer = useRef(null);
+  function showToast(message) {
+    setToast(message);
+    clearTimeout(toastTimer.current);
+    toastTimer.current = setTimeout(() => setToast(null), 4000);
+  }
+  useEffect(() => () => clearTimeout(toastTimer.current), []);
+
   const [selectedCourseId, setSelectedCourseId] = useState(null);
   const [selectedTopicId, setSelectedTopicId] = useState(null);
 
-  // แท็บที่เลือกอยู่บน Upperbar: "course" (รายวิชา) หรือ "topic" (รายหัวข้อ)
+  // "course" = แผนผังรายวิชา / "topic" = แผนผังรายหัวข้อ
   const [activeTab, setActiveTab] = useState("course");
 
-  // ========================================
-  // โหลดข้อมูลจาก Backend API ตอนเปิดหน้าเว็บ
-  // ========================================
-
+  // โหมด mock: บันทึกความคืบหน้าลง localStorage ทุกครั้งที่เปลี่ยน
   useEffect(() => {
+    if (!USE_MOCK_DATA) return;
+    try {
+      localStorage.setItem(mockProgressKey(), JSON.stringify(doneTopicIds));
+    } catch (error) {
+      console.warn("บันทึกความคืบหน้า mock ไม่สำเร็จ", error);
+    }
+  }, [doneTopicIds]);
+
+  // ดึงข้อมูลจาก backend ตอนเปิดหน้านี้ (โหมด mock ข้าม)
+  useEffect(() => {
+    if (USE_MOCK_DATA) return;
     let isMounted = true;
+    setLoadError(false);
 
     async function loadAll() {
       try {
-        // 1) หัวข้อที่เรารู้แล้วจาก GET /api/progress
-        let progressList = [];
-        try {
-          const progressResponse = await fetch("/api/progress");
-          if (progressResponse.ok) {
-            progressList = await progressResponse.json();
-          }
-        } catch (err) {
-          console.warn("ไม่สามารถดึง progress จาก backend ได้:", err);
-        }
+        // 1) หัวข้อที่รู้แล้ว (ต้อง login — browser แนบ cookie ให้เอง)
+        const progressResponse = await fetch("/api/progress");
 
-        // 2) แผนผังวิชาจาก GET /api/skill-tree
-        const treeResponse = await fetch("/api/skill-tree");
-
-        if (!treeResponse.ok) {
-          throw new Error(`backend /api/skill-tree status: ${treeResponse.status}`);
-        }
-
-        const treeData = await treeResponse.json();
-
-        if (!treeData.courses || treeData.courses.length === 0) {
-          // ถ้า backend ส่งวิชาว่าง ให้ใช้ fallback
-          if (isMounted) {
-            setTree(fallbackSkillTree);
-            setCourseDetails(fallbackCourseDetails);
-          }
+        // session หมดอายุ (ไม่ได้ใช้งาน 30 นาที) → กลับไปหน้า login
+        if (progressResponse.status === 401) {
+          onLogout();
           return;
         }
 
-        // 3) ดึงรายละเอียดและหัวข้อของทุกวิชาจาก GET /api/courses/{id} พร้อมกัน
+        // 2) แผนผังวิชา + เส้น prerequisite (ไม่ต้อง login)
+        const treeResponse = await fetch("/api/skill-tree");
+
+        if (!treeResponse.ok || !progressResponse.ok) {
+          throw new Error("backend ตอบ error");
+        }
+
+        const treeData = await treeResponse.json();
+        const progressList = await progressResponse.json();
+
+        // 3) หัวข้อของทุกวิชา (ยิงพร้อมกันทุกวิชา แล้วรอให้ครบ)
         const details = await Promise.all(
           treeData.courses.map(async (course) => {
             const response = await fetch(`/api/courses/${course.id}`);
-            if (!response.ok) {
-              throw new Error(`backend /api/courses/${course.id} error: ${response.status}`);
-            }
+            if (!response.ok) throw new Error("backend ตอบ error");
             return response.json();
           })
         );
 
-        if (isMounted) {
-          setTree(treeData);
-          setCourseDetails(details);
-          if (progressList.length > 0) {
-            setDoneTopicIds(progressList.map((progress) => progress.topicId));
-          }
-        }
+        if (!isMounted) return;
+        setTree(treeData);
+        setCourseDetails(details);
+        setDoneTopicIds(progressList.map((progress) => progress.topicId));
       } catch (error) {
-        console.warn("โหลดข้อมูลจาก backend ไม่สำเร็จ ใช้ข้อมูลจำลอง (fallback data):", error);
-        if (isMounted) {
-          setTree(fallbackSkillTree);
-          setCourseDetails(fallbackCourseDetails);
-          setLoadError(false);
-        }
+        console.error("โหลดข้อมูลรายวิชาไม่สำเร็จ", error);
+        if (isMounted) setLoadError(true);
       }
     }
 
     loadAll();
-
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [onLogout, reloadKey]);
 
-  // ซิงค์หัวข้อที่รู้แล้วลง localStorage
+  // กด Esc = ล้างสิ่งที่เลือกอยู่ (หัวข้อก่อน แล้วค่อยวิชา) ยกเว้นตอนกำลังพิมพ์ในช่องค้นหา
   useEffect(() => {
-    try {
-      localStorage.setItem("learnedTopicIds", JSON.stringify(doneTopicIds));
-    } catch {
-      // ignore
-    }
-  }, [doneTopicIds]);
+    function handleKeyDown(event) {
+      if (event.key !== "Escape") return;
+      const tag = event.target?.tagName;
+      if (tag === "INPUT" || tag === "TEXTAREA") return;
 
-  // คำนวณโครงสร้างข้อมูลพร้อมใช้งาน
+      if (selectedTopicId) setSelectedTopicId(null);
+      else if (selectedCourseId) setSelectedCourseId(null);
+    }
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [selectedTopicId, selectedCourseId]);
+
+  // แปลงข้อมูลให้หน้าเว็บใช้ (คำนวณใหม่ทุกครั้งที่ข้อมูลเปลี่ยน เช่น ติ๊กหัวข้อ)
   const topics = toTopicCards(courseDetails, doneTopicIds);
   const topicById = toLookup(topics);
   const courses = tree ? toCourseCards(tree, topics) : [];
@@ -157,11 +172,13 @@ function Home({ onLogout }) {
   const selectedCourse = courses.find((course) => course.id === selectedCourseId) || null;
   const selectedTopic = topicById[selectedTopicId] || null;
 
+  // เลือกวิชา (หรือ null = เลิกเลือก) → เลิกเลือกหัวข้อด้วย
   function selectCourse(course) {
     setSelectedCourseId(course ? course.id : null);
     setSelectedTopicId(null);
   }
 
+  // เลือกหัวข้อ → เลือกวิชาของหัวข้อนั้นด้วย แล้วไปแท็บรายหัวข้อ
   function selectTopic(topic) {
     if (!topic) return;
     setSelectedTopicId(topic.id);
@@ -169,37 +186,69 @@ function Home({ onLogout }) {
     setActiveTab("topic");
   }
 
-  // บันทึกความก้าวหน้า "รู้แล้ว" / "ยังไม่รู้"
+  // ========================================
+  // ติ๊ก / ยกเลิกติ๊ก "รู้แล้ว"
+  //   ยังไม่รู้ → PUT    /api/progress/topics/{topicId}
+  //   รู้แล้ว   → DELETE /api/progress/topics/{topicId}
+  // อัปเดตหน้าจอก่อนให้รู้สึกเร็ว ถ้าบันทึกไม่สำเร็จ ย้อนกลับและแจ้งผู้ใช้
+  // (โหมด mock: แค่เปลี่ยน state แล้ว useEffect ด้านบนจะบันทึกลง localStorage ให้)
+  // ========================================
   async function toggleTopicDone(topicId) {
-    const isDone = doneTopicIds.includes(topicId);
+    const wasDone = doneTopicIds.includes(topicId);
 
-    // Optimistic update
-    if (isDone) {
-      setDoneTopicIds((prev) => prev.filter((id) => id !== topicId));
-    } else {
-      setDoneTopicIds((prev) => [...prev, topicId]);
-    }
+    const setDone = (done) =>
+      setDoneTopicIds((current) =>
+        done
+          ? current.includes(topicId) ? current : [...current, topicId]
+          : current.filter((id) => id !== topicId)
+      );
+
+    setDone(!wasDone);
+    if (USE_MOCK_DATA) return;
 
     try {
       const response = await fetch(`/api/progress/topics/${topicId}`, {
-        method: isDone ? "DELETE" : "PUT",
+        method: wasDone ? "DELETE" : "PUT",
       });
 
-      if (response.status === 401 && onLogout) {
+      if (response.status === 401) {
         onLogout();
         return;
       }
-    } catch (err) {
-      console.warn("ไม่สามารถ sync progress ไปยัง backend:", err);
+      if (!response.ok) throw new Error("backend ตอบ error");
+    } catch (error) {
+      console.error("บันทึกไม่สำเร็จ", error);
+      setDone(wasDone); // ย้อนกลับ
+      showToast("บันทึกไม่สำเร็จ ลองใหม่อีกครั้ง");
     }
   }
 
-  // ฝั่งซ้าย: แสดงผังรายหัวข้อ หรือ ผังรายวิชา
+  // ========================================
+  // ฝั่งซ้ายแสดงอะไร
+  //   โหลดพัง           → ข้อความ error
+  //   ยังโหลดไม่เสร็จ    → กำลังโหลด
+  //   แท็บรายหัวข้อ      → แผนผังรายหัวข้อ
+  //   แท็บรายวิชา (ปกติ) → แผนผังรายวิชา
+  // ========================================
   function renderLeftSide() {
     if (loadError) {
       return (
-        <div className="load-error">
-          โหลดข้อมูลรายวิชาไม่สำเร็จ ลองเช็กว่า backend เปิดอยู่ไหม
+        <div className="load-error" role="alert">
+          <strong>โหลดข้อมูลรายวิชาไม่สำเร็จ</strong>
+          <span>ลองเช็กว่า backend เปิดอยู่ไหม แล้วกดลองอีกครั้ง</span>
+          <button type="button" className="retry-btn" onClick={() => setReloadKey((key) => key + 1)}>
+            ลองอีกครั้ง
+          </button>
+        </div>
+      );
+    }
+
+    if (!tree) {
+      return (
+        <div className="skeleton-map" role="status" aria-label="กำลังโหลดข้อมูลรายวิชา">
+          {[0, 1, 2, 3].map((index) => (
+            <div key={index} className="skeleton-card" />
+          ))}
         </div>
       );
     }
@@ -225,8 +274,9 @@ function Home({ onLogout }) {
     );
   }
 
+
   return (
-    <>
+    <div className="app-shell">
       <Upperbar
         onLogout={onLogout}
         activeTab={activeTab}
@@ -238,12 +288,13 @@ function Home({ onLogout }) {
       />
 
       <div className="homepage">
+
         {/* ฝั่งซ้าย 70% */}
         <div className="leftPage">
           {renderLeftSide()}
         </div>
 
-        {/* ฝั่งขวา 30% */}
+        {/* ฝั่งขวา 30%: แท็บรายหัวข้อ + เลือกหัวข้อไว้ → รายละเอียดหัวข้อ / นอกนั้น → รายละเอียดวิชา */}
         <div className="rightPage">
           {activeTab === "topic" && selectedTopic ? (
             <TopicDetail
@@ -259,14 +310,22 @@ function Home({ onLogout }) {
               setSelectedCourse={selectCourse}
               courses={courses}
               courseTopics={topics.filter((topic) => topic.courseId === selectedCourseId)}
+              topicById={topicById}
               onShowTopics={() => setActiveTab("topic")}
               onSelectTopic={selectTopic}
               onToggleDone={toggleTopicDone}
             />
           )}
         </div>
+
       </div>
-    </>
+
+      {toast && (
+        <div className="toast" role="alert">
+          {toast}
+        </div>
+      )}
+    </div>
   );
 }
 
