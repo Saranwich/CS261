@@ -1,7 +1,26 @@
-
 import { useMemo } from "react";
 import ResourceList from "./ResourceList";
+import Collapsible from "./Collapsible";
+import ProgressRing from "./ProgressRing";
+import { ArrowRightIcon, CheckIcon, CircleIcon, DiamondIcon } from "./Icons";
+import COURSE_RESOURCES from "../data/courseResources";
 import "./TopicDetail.css";
+
+// ลิงก์ค้นหาจากชื่อหัวข้อ (ไม่ต้องเก็บลิงก์ทีละหัวข้อ และไม่มีวันเป็นลิงก์เสีย)
+function searchLinksFor(topic) {
+  const youtube = (query) =>
+    `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`;
+  return [
+    { type: "search", title: "คลิปสอนภาษาไทย", url: youtube(`สอน ${topic.name}`), note: "ค้นใน YouTube" },
+    { type: "search", title: "คลิปสอนภาษาอังกฤษ", url: youtube(`${topic.name} tutorial`), note: "ค้นใน YouTube (มีให้เลือกเยอะกว่า)" },
+    {
+      type: "search",
+      title: "บทความอ่าน",
+      url: `https://www.google.com/search?q=${encodeURIComponent(`${topic.name} ${topic.courseName || ""}`)}`,
+      note: "ค้นใน Google",
+    },
+  ];
+}
 
 function TopicDetail({
   topic,
@@ -44,7 +63,7 @@ function TopicDetail({
   if (!topic) {
     return (
       <aside className="topic-detail topic-detail--empty">
-        <div className="topic-detail__empty-icon">◇</div>
+        <div className="topic-detail__empty-icon"><DiamondIcon size={26} /></div>
         <h2>เลือกหัวข้อที่ต้องการเรียนรู้</h2>
         <p>
           คลิกหัวข้อจาก Skill Tree เพื่อดูรายละเอียด
@@ -92,7 +111,7 @@ function TopicDetail({
               topic.done ? "is-done" : ""
             }`}
           >
-            {topic.done ? "✓" : "◇"}
+            {topic.done ? <CheckIcon size={20} /> : <DiamondIcon size={19} />}
           </span>
 
           <div>
@@ -111,33 +130,31 @@ function TopicDetail({
         </section>
 
         <section className="topic-detail__progress">
-          <div className="topic-detail__progress-heading">
-            <h3>ความพร้อมก่อนเรียน</h3>
-            <span>
-              {completedPrerequisites}/{prerequisites.length}
-            </span>
-          </div>
-
-          <div className="topic-detail__progress-track">
-            <div
-              className="topic-detail__progress-fill"
-              style={{
-                width: `${
-                  prerequisites.length
-                    ? (completedPrerequisites / prerequisites.length) * 100
-                    : 100
-                }%`,
-              }}
+          <div className="progress-card">
+            <ProgressRing
+              key={topic.id}
+              value={
+                prerequisites.length
+                  ? (completedPrerequisites / prerequisites.length) * 100
+                  : 100
+              }
+              done={missingPrerequisites.length === 0}
             />
-          </div>
 
-          <p>
-            {prerequisites.length === 0
-              ? "หัวข้อนี้ไม่มี prerequisite"
-              : missingPrerequisites.length === 0
-                ? "คุณเรียนหัวข้อพื้นฐานครบแล้ว"
-                : `ยังมีหัวข้อพื้นฐานที่ต้องทบทวน ${missingPrerequisites.length} หัวข้อ`}
-          </p>
+            <div className="progress-card__text">
+              <h3>ความพร้อมก่อนเรียน</h3>
+              <strong className="progress-card__count">
+                {completedPrerequisites}/{prerequisites.length} หัวข้อพื้นฐาน
+              </strong>
+              <p>
+                {prerequisites.length === 0
+                  ? "หัวข้อนี้ไม่มี prerequisite"
+                  : missingPrerequisites.length === 0
+                    ? "คุณเรียนหัวข้อพื้นฐานครบแล้ว"
+                    : `ยังมีหัวข้อพื้นฐานที่ต้องทบทวน ${missingPrerequisites.length} หัวข้อ`}
+              </p>
+            </div>
+          </div>
 
           {firstMissing && (
             <button
@@ -149,18 +166,12 @@ function TopicDetail({
                 <small>แนะนำให้เริ่มจาก</small>
                 <strong>{firstMissing.name}</strong>
               </span>
-              <span aria-hidden="true">→</span>
+              <span aria-hidden="true"><ArrowRightIcon size={16} /></span>
             </button>
           )}
         </section>
 
-        <section className="topic-detail__section">
-          <div className="topic-detail__section-heading">
-            <h3>หัวข้อพื้นฐานที่ต้องรู้</h3>
-            <span className="topic-detail__count">
-              {prerequisites.length}
-            </span>
-          </div>
+        <Collapsible title="หัวข้อพื้นฐานที่ต้องรู้" count={prerequisites.length}>
 
           {prerequisites.length === 0 ? (
             <p className="topic-detail__muted">
@@ -180,7 +191,7 @@ function TopicDetail({
                         item.done ? "is-done" : ""
                       }`}
                     >
-                      {item.done ? "✓" : index + 1}
+                      {item.done ? <CheckIcon size={13} /> : index + 1}
                     </span>
 
                     <span className="topic-detail__list-text">
@@ -208,15 +219,9 @@ function TopicDetail({
               ))}
             </ul>
           )}
-        </section>
+        </Collapsible>
 
-        <section className="topic-detail__section">
-          <div className="topic-detail__section-heading">
-            <h3>หัวข้อที่เรียนต่อได้</h3>
-            <span className="topic-detail__count">
-              {nextTopics.length}
-            </span>
-          </div>
+        <Collapsible title="หัวข้อที่เรียนต่อได้" count={nextTopics.length}>
 
           {nextTopics.length === 0 ? (
             <p className="topic-detail__muted">
@@ -231,9 +236,7 @@ function TopicDetail({
                     className="topic-detail__list-button"
                     onClick={() => onSelectTopic?.(item)}
                   >
-                    <span className="topic-detail__list-status">
-                      →
-                    </span>
+                    <span className="topic-detail__list-status"><ArrowRightIcon size={14} /></span>
                     <span className="topic-detail__list-text">
                       <strong>{item.name}</strong>
                       <small>{item.courseCode}</small>
@@ -243,15 +246,20 @@ function TopicDetail({
               ))}
             </ul>
           )}
-        </section>
+        </Collapsible>
 
-        <section className="topic-detail__section">
-          <h3>แหล่งเรียนรู้เพิ่มเติม</h3>
+        <Collapsible title="แหล่งเรียนรู้เพิ่มเติม" defaultOpen={false}>
           <p className="topic-detail__muted">
             ค้นหาเนื้อหาเพื่อทบทวนหัวข้อนี้
           </p>
-          <ResourceList topic={topic} />
-        </section>
+          <ResourceList links={searchLinksFor(topic)} />
+          {COURSE_RESOURCES[topic.courseCode] && (
+            <>
+              <p className="topic-detail__muted">แหล่งเรียนวิชา {topic.courseCode}</p>
+              <ResourceList links={COURSE_RESOURCES[topic.courseCode]} />
+            </>
+          )}
+        </Collapsible>
       </div>
 
       <footer className="topic-detail__footer">
@@ -262,7 +270,11 @@ function TopicDetail({
           }`}
           onClick={() => onToggleDone?.(topic.id)}
         >
-          {topic.done ? "✓ เรียนหัวข้อนี้แล้ว" : "○ ฉันเข้าใจหัวข้อนี้แล้ว"}
+          {topic.done ? (
+            <><CheckIcon size={15} /> เรียนหัวข้อนี้แล้ว</>
+          ) : (
+            <><CircleIcon size={15} /> ฉันเข้าใจหัวข้อนี้แล้ว</>
+          )}
         </button>
       </footer>
     </aside>
