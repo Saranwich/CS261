@@ -230,3 +230,10 @@
   background-color: #323548;
   border-radius: 4px;
 }
+
+.nav-container,
+.nav-container button,
+.nav-container input,
+.search-dropdown {
+  font-family: 'Red Hat Display', 'Noto Sans Thai', system-ui, sans-serif;
+}
