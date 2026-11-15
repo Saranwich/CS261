@@ -1,8 +1,6 @@
 import TOPIC_PREREQUISITES from "./topicPrerequisites";
 
-// ========================================
 // 1) ข้อมูลรายวิชา (แหล่งเดียว)
-// ========================================
 const COURSE_INFO = [
   { id: "c0000000-0000-0000-0000-000000000100", code: "CS100", name: "Web Development Basics",
     desc: "พื้นฐานเทคโนโลยีเว็บ สถาปัตยกรรม Client-Server HTML, CSS, JavaScript และ DOM" },
@@ -28,9 +26,7 @@ const coursePrerequisites = COURSE_PREREQ_CODES.map(([course, prereq]) => ({
   prerequisiteId: courseByCode[prereq].id,
 }));
 
-// ========================================
 // 2) สร้างหัวข้อ
-// ========================================
 const DEFAULT_TOPICS = ["Introduction", "Core Concepts", "Advanced Topics"];
 const CROSS_REF = /^(CS\d+):\s*(.+)$/;
 
@@ -38,13 +34,12 @@ const allTopics = [];
 
 COURSE_INFO.forEach((course) => {
   const prereqMap = TOPIC_PREREQUISITES[course.code] || {};
-  const names = new Set(Object.keys(prereqMap));
-
+  const keys = Object.keys(prereqMap);
+  const roots = [];
   Object.values(prereqMap).flat().forEach((req) => {
-    if (!CROSS_REF.test(req)) names.add(req);
+    if (!CROSS_REF.test(req) && !keys.includes(req) && !roots.includes(req)) roots.push(req);
   });
-
-  const list = names.size > 0 ? [...names] : DEFAULT_TOPICS;
+  const list = keys.length > 0 ? [...roots, ...keys] : DEFAULT_TOPICS;
 
   list.forEach((name, index) => {
     allTopics.push({
@@ -68,9 +63,7 @@ const topicByFullName = new Map(
   allTopics.map((t) => [`${t.courseCode}: ${t.name}`, t])
 );
 
-// ========================================
 // 3) เชื่อม prerequisites ระดับหัวข้อ
-// ========================================
 Object.entries(TOPIC_PREREQUISITES).forEach(([courseCode, topicMap]) => {
   Object.entries(topicMap).forEach(([topicName, requirements]) => {
     const current = topicByFullName.get(`${courseCode}: ${topicName}`);
@@ -89,9 +82,7 @@ Object.entries(TOPIC_PREREQUISITES).forEach(([courseCode, topicMap]) => {
   });
 });
 
-// ========================================
 // 4) คำนวณ depth
-// ========================================
 const visiting = new Set();
 const finished = new Set();
 
@@ -111,9 +102,7 @@ function calculateDepth(topic) {
 }
 allTopics.forEach(calculateDepth);
 
-// ========================================
 // 5) Export (ชุดเดียว ใช้ได้ทั้งชื่อเดิม fallback / mock)
-// ========================================
 export const skillTree = {
   courses: COURSE_INFO.map((c) => ({
     ...c,
@@ -138,12 +127,8 @@ export const fallbackCourseDetails = courseDetails;
 export const mockSkillTree = skillTree;
 export const mockCourseDetails = courseDetails;
 
-// หัวข้อที่จำลองว่าเรียนเสร็จแล้ว (เปลี่ยนจากเลขเป็น id ใหม่)
-export const mockDoneTopicIds = [
-  "t-cs100-1",
-  "t-cs100-2",
-  "t-cs101-1",
-  "t-cs102-1",
-];
+// หัวข้อที่จำลองว่าเรียนเสร็จแล้ว (ค่าตั้งต้น = ยังไม่เรียนอะไรเลย)
+// อยากให้มีหัวข้อที่เรียนแล้วตั้งแต่เปิดครั้งแรก ใส่ id เพิ่มได้ เช่น "t-cs100-1"
+export const mockDoneTopicIds = [];
 
 export default skillTree;

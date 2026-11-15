@@ -1,28 +1,6 @@
 import TOPIC_PREREQUISITES from "../data/topicPrerequisites";
 
-// ========================================
 // แปลงข้อมูลหัวข้อจาก backend ให้เป็นรูปแบบที่หน้าเว็บใช้
-//
-//   courseDetails = ผลของ GET /api/courses/{id} ของทุกวิชา
-//                   [{ id, code, name, topics: [{ id, name, desc, seqNo }] }]
-//   doneTopicIds  = id ของหัวข้อที่เรารู้แล้ว (จาก GET /api/progress)
-//
-// ผลลัพธ์ 1 หัวข้อ หน้าตาแบบนี้
-//   {
-//     id: "7213...",
-//     name: "Linked Lists",
-//     desc: "...",
-//     seqNo: 4,
-//     courseId: "c000...213",
-//     courseCode: "CS213",
-//     courseName: "Data Structures",
-//     done: true,            // รู้แล้วหรือยัง
-//     prerequisites: [...],  // id ของหัวข้อที่ต้องรู้ก่อน
-//     nextTopics: [...],     // id ของหัวข้อที่เอาหัวข้อนี้ไปต่อยอด
-//     depth: 3,              // อยู่ลึกแค่ไหน (0 = พื้นฐานสุด) ใช้เรียง "เรียนอะไรก่อน-หลัง"
-//   }
-// ========================================
-
 export function toTopicCards(courseDetails = [], doneTopicIds = []) {
   // 1) สร้างหัวข้อทุกตัว (ยังไม่มีเส้นเชื่อม)
   const topics = [];
@@ -108,10 +86,7 @@ export function toLookup(items = []) {
   return lookup;
 }
 
-// ========================================
 // หาหัวข้อทั้งหมดที่ต้องรู้ก่อน (ย้อนไปให้สุดทุกชั้น)
-// ========================================
-
 export function findAllPrerequisites(startIds = [], topicById = {}) {
   const foundIds = [];
   const toVisit = [...startIds];
