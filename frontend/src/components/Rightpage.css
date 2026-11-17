@@ -2,326 +2,498 @@
   box-sizing: border-box;
 }
 
-
 /* ========================================
-   พื้นที่ Rightpage
+   พื้นที่ Rightpage (สไตล์เดียวกับ TopicDetail)
 ======================================== */
 
 .right-page {
+  display: flex;
+  flex-direction: column;
   width: 100%;
   height: 100%;
-
-  background: #171a23;
-
-  color: white;
-
-  overflow-y: auto;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  color: #edf1fa;
+  background: #111621;
+  font-family: Inter, "Noto Sans Thai", sans-serif;
 }
 
-
 /* ========================================
-   ยังไม่ได้เลือกวิชา
+   ยังไม่ได้เลือกวิชา (Empty State)
 ======================================== */
 
-.empty-course {
-  width: 100%;
-  height: 100%;
-
-  display: flex;
-
+.right-page--empty {
   align-items: center;
-
   justify-content: center;
+  padding: 28px;
+  box-sizing: border-box;
+  text-align: center;
 }
 
+.right-page__empty-icon {
+  display: grid;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  margin-bottom: 16px;
+  border: 1px solid rgba(139, 154, 255, 0.25);
+  border-radius: 16px;
+  color: #aab5ff;
+  background: rgba(139, 154, 255, 0.08);
+  font-size: 27px;
+}
 
-.empty-course h2 {
+.right-page--empty h2 {
   margin: 0;
-
-  color: #20c878;
-
-  font-size: 28px;
-
-  font-weight: 500;
+  color: #f0f3fc;
+  font-size: 16px;
 }
 
-
-/* ========================================
-   รายละเอียดวิชา
-======================================== */
-
-.course-detail {
-  width: 100%;
-
-  padding: 25px 22px;
-}
-
-
-/* ========================================
-   Label
-======================================== */
-
-.detail-label {
-  margin-bottom: 8px;
-
-  color: #8b93a3;
-
+.right-page--empty p {
+  max-width: 290px;
+  margin: 10px 0 0;
+  color: #8e99af;
   font-size: 12px;
+  line-height: 1.8;
 }
 
-
 /* ========================================
-   ชื่อวิชา
+   Header
 ======================================== */
 
-.detail-title {
+.right-page__header {
   display: flex;
-
   align-items: center;
-
-  gap: 9px;
-
-  margin: 0;
-
-  color: #22C55E;
-
-  font-size: 20px;
-
-  font-weight: 700;
-}
-
-
-/* ========================================
-   จุดหน้าชื่อ
-======================================== */
-
-.detail-dot {
-  width: 8px;
-  height: 8px;
-
-  border-radius: 2px;
-
-  background: #55d7bd;
-
+  justify-content: space-between;
+  padding: 20px 22px 16px;
+  border-bottom: 1px solid rgba(151, 164, 191, 0.13);
   flex-shrink: 0;
 }
 
+.right-page__eyebrow {
+  margin: 0 0 9px;
+  color: #8b9aff;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1.8px;
+}
+
+.right-page__course-code {
+  display: inline-block;
+  padding: 4px 8px;
+  border: 1px solid rgba(139, 154, 255, 0.23);
+  border-radius: 6px;
+  color: #aab5ff;
+  background: rgba(139, 154, 255, 0.08);
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.right-page__close {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid rgba(151, 164, 191, 0.2);
+  border-radius: 9px;
+  color: #9ba6bd;
+  background: #1a2030;
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.right-page__close:hover {
+  color: #fff;
+  border-color: #8795ff;
+}
 
 /* ========================================
-   รายละเอียด
+   Scrollable Body
 ======================================== */
 
-.detail-info {
-  margin-top: 15px;
+.right-page__body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 22px;
+  scrollbar-color: #343d53 transparent;
+  scrollbar-width: thin;
+}
 
-  color: #9098a7;
+/* Title row */
+.right-page__title-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 13px;
+  margin-bottom: 25px;
+}
 
+.right-page__status {
+  display: grid;
+  place-items: center;
+  flex: 0 0 42px;
+  width: 42px;
+  height: 42px;
+  border: 1px solid rgba(139, 154, 255, 0.25);
+  border-radius: 12px;
+  color: #aab5ff;
+  background: rgba(139, 154, 255, 0.1);
+  font-size: 20px;
+}
+
+.right-page__status.is-done {
+  color: #45d6ae;
+  border-color: rgba(69, 214, 174, 0.3);
+  background: rgba(69, 214, 174, 0.1);
+}
+
+.right-page__title {
+  margin: 1px 0 7px;
+  color: #f0f3fc;
+  font-size: 19px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.right-page__subtitle {
+  margin: 0;
+  color: #8e9bb4;
+  font-size: 11px;
+}
+
+/* ========================================
+   Sections
+======================================== */
+
+.right-page__section {
+  margin-top: 25px;
+}
+
+.right-page__section h3,
+.right-page__progress-heading h3 {
+  margin: 0;
+  color: #dce3f3;
   font-size: 12px;
+  font-weight: 700;
 }
 
-
-.detail-info strong {
-  color: #ffffff;
-
-  font-weight: 600;
+.right-page__description {
+  margin: 11px 0 0;
+  color: #9aa6bd;
+  font-size: 12px;
+  line-height: 1.9;
+  overflow-wrap: anywhere;
 }
 
+.right-page__muted {
+  margin: 10px 0 0;
+  color: #7f8ba3;
+  font-size: 11px;
+  line-height: 1.8;
+}
 
 /* ========================================
    Progress
 ======================================== */
 
-.detail-progress {
-  width: 100%;
+.right-page__progress {
+  padding: 16px;
+  border: 1px solid rgba(139, 154, 255, 0.18);
+  border-radius: 13px;
+  background: rgba(139, 154, 255, 0.055);
+}
 
-  height: 6px;
+.right-page__progress-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
 
-  margin-top: 12px;
+.right-page__progress-heading span {
+  color: #aab5ff;
+  font-size: 11px;
+  font-weight: 700;
+}
 
-  border-radius: 10px;
-
-  background: #2a303e;
-
+.right-page__progress-track {
+  height: 5px;
+  margin-top: 13px;
   overflow: hidden;
-}
-
-
-.detail-progress-fill {
-  height: 100%;
-
   border-radius: 10px;
-
-  background: #55d7bd;
+  background: #293146;
 }
 
+.right-page__progress-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #7c8cff, #45d6ae);
+  transition: width 200ms ease;
+}
+
+.right-page__progress > p {
+  margin: 10px 0 0;
+  color: #8e9bb4;
+  font-size: 10px;
+  line-height: 1.7;
+}
 
 /* ========================================
    Buttons
 ======================================== */
 
-.detail-buttons {
+.right-page__actions {
   display: flex;
-
-  justify-content: flex-end;
-
-  gap: 8px;
-
-  margin-top: 18px;
-}
-
-
-.primary-button,
-.secondary-button {
-  height: 38px;
-
-  padding: 0 14px;
-
-  border-radius: 9px;
-
-  font-size: 12px;
-
-  cursor: pointer;
-}
-
-
-.primary-button {
-  border: none;
-
-  background: #f0b52f;
-
-  color: #171a20;
-
-  font-weight: 700;
-}
-
-
-.primary-button:hover {
-  background: #ffc348;
-}
-
-
-.secondary-button {
-  border: 1px solid #363d4c;
-
-  background: transparent;
-
-  color: #ffffff;
-}
-
-
-.secondary-button:hover {
-  background: #222631;
-}
-/* ========================================
-   ส่วนแสดงผลวิชาเกี่ยวเนื่อง
-======================================== */
-
-.section-block {
+  gap: 10px;
   margin-top: 20px;
 }
 
-.section-title {
-  margin-bottom: 10px;
-  color: #8b93a3;
-  font-size: 13px;
-}
-
-.relation-list {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  overflow-x: auto;
-  padding-bottom: 8px;
-}
-
-.relation-item-wrapper {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.arrow {
-  color: #556070;
+.right-page__primary-btn {
+  flex: 1;
+  min-height: 40px;
+  padding: 10px 16px;
+  border: 1px solid rgba(139, 154, 255, 0.4);
+  border-radius: 10px;
+  color: #dce1ff;
+  background: rgba(139, 154, 255, 0.14);
   font-size: 12px;
+  font-weight: 650;
+  cursor: pointer;
+  transition:
+    background 180ms ease,
+    border-color 180ms ease;
 }
 
-.relation-card {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  min-width: 190px;
-  padding: 8px 12px;
-  border-radius: 20px;
-  background: #10141d;
+.right-page__primary-btn:hover {
+  border-color: #aab5ff;
+  background: rgba(139, 154, 255, 0.24);
 }
 
-.prereq-card {
-  border: 1px solid #d49a24;
-}
-
-.next-card {
-  border: 1px solid #2389a0;
-}
-
-.badge {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
+.right-page__secondary-btn {
+  padding: 10px 16px;
+  border: 1px solid rgba(151, 164, 191, 0.2);
+  border-radius: 10px;
+  color: #9ba6bd;
+  background: #1a2030;
   font-size: 12px;
-  font-weight: bold;
-  flex-shrink: 0;
+  cursor: pointer;
+  transition: all 0.18s ease;
 }
 
-.prereq-badge {
-  background: #d49a24;
-  color: #10141d;
+.right-page__secondary-btn:hover {
+  border-color: rgba(151, 164, 191, 0.4);
+  color: #fff;
 }
 
-.next-badge {
-  background: #2389a0;
-  color: #ffffff;
+/* ========================================
+   Lists (Prerequisites, Next, Topics)
+======================================== */
+
+.right-page__section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
 }
 
-.relation-text {
+.right-page__count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 5px;
+  box-sizing: border-box;
+  border-radius: 7px;
+  color: #aab5ff;
+  background: rgba(139, 154, 255, 0.1);
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.right-page__list {
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  gap: 8px;
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
 }
 
-.relation-name {
-  color: #ffffff;
-  font-size: 12px;
-  font-weight: 600;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+.right-page__list li {
+  min-width: 0;
 }
 
-.relation-sub {
-  color: #7f8999;
+.right-page__list-button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-width: 0;
+  padding: 11px;
+  border: 1px solid rgba(151, 164, 191, 0.13);
+  border-radius: 10px;
+  color: #dce3f3;
+  background: rgba(25, 31, 46, 0.8);
+  text-align: left;
+  cursor: pointer;
+  transition: all 180ms ease;
+}
+
+.right-page__list-button:hover {
+  border-color: rgba(139, 154, 255, 0.5);
+  background: rgba(139, 154, 255, 0.06);
+}
+
+.right-page__list-status {
+  display: grid;
+  place-items: center;
+  flex: 0 0 25px;
+  width: 25px;
+  height: 25px;
+  border-radius: 8px;
+  color: #9ba8ff;
+  background: rgba(139, 154, 255, 0.1);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.right-page__list-status.is-done {
+  color: #45d6ae;
+  background: rgba(69, 214, 174, 0.1);
+}
+
+/* ========================================
+   Interactive Topic Row Items
+======================================== */
+
+.right-page__topic-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-width: 0;
+  padding: 10px 12px;
+  border: 1px solid rgba(151, 164, 191, 0.13);
+  border-radius: 10px;
+  background: rgba(25, 31, 46, 0.8);
+  transition: all 180ms ease;
+}
+
+.right-page__topic-item:hover {
+  border-color: rgba(139, 154, 255, 0.35);
+  background: rgba(30, 38, 56, 0.85);
+}
+
+/* ปุ่มไอคอนซ้าย คลิกสลับสถานะได้ทันที */
+.right-page__list-status--clickable {
+  border: none;
+  cursor: pointer;
+  transition: all 180ms ease;
+}
+
+.right-page__list-status--clickable:hover {
+  transform: scale(1.12);
+  filter: brightness(1.25);
+  box-shadow: 0 0 8px rgba(139, 154, 255, 0.35);
+}
+
+.right-page__list-status--clickable.is-done:hover {
+  box-shadow: 0 0 8px rgba(69, 214, 174, 0.4);
+}
+
+/* ข้อความตรงกลาง คลิกเพื่อดูรายละเอียด */
+.right-page__list-text--clickable {
+  cursor: pointer;
+}
+
+.right-page__list-text--clickable:hover strong {
+  color: #8b9aff;
+}
+
+/* ปุ่ม Badge ด้านขวา สำหรับกดเรียนรู้แล้วทันที */
+.right-page__badge-btn {
+  flex-shrink: 0;
+  padding: 5px 10px;
+  border-radius: 7px;
   font-size: 10px;
+  font-weight: 650;
+  white-space: nowrap;
+  border: 1px solid rgba(151, 164, 191, 0.18);
+  color: #9ba6bd;
+  background: rgba(151, 164, 191, 0.08);
+  cursor: pointer;
+  transition: all 180ms ease;
 }
 
-.empty-text {
-  color: #556070;
-  font-size: 12px;
-}
-.course-description {
-  margin-top: 16px;
-  margin-bottom: 20px;
-}
-
-.description-title {
-  margin-bottom: 6px;
-  color: #8e96a8;
-  font-size: 12px;
+.right-page__badge-btn:hover {
+  border-color: rgba(69, 214, 174, 0.45);
+  color: #60dfb8;
+  background: rgba(69, 214, 174, 0.14);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
 }
 
-.description-text {
-  color: #d7dbe5;
-  font-size: 14px;
-  line-height: 1.6;
+.right-page__badge-btn.is-done {
+  border-color: rgba(69, 214, 174, 0.35);
+  color: #60dfb8;
+  background: rgba(69, 214, 174, 0.12);
+}
+
+.right-page__badge-btn.is-done:hover {
+  border-color: rgba(248, 113, 113, 0.45);
+  color: #fca5a5;
+  background: rgba(239, 68, 68, 0.14);
+}
+
+.right-page__list-text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+
+.right-page__list-text strong {
+  color: #dce3f3;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.right-page__list-text small {
+  color: #7f8ba3;
+  font-size: 9px;
+}
+
+.right-page__badge {
+  flex-shrink: 0;
+  padding: 4px 6px;
+  border-radius: 6px;
+  font-size: 9px;
+  white-space: nowrap;
+  color: #9ba6bd;
+  background: rgba(151, 164, 191, 0.08);
+}
+
+.right-page__badge.is-done {
+  color: #60dfb8;
+  background: rgba(69, 214, 174, 0.1);
+}
+
+/* ========================================
+   Responsive
+======================================== */
+
+@media (max-width: 900px) {
+  .right-page__body {
+    padding: 17px;
+  }
+
+  .right-page__header {
+    padding: 16px 17px;
+  }
 }

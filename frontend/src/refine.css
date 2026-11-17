@@ -1,0 +1,190 @@
+/* ========================================
+   refine.css — ขัดหน้าตาให้ดูมีระดับขึ้น
+======================================== */
+
+:root {
+  --radius-md: 12px;
+  --radius-lg: 16px;
+}
+
+
+/* ----- ตัวอักษร ----- */
+
+body { text-rendering: optimizeLegibility; }
+
+/* ตัวเลขกว้างเท่ากัน ไม่สั่นตอนเปลี่ยนค่า (เปอร์เซ็นต์ จำนวนหัวข้อ ซูม) */
+.course-percent,
+.course-info,
+.overview__count,
+.overview__sub,
+.progress-card__count,
+.collapsible__count,
+.right-page__count,
+.topic-detail__count,
+.zoom-value,
+.topic-course__count,
+.topic-node__meta,
+.right-page__badge,
+.topic-detail__badge {
+  font-variant-numeric: tabular-nums;
+}
+
+/* หัวข้อไม่ทิ้งคำเดียวไว้บรรทัดสุดท้าย / ย่อหน้าอ่านสบายไม่ยาวเกินไป */
+h1, h2, h3 { text-wrap: balance; }
+
+.right-page__description,
+.topic-detail__description {
+  max-width: 64ch;
+  text-wrap: pretty;
+}
+
+.right-page__title,
+.topic-detail__title {
+  font-size: 22px;
+  line-height: 1.35;
+  font-weight: 700;
+}
+
+.topic-page__title { font-size: 24px; font-weight: 700; }
+
+
+/* ----- แถบบน ----- */
+
+.nav-container {
+  box-shadow: 0 1px 0 var(--border), var(--shadow-sm);
+}
+
+.brand {
+  padding: 0 8px 0 6px;
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+}
+
+.avatar { border-radius: 50%; }
+
+.search-btn { border-radius: 10px; transition: border-color 0.2s ease, box-shadow 0.25s ease; }
+
+
+/* ----- การ์ดวิชา: สีประจำวิชาเป็นตัวเด่น ----- */
+
+.course-card { border-radius: var(--radius-lg); }
+
+/* แถบสีซ้ายหนาขึ้นตอนเลือก */
+.course-card::before {
+  transition: width 0.25s var(--ease-out, ease), top 0.25s ease, bottom 0.25s ease;
+}
+.course-card:hover::before,
+.course-card.selected::before { width: 5px; top: 10px; bottom: 10px; }
+
+/* ความคืบหน้าและจุดสถานะใช้สีของวิชานั้น (วิชาที่ครบแล้วยังเป็นเขียวเหมือนเดิม) */
+.course-card .progress {
+  background: linear-gradient(
+    90deg,
+    var(--course-color),
+    color-mix(in srgb, var(--course-color) 65%, white)
+  );
+}
+.course-card.is-done .progress { background: var(--success); }
+
+.course-card.is-progress .course-dot {
+  background: var(--course-color);
+  box-shadow: 0 0 0 3px var(--course-soft);
+}
+
+.course-card.is-progress .course-percent { color: var(--course-color); }
+
+/* กรอบตอนเลือกเป็นสีวิชา + คลื่นตอนกดใช้สีเดียวกัน (เดิมม่วงตายตัว) */
+.course-card.selected {
+  border-color: var(--course-color);
+  box-shadow: 0 0 0 1px var(--course-color), var(--shadow-md);
+}
+.course-card.is-done.selected {
+  border-color: var(--course-color);
+  box-shadow: 0 0 0 1px var(--course-color), var(--shadow-md);
+}
+
+@keyframes select-pulse {
+  0%   { box-shadow: 0 0 0 1px var(--course-color), 0 0 0 0 var(--course-line); }
+  100% { box-shadow: 0 0 0 1px var(--course-color), 0 0 0 14px transparent; }
+}
+
+.progress-bar { height: 6px; }
+
+
+/* ----- การ์ดหัวข้อ + กล่องวิชาในผังหัวข้อ ----- */
+
+.topic-node { border-radius: var(--radius-md); }
+.topic-course { border-radius: 20px; }
+
+/* ป้ายรหัสวิชาในหัวกล่อง ใหญ่และเด่นพอจะบอกว่าตรงนี้คือวิชาไหน */
+.topic-course__code { border-radius: 8px; letter-spacing: 0.02em; }
+
+/* หัวข้อที่เรียนแล้ว: เส้นสีซ้ายเปลี่ยนเป็นเขียว ให้สถานะอ่านออกแม้มองไกล ๆ */
+.topic-node--done::before { background: var(--success); }
+
+
+/* ----- ปุ่มซูม / แผนที่ย่อ / แผงภาพรวม: กระจกฝ้าเหมือนกันทั้งชุด ----- */
+
+.zoom-controls,
+.minimap {
+  border-radius: 12px;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+
+.zoom-controls { padding: 4px 6px; }
+.zoom-controls button { border-radius: 8px; }
+.overview { border-radius: 20px; }
+
+
+/* ----- แผงขวา ----- */
+
+.right-page__progress,
+.topic-detail__progress {
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.right-page__list-button,
+.topic-detail__list-button,
+.right-page__topic-item { border-radius: var(--radius-md); }
+
+.right-page__status,
+.topic-detail__status { border-radius: 14px; }
+
+.progress-card__count { font-size: 20px; }
+
+/* ปุ่มหลักล่างสุด ใหญ่ขึ้นนิดให้กดง่าย */
+.right-page__primary-btn,
+.topic-detail__done-button {
+  min-height: 46px;
+  border-radius: var(--radius-md);
+}
+
+
+/* ----- ลิงก์แหล่งเรียน ----- */
+
+.resource-item { border-radius: var(--radius-md); }
+.resource-type { border-radius: 6px; }
+
+
+/* ----- แจ้งเตือน ----- */
+
+.toast { border-radius: 14px; padding: 13px 20px; font-size: 14px; }
+
+
+/* ----- หน้า Login: แสงนุ่ม ๆ หลังโลโก้ ----- */
+
+.cl-page::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(640px 380px at 50% 14%, var(--glow-1), transparent 70%);
+  pointer-events: none;
+}
+
+.cl-header,
+.cl-main { position: relative; }
+
+.cl-card { border-radius: 20px; }

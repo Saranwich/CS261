@@ -9,6 +9,7 @@ services:
     environment:
       CHOKIDAR_USEPOLLING: "true"
       API_PROXY_TARGET: http://backend-dev:8080
+      VITE_USE_MOCK: ${VITE_USE_MOCK:-true}
     volumes:
       - ./frontend:/app
       - frontend_node_modules:/app/node_modules
@@ -38,6 +39,30 @@ services:
       MYSQL_DATABASE: ${MYSQL_DATABASE}
     volumes:
       - mysql_data:/var/lib/mysql
+    # ping ผ่าน TCP (127.0.0.1) ไม่ใช่ socket: ตอนเครื่องเปล่า MySQL เปิด server ชั่วคราวที่ไม่รับ TCP ก่อน
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p\"$$MYSQL_ROOT_PASSWORD\" --silent"]
+      interval: 3s
+      timeout: 3s
+      retries: 30
+    profiles:
+      - dev
+      - be-dev
+      - prod
+      - be-prod
+
+  # ใส่ข้อมูลหลักสูตร (db/seed.sql) ให้เองครั้งเดียวตอน DB ยังว่าง แล้วจบ
+  seed:
+    image: mysql:8.4
+    environment:
+      MYSQL_PWD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+    volumes:
+      - ./db:/db:ro
+    entrypoint: ["sh", "/db/seed-if-empty.sh"]
+    depends_on:
+      mysql:
+        condition: service_healthy
     profiles:
       - dev
       - be-dev
@@ -70,8 +95,10 @@ services:
     volumes:
       - ./backend/src:/app/src
     depends_on:
-      - mysql
-      - redis
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_started
     profiles:
       - dev
       - be-dev
@@ -90,8 +117,10 @@ services:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       TU_API_KEY: ${TU_API_KEY}
     depends_on:
-      - mysql
-      - redis
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_started
     profiles:
       - prod
       - be-prod

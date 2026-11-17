@@ -16,20 +16,24 @@ function App() {
       body: JSON.stringify({ username: studentId, password }),
     });
     // LoginPage เอา error.message ไปแสดงใต้ฟอร์ม
-    if (res.status === 401) throw new Error("Invalid Student ID or password.");
-    if (res.status === 403) throw new Error("Only students can log in.");
-    if (!res.ok) throw new Error("Login failed. Please try again later.");
+    if (res.status === 401) throw new Error("รหัสนักศึกษาหรือรหัสผ่านไม่ถูกต้อง");
+    if (res.status === 403) throw new Error("ระบบนี้สำหรับนักศึกษาเท่านั้น");
+    if (!res.ok) throw new Error("เข้าสู่ระบบไม่สำเร็จ กรุณาลองใหม่ภายหลัง");
 
     // เก็บข้อมูลนักศึกษาไว้ให้ Upperbar ใช้ (session จริงอยู่ใน cookie ที่ browser ถือเอง)
     localStorage.setItem("user", JSON.stringify(await res.json()));
+    // เก็บรหัสนักศึกษาไว้ให้ Homepage ใช้ตั้งชื่อ key ความคืบหน้าของโหมด mock (แยกรายคน)
+    localStorage.setItem("studentId", studentId);
     localStorage.setItem("isLoggedIn", "true");
     setIsLoggedIn(true);
   };
 
   // ปุ่ม Logout
+  // หมายเหตุ: ไม่ล้างความคืบหน้าของโหมด mock (mockDoneTopicIds:<รหัส>) จึงยังอยู่เมื่อ login กลับมา
   const handleLogout = () => {
     localStorage.removeItem("isLoggedIn");
     localStorage.removeItem("user");
+    localStorage.removeItem("studentId");
     setIsLoggedIn(false);
   };
 

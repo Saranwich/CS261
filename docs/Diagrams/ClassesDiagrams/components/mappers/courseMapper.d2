@@ -4,6 +4,7 @@ courseMapper: {
   "+toSkillTreeDTO(courses: List<Course>, prerequisites: List<Prerequisite>)": SkillTreeDTO
   "+toCourseItemDTO(course: Course)": CourseItemDTO
   "+toPrerequisiteDTO(prerequisite: Prerequisite)": PrerequisiteDTO
-  "+toDetailDTO(course: Course, courseTopics: List<CourseTopic>)": CourseDetailDTO
-  "+toTopicItemDTO(courseTopic: CourseTopic)": TopicItemDTO
+  "+toDetailDTO(course: Course, courseTopics: List<CourseTopic>, topicRelations: List<TopicRelation>, resourceTopics: List<ResourceTopic>)": CourseDetailDTO
+  "+toTopicItemDTO(courseTopic: CourseTopic, prerequisites: List<UUID>, resources: List<ResourceDTO>)": TopicItemDTO
+  "+toResourceDTO(resource: Resource)": ResourceDTO
 }

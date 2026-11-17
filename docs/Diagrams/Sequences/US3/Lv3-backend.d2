@@ -9,6 +9,8 @@ CourseCtrl: ":CourseController"
 CourseSvc: ":CourseService"
 CourseRepo: ":CourseRepository"
 CourseTopicRepo: ":CourseTopicRepository"
+TopicRelRepo: ":TopicRelationRepository"
+ResTopicRepo: ":ResourceTopicRepository"
 CourseMapper: ":CourseMapper"
 ProgressCtrl: ":ProgressController"
 Session: ":HttpSession"
@@ -40,7 +42,11 @@ Redis: Redis Container {
         found: "[มี Course]" {
             CourseSvc -> CourseTopicRepo: "findByCourseIdOrderBySeqNoAsc(courseId)"
             CourseTopicRepo -> CourseSvc: List<CourseTopic>
-            CourseSvc -> CourseMapper: "toDetailDTO(course, courseTopics)"
+            CourseSvc -> TopicRelRepo: "findByTopicIdIn(topicIds)"
+            TopicRelRepo -> CourseSvc: List<TopicRelation>
+            CourseSvc -> ResTopicRepo: "findByTopicIdIn(topicIds)"
+            ResTopicRepo -> CourseSvc: List<ResourceTopic>
+            CourseSvc -> CourseMapper: "toDetailDTO(course, courseTopics, topicRelations, resourceTopics)"
             CourseMapper -> CourseSvc: CourseDetailDTO
             CourseSvc -> Redis: "put (TTL 1 วัน)"
         }

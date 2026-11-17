@@ -46,6 +46,18 @@ Mappers.CourseMapper -> DTOs.CourseDetailDTO: creates {
 Mappers.CourseMapper -> DTOs.TopicItemDTO: creates {
     style.stroke-dash: 3
 }
+Mappers.CourseMapper -> Entities.TopicRelation: reads {
+    style.stroke-dash: 3
+}
+Mappers.CourseMapper -> Entities.ResourceTopic: reads {
+    style.stroke-dash: 3
+}
+Mappers.CourseMapper -> Entities.Resource: reads {
+    style.stroke-dash: 3
+}
+Mappers.CourseMapper -> DTOs.ResourceDTO: creates {
+    style.stroke-dash: 3
+}
 Mappers.ProgressMapper -> Entities.Progress: reads {
     style.stroke-dash: 3
 }
