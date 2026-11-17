@@ -5,15 +5,20 @@ import com.cs261g7cstu.backend.dto.SkillTreeDTO;
 import com.cs261g7cstu.backend.entity.Course;
 import com.cs261g7cstu.backend.entity.CourseTopic;
 import com.cs261g7cstu.backend.entity.Prerequisite;
+import com.cs261g7cstu.backend.entity.ResourceTopic;
+import com.cs261g7cstu.backend.entity.TopicRelation;
 import com.cs261g7cstu.backend.mapper.CourseMapper;
 import com.cs261g7cstu.backend.repository.CourseRepository;
 import com.cs261g7cstu.backend.repository.CourseTopicRepository;
 import com.cs261g7cstu.backend.repository.PrerequisiteRepository;
+import com.cs261g7cstu.backend.repository.ResourceTopicRepository;
+import com.cs261g7cstu.backend.repository.TopicRelationRepository;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -23,15 +28,21 @@ public class CourseService {
     private final CourseRepository courseRepository;
     private final CourseTopicRepository courseTopicRepository;
     private final PrerequisiteRepository prerequisiteRepository;
+    private final TopicRelationRepository topicRelationRepository;
+    private final ResourceTopicRepository resourceTopicRepository;
     private final CourseMapper courseMapper;
 
     public CourseService(CourseRepository courseRepository,
                          CourseTopicRepository courseTopicRepository,
                          PrerequisiteRepository prerequisiteRepository,
+                         TopicRelationRepository topicRelationRepository,
+                         ResourceTopicRepository resourceTopicRepository,
                          CourseMapper courseMapper) {
         this.courseRepository = courseRepository;
         this.courseTopicRepository = courseTopicRepository;
         this.prerequisiteRepository = prerequisiteRepository;
+        this.topicRelationRepository = topicRelationRepository;
+        this.resourceTopicRepository = resourceTopicRepository;
         this.courseMapper = courseMapper;
     }
 
@@ -47,6 +58,12 @@ public class CourseService {
         Course course = courseRepository.findById(courseId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Course not found"));
         List<CourseTopic> courseTopics = courseTopicRepository.findByCourseIdOrderBySeqNoAsc(courseId);
-        return courseMapper.toDetailDTO(course, courseTopics);
+        List<UUID> topicIds = new ArrayList<>();
+        for (CourseTopic courseTopic : courseTopics) {
+            topicIds.add(courseTopic.getTopic().getId());
+        }
+        List<TopicRelation> topicRelations = topicRelationRepository.findByTopicIdIn(topicIds);
+        List<ResourceTopic> resourceTopics = resourceTopicRepository.findByTopicIdIn(topicIds);
+        return courseMapper.toDetailDTO(course, courseTopics, topicRelations, resourceTopics);
     }
 }

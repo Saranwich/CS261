@@ -20,6 +20,12 @@ sessions: D2 sessions (Redis)
 sessions.shape: cylinder
 progress: D5 progress (MySQL)
 progress.shape: cylinder
+topic_relations: D11 topic_relations (MySQL)
+topic_relations.shape: cylinder
+res_topics: D12 relation_res_topics (MySQL)
+res_topics.shape: cylinder
+resources: D13 resources (MySQL)
+resources.shape: cylinder
 cstu_student -> system3-1: course id
 system3-1 -> course_cache: ค้นหาด้วย course id / เก็บรายละเอียดวิชา (TTL 1 วัน)
 course_cache -> system3-1: รายละเอียดวิชา (ถ้ามี)
@@ -29,7 +35,13 @@ system3-1 -> course_topics: ค้นหา topic ของวิชา (เม�
 course_topics -> system3-1: topic id + seq_no
 system3-1 -> topics: ค้นหาด้วย topic id (เมื่อ cache ไม่มี)
 topics -> system3-1: ข้อมูล topic
-system3-1 -> cstu_student: รายละเอียดวิชา + รายการ topic / แจ้งไม่พบรายวิชา
+system3-1 -> topic_relations: ค้นหาด้วย topic id (เมื่อ cache ไม่มี)
+topic_relations -> system3-1: req topic id ของแต่ละ topic
+system3-1 -> res_topics: ค้นหาด้วย topic id (เมื่อ cache ไม่มี)
+res_topics -> system3-1: res id ของแต่ละ topic
+system3-1 -> resources: ค้นหาด้วย res id (เมื่อ cache ไม่มี)
+resources -> system3-1: ข้อมูลแหล่งเรียน
+system3-1 -> cstu_student: รายละเอียดวิชา + รายการ topic + หัวข้อที่ต้องรู้ก่อน + แหล่งเรียน / แจ้งไม่พบรายวิชา
 cstu_student -> system3-2: cookie (session id)
 system3-2 -> sessions: session id
 sessions -> system3-2: user id (ถ้ามี)
