@@ -1,6 +1,7 @@
 -- ข้อมูลหลักสูตรจริง CS100 / CS101 / CS102 / CS111 (#55)
 -- หัวข้อ + ลิงก์มาจากเอกสารรายวิชา, ชื่อวิชา + เส้นเชื่อมเทียบจาก mock ของหน้าบ้าน (frontend/src/data)
--- รัน (ตาราง ต้องมีแล้ว = เปิด backend ครั้งแรกก่อน):
+-- ปกติไม่ต้องรันเอง: service `seed` ใน compose.yaml ใส่ให้ตอน DB ยังว่าง (db/seed-if-empty.sh)
+-- รันเองเมื่อแก้ไฟล์นี้แล้วอยากได้ข้อมูลใหม่ (ตารางต้องมีแล้ว = เปิด backend ครั้งแรกก่อน):
 --   docker compose exec -T mysql sh -c 'mysql --default-character-set=utf8mb4 -uroot -p"$MYSQL_ROOT_PASSWORD" "$MYSQL_DATABASE"' < db/seed.sql
 -- แล้วล้าง cache (ไม่ใช้ FLUSHDB เพราะจะลบ session ที่ login อยู่ด้วย):
 --   docker compose exec redis redis-cli del 'skillTree::SimpleKey []'

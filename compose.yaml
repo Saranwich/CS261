@@ -51,6 +51,24 @@ services:
       - prod
       - be-prod
 
+  # ใส่ข้อมูลหลักสูตร (db/seed.sql) ให้เองครั้งเดียวตอน DB ยังว่าง แล้วจบ
+  seed:
+    image: mysql:8.4
+    environment:
+      MYSQL_PWD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+    volumes:
+      - ./db:/db:ro
+    entrypoint: ["sh", "/db/seed-if-empty.sh"]
+    depends_on:
+      mysql:
+        condition: service_healthy
+    profiles:
+      - dev
+      - be-dev
+      - prod
+      - be-prod
+
   redis:
     image: redis:8-alpine
     ports:
