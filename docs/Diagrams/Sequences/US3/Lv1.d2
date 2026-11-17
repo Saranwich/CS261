@@ -37,6 +37,8 @@ Redis: Redis Container {
 
         found: "[มีวิชา]" {
             MySQL -> Backend: วิชา + topic
+            Backend -> MySQL: หาหัวข้อที่ต้องรู้ก่อน + แหล่งเรียน ของ topic ในวิชานี้
+            MySQL -> Backend: คู่ topic id + req topic id, แหล่งเรียนของแต่ละ topic
             Backend -> Redis: "เก็บรายละเอียดวิชาลง cache (TTL 1 วัน)"
         }
     }

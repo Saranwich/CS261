@@ -40,6 +40,8 @@ Repositories: Repositories {
     CourseTopicRepository: @components/repositories/courseTopicRepository.courseTopicRepository
     PrerequisiteRepository: @components/repositories/prerequisiteRepository.prerequisiteRepository
     TopicRepository: @components/repositories/topicRepository.topicRepository
+    TopicRelationRepository: @components/repositories/topicRelationRepository.topicRelationRepository
+    ResourceTopicRepository: @components/repositories/resourceTopicRepository.resourceTopicRepository
     ProgressRepository: @components/repositories/progressRepository.progressRepository
 }
 
@@ -49,6 +51,10 @@ Entities: Entities {
     Course: @components/entities/course.course
     CourseTopic: @components/entities/courseTopic.courseTopic
     Topic: @components/entities/topic.topic
+    TopicRelation: @components/entities/topicRelation.topicRelation
+    Resource: @components/entities/resource.resource
+    ResourceKind: @components/enums/resourceKind.resourceKind
+    ResourceTopic: @components/entities/resourceTopic.resourceTopic
     Prerequisite: @components/entities/prerequisite.prerequisite
     Progress: @components/entities/progress.progress
     ProgressId: @components/entities/progressId.progressId
@@ -64,6 +70,7 @@ DTOs: DTOs {
     PrerequisiteDTO: @components/dtos/prerequisiteDTO.prerequisiteDTO
     CourseDetailDTO: @components/dtos/courseDetailDTO.courseDetailDTO
     TopicItemDTO: @components/dtos/topicItemDTO.topicItemDTO
+    ResourceDTO: @components/dtos/resourceDTO.resourceDTO
     ProgressDTO: @components/dtos/progressDTO.progressDTO
     CourseProgressCount: @components/dtos/courseProgressCount.courseProgressCount
     CourseProgressDTO: @components/dtos/courseProgressDTO.courseProgressDTO

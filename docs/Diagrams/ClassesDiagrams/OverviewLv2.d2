@@ -40,6 +40,8 @@ Repositories: Repositories {
     CourseTopicRepository: "<<JpaRepository>>\nCourseTopicRepository"
     PrerequisiteRepository: "<<JpaRepository>>\nPrerequisiteRepository"
     TopicRepository: "<<JpaRepository>>\nTopicRepository"
+    TopicRelationRepository: "<<JpaRepository>>\nTopicRelationRepository"
+    ResourceTopicRepository: "<<JpaRepository>>\nResourceTopicRepository"
     ProgressRepository: "<<JpaRepository>>\nProgressRepository"
 }
 
@@ -49,6 +51,10 @@ Entities: Entities {
     Course: "<<@Entity>>\nCourse"
     CourseTopic: "<<@Entity>>\nCourseTopic"
     Topic: "<<@Entity>>\nTopic"
+    TopicRelation: "<<@Entity>>\nTopicRelation"
+    Resource: "<<@Entity>>\nResource"
+    ResourceKind: "<<enumeration>>\nResourceKind"
+    ResourceTopic: "<<@Entity>>\nResourceTopic"
     Prerequisite: "<<@Entity>>\nPrerequisite"
     Progress: "<<@Entity>>\nProgress"
     ProgressId: "<<@Embeddable>>\nProgressId"
@@ -64,6 +70,7 @@ DTOs: DTOs {
     PrerequisiteDTO: "<<record>>\nPrerequisiteDTO"
     CourseDetailDTO: "<<record>>\nCourseDetailDTO"
     TopicItemDTO: "<<record>>\nTopicItemDTO"
+    ResourceDTO: "<<record>>\nResourceDTO"
     ProgressDTO: "<<record>>\nProgressDTO"
     CourseProgressCount: "<<record>>\nCourseProgressCount"
     CourseProgressDTO: "<<record>>\nCourseProgressDTO"

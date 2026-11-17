@@ -10,6 +10,8 @@ CourseCtrl: "<<@RestController>>\nCourseController"
 CourseSvc: "<<@Service>>\nCourseService"
 CourseRepo: "<<JpaRepository>>\nCourseRepository"
 CourseTopicRepo: "<<JpaRepository>>\nCourseTopicRepository"
+TopicRelRepo: "<<JpaRepository>>\nTopicRelationRepository"
+ResTopicRepo: "<<JpaRepository>>\nResourceTopicRepository"
 CourseMapper: "<<@Component>>\nCourseMapper"
 ProgressCtrl: "<<@RestController>>\nProgressController"
 ProgressSvc: "<<@Service>>\nProgressService"
@@ -50,7 +52,15 @@ Redis: Redis Container {
             CourseTopicRepo -> MySQL: "SQL query (join topics)"
             MySQL -> CourseTopicRepo: ผลลัพธ์
             CourseTopicRepo -> CourseSvc: List<CourseTopic>
-            CourseSvc -> CourseMapper: แปลง Course + List<CourseTopic>
+            CourseSvc -> TopicRelRepo: หาหัวข้อที่ต้องรู้ก่อนของ topic ในวิชานี้
+            TopicRelRepo -> MySQL: SQL query (topic_id IN ...)
+            MySQL -> TopicRelRepo: ผลลัพธ์
+            TopicRelRepo -> CourseSvc: List<TopicRelation>
+            CourseSvc -> ResTopicRepo: หาแหล่งเรียนของ topic ในวิชานี้
+            ResTopicRepo -> MySQL: "SQL query (join resources, topic_id IN ...)"
+            MySQL -> ResTopicRepo: ผลลัพธ์
+            ResTopicRepo -> CourseSvc: List<ResourceTopic>
+            CourseSvc -> CourseMapper: แปลง Course + List<CourseTopic> + List<TopicRelation> + List<ResourceTopic>
             CourseMapper -> CourseSvc: CourseDetailDTO
             CourseSvc -> Redis: "เก็บ CourseDetailDTO ลง cache (key = course id, TTL 1 วัน)"
         }
