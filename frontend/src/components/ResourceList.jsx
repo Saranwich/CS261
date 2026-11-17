@@ -4,7 +4,7 @@ import "./ResourceList.css";
 // รายการลิงก์แหล่งเรียน (ใช้ทั้งฝั่งขวาตอนเลือกวิชา และตอนเลือกหัวข้อ)
 //
 //   links = [{ type, title, url, note }]
-//     type = "video" | "web" | "book" | "course" | "search"
+//     type = "url" | "file" (จาก backend) | "video" | "web" | "book" | "course" | "search"
 //   กดแล้วเปิดแท็บใหม่ หน้าเว็บเราไม่หายไปไหน
 // ========================================
 
@@ -14,6 +14,8 @@ const TYPE_LABEL = {
   book: "หนังสือ",
   course: "คอร์ส",
   search: "ค้นหา",
+  url: "ลิงก์",
+  file: "ไฟล์",
 };
 
 function ResourceList({ links }) {
