@@ -2,7 +2,6 @@ import "./Rightpage.css";
 import ResourceList from "./ResourceList";
 import Collapsible from "./Collapsible";
 import ProgressRing from "./ProgressRing";
-import COURSE_RESOURCES from "../data/courseResources";
 import { ArrowRightIcon, BookIcon, CheckIcon, DiamondIcon } from "./Icons";
 
 function Rightpage({
@@ -164,8 +163,16 @@ function Rightpage({
     .map(getCourseById)
     .filter(Boolean);
 
-  // เลือกแหล่งเรียนรู้ให้ตรงกับรหัสวิชาที่เลือก
-  const resources = COURSE_RESOURCES[selectedCourse.code] || [];
+  // แหล่งเรียนของวิชา = รวมแหล่งเรียนจากทุกหัวข้อในวิชา (ตัดลิงก์ซ้ำ)
+  const resources = [];
+  const seenUrls = new Set();
+  for (const topic of courseTopics) {
+    for (const link of topic.resources || []) {
+      if (seenUrls.has(link.url)) continue;
+      seenUrls.add(link.url);
+      resources.push(link);
+    }
+  }
 
   const percent =
     selectedCourse.topics === 0

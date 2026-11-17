@@ -1,0 +1,5 @@
+resourceTopicRepository: {
+  shape: class
+  label: "<<JpaRepository>>\nResourceTopicRepository"
+  "+findByTopicIdIn(topicIds: Collection<UUID>)": List<ResourceTopic>
+}

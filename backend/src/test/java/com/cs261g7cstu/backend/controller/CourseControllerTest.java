@@ -3,6 +3,7 @@ package com.cs261g7cstu.backend.controller;
 import com.cs261g7cstu.backend.dto.CourseDetailDTO;
 import com.cs261g7cstu.backend.dto.CourseItemDTO;
 import com.cs261g7cstu.backend.dto.PrerequisiteDTO;
+import com.cs261g7cstu.backend.dto.ResourceDTO;
 import com.cs261g7cstu.backend.dto.SkillTreeDTO;
 import com.cs261g7cstu.backend.dto.TopicItemDTO;
 import com.cs261g7cstu.backend.service.CourseService;
@@ -14,6 +15,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -66,7 +68,7 @@ class CourseControllerTest {
                 "CS261",
                 "Software Engineering",
                 "SE fundamentals",
-                List.of(new TopicItemDTO(topicId, "Requirements", "User stories", 1))
+                List.of(new TopicItemDTO(topicId, "Requirements", "User stories", 1, List.of(), List.of()))
         );
 
         when(courseService.getCourseDetail(courseId)).thenReturn(detailDTO);
@@ -78,7 +80,53 @@ class CourseControllerTest {
                 .andExpect(jsonPath("$.name").value("Software Engineering"))
                 .andExpect(jsonPath("$.topics.length()").value(1))
                 .andExpect(jsonPath("$.topics[0].id").value(topicId.toString()))
-                .andExpect(jsonPath("$.topics[0].seqNo").value(1));
+                .andExpect(jsonPath("$.topics[0].seqNo").value(1))
+                .andExpect(jsonPath("$.topics[0].prerequisites.length()").value(0))
+                .andExpect(jsonPath("$.topics[0].resources.length()").value(0));
+    }
+
+    @Test
+    void getCourseDetail_whenTopicsHavePrerequisitesAndResources_shouldReturnPopulatedFields() throws Exception {
+        UUID courseId = UUID.randomUUID();
+        UUID topic1Id = UUID.randomUUID();
+        UUID topic2Id = UUID.randomUUID();
+        UUID resourceId = UUID.randomUUID();
+
+        ResourceDTO resourceDTO = new ResourceDTO(
+                resourceId,
+                "url",
+                null,
+                "https://example.com/req",
+                "Requirements Guide",
+                "Chapter 2",
+                LocalDateTime.of(2026, 3, 1, 10, 0)
+        );
+
+        CourseDetailDTO detailDTO = new CourseDetailDTO(
+                courseId,
+                "CS261",
+                "Software Engineering",
+                "SE fundamentals",
+                List.of(
+                        new TopicItemDTO(topic1Id, "Requirements", "User stories", 1, List.of(), List.of(resourceDTO)),
+                        new TopicItemDTO(topic2Id, "Architecture", "Diagrams", 2, List.of(topic1Id), List.of())
+                )
+        );
+
+        when(courseService.getCourseDetail(courseId)).thenReturn(detailDTO);
+
+        mockMvc.perform(get("/courses/{courseId}", courseId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.topics.length()").value(2))
+                .andExpect(jsonPath("$.topics[0].resources.length()").value(1))
+                .andExpect(jsonPath("$.topics[0].resources[0].id").value(resourceId.toString()))
+                .andExpect(jsonPath("$.topics[0].resources[0].type").value("url"))
+                .andExpect(jsonPath("$.topics[0].resources[0].title").value("Requirements Guide"))
+                .andExpect(jsonPath("$.topics[0].resources[0].note").value("Chapter 2"))
+                .andExpect(jsonPath("$.topics[0].resources[0].url").value("https://example.com/req"))
+                .andExpect(jsonPath("$.topics[1].prerequisites.length()").value(1))
+                .andExpect(jsonPath("$.topics[1].prerequisites[0]").value(topic1Id.toString()))
+                .andExpect(jsonPath("$.topics[1].resources.length()").value(0));
     }
 
     @Test
