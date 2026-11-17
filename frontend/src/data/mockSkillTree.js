@@ -1,4 +1,5 @@
 import TOPIC_PREREQUISITES from "./topicPrerequisites";
+import COURSE_RESOURCES from "./courseResources";
 
 // 1) ข้อมูลรายวิชา (แหล่งเดียว)
 const COURSE_INFO = [
@@ -54,6 +55,8 @@ COURSE_INFO.forEach((course) => {
       prerequisites: [],
       nextTopics: [],
       depth: 0,
+      // โหมด mock: ใส่แหล่งเรียนของวิชาไว้ที่หัวข้อแรก (backend จริงผูกแหล่งเรียนกับหัวข้อ)
+      resources: index === 0 ? COURSE_RESOURCES[course.code] || [] : [],
     });
   });
 });

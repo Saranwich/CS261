@@ -3,7 +3,6 @@ import ResourceList from "./ResourceList";
 import Collapsible from "./Collapsible";
 import ProgressRing from "./ProgressRing";
 import { ArrowRightIcon, CheckIcon, CircleIcon, DiamondIcon } from "./Icons";
-import COURSE_RESOURCES from "../data/courseResources";
 import "./TopicDetail.css";
 
 // ลิงก์ค้นหาจากชื่อหัวข้อ (ไม่ต้องเก็บลิงก์ทีละหัวข้อ และไม่มีวันเป็นลิงก์เสีย)
@@ -253,10 +252,10 @@ function TopicDetail({
             ค้นหาเนื้อหาเพื่อทบทวนหัวข้อนี้
           </p>
           <ResourceList links={searchLinksFor(topic)} />
-          {COURSE_RESOURCES[topic.courseCode] && (
+          {topic.resources?.length > 0 && (
             <>
-              <p className="topic-detail__muted">แหล่งเรียนวิชา {topic.courseCode}</p>
-              <ResourceList links={COURSE_RESOURCES[topic.courseCode]} />
+              <p className="topic-detail__muted">แหล่งเรียนของหัวข้อนี้</p>
+              <ResourceList links={topic.resources} />
             </>
           )}
         </Collapsible>
